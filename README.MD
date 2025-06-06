@@ -6,12 +6,3 @@ Aplikasi yang kami buat berfungsi untuk menerapkan cara pola makan yang sehat de
 ### Resource
 
 MaterialFx : https://github.com/palexdev/MaterialFX
-
-
-### Test and Run Project
-
-Tambahkan baris ini ke file ```launch.json``` dibawah baris ```"mainClass"```
-
-```
-"vmArgs": "--module-path C:\User\<user>\...\HealFood\javafx-sdk-11\lib --add-modules javafx.controls,javafx.fxml"
-```
