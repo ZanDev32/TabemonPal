@@ -1,0 +1,23 @@
+@import "fonts/fontstyle.css";
+
+.background{
+    -fx-background-color: #FEF7E7
+}
+
+.sideBar{
+    -fx-background-color: #EED8AF;
+    -fx-background-radius: 0px 50px 50px 0px
+}
+
+.button {
+    -fx-background-color: rgba(255, 255, 255, 0.3);
+    -fx-padding: 0px 50px 0px 70px;
+    -fx-font-family: Poppins;
+    -fx-font-style: normal;
+    -fx-font-size: 30;
+
+}
+
+.icon{
+    -fx-padding: 0px 26px 0px 0px;
+}

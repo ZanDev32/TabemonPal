@@ -13,8 +13,4 @@ public class PrimaryController {
     private void switchToSecondary() throws IOException {
         App.setRoot("secondary");
     }
-
-    public void initialize() {
-        // Hint: initialize() will be called when the associated FXML has been completely loaded.
-    }
 }
