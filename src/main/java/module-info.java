@@ -6,5 +6,6 @@ module com.starlight {
 
     opens com.starlight to javafx.fxml;
     
+    exports com.starlight.controller;
     exports com.starlight;
 }
