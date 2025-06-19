@@ -6,3 +6,7 @@ Aplikasi yang kami buat berfungsi untuk menerapkan cara pola makan yang sehat de
 ### Resource
 
 MaterialFx : https://github.com/palexdev/MaterialFX
+
+### Library
+
+ChatGPT Java API : https://github.com/PlexPt/chatgpt-java
