@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
-<?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
@@ -13,6 +12,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
@@ -38,7 +38,7 @@
         </rowConstraints>
          <children>
             <Label alignment="BASELINE_LEFT" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" stylesheets="@../style.css" text="DASHBOARD" textAlignment="CENTER" GridPane.rowIndex="3" />
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#home" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Home" GridPane.rowIndex="4">
+            <MFXButton fx:id="home" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#home" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Home" GridPane.rowIndex="4">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -49,13 +49,9 @@
                         </ImageView>
                      </children>
                   </HBox>
-               </graphic>
-               <styleClass>
-                  <String fx:value="button" />
-                  <String fx:value="button-active" />
-               </styleClass></MFXButton>
-            <Pane maxWidth="-Infinity" prefHeight="52.0" prefWidth="4.0" styleClass="button-active-bar" stylesheets="@../style.css" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#community" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Community" GridPane.rowIndex="5">
+               </graphic></MFXButton>
+            <Pane fx:id="activeBar" maxWidth="-Infinity" prefHeight="52.0" prefWidth="4.0" styleClass="button-active-bar" stylesheets="@../style.css" GridPane.halignment="RIGHT" GridPane.rowIndex="4" />
+            <MFXButton fx:id="community" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#community" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Community" GridPane.rowIndex="5">
                <graphic>
                   <HBox prefHeight="20.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -71,7 +67,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#wiki" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Healthy Wiki" GridPane.rowIndex="6">
+            <MFXButton fx:id="wiki" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#wiki" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Healthy Wiki" GridPane.rowIndex="6">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -87,7 +83,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#consult" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Consult with AI" GridPane.rowIndex="7">
+            <MFXButton fx:id="consult" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#consult" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Consult with AI" GridPane.rowIndex="7">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -100,7 +96,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#mission" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Mission" GridPane.rowIndex="8">
+            <MFXButton fx:id="mission" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#mission" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Mission" GridPane.rowIndex="8">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -113,7 +109,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#games" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Games" GridPane.rowIndex="9">
+            <MFXButton fx:id="games" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#games" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Games" GridPane.rowIndex="9">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -126,7 +122,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achivement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Achivements" GridPane.rowIndex="10">
+            <MFXButton fx:id="achivement" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achivement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" stylesheets="@../style.css" text="Achivements" GridPane.rowIndex="10">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -143,6 +139,18 @@
       </GridPane>
    </left>
    <center>
-      <AnchorPane fx:id="ap" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+      <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
+         <children>
+            <HBox prefHeight="101.0" prefWidth="990.0">
+               <children>
+                  <AnchorPane prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" layoutX="390.0" layoutY="37.0" text="navbar.java" textAlignment="CENTER" />
+                     </children>
+                  </AnchorPane>
+               </children></HBox>
+            <AnchorPane fx:id="ap" maxHeight="1.7976931348623157E308" prefHeight="364.0" prefWidth="990.0" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
    </center>
 </BorderPane>

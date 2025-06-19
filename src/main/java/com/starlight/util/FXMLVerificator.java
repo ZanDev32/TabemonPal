@@ -49,7 +49,7 @@ public class FXMLVerificator {
             // Save changes only if content was modified
             if (!original.equals(content)) {
                 Files.writeString(fxmlPath, content);
-                System.out.println("Downgraded version in: " + fxmlPath.getFileName());
+                System.out.println("Downgraded JavaFX version in: " + fxmlPath.getFileName());
             }
 
         } catch (IOException e) {

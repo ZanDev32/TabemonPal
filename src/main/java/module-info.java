@@ -4,6 +4,7 @@ module com.starlight {
     requires javafx.fxml;
     requires javafx.web;
     requires java.logging;
+    requires MaterialFX;
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller to javafx.fxml;

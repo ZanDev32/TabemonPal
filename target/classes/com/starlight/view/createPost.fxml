@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" styleClass="create-post" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
+   <children>
+      <Label styleClass="create-post-header" text="Create New Recipes">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </Label>
+      <HBox prefHeight="23.0" prefWidth="420.0">
+         <children>
+            <Label styleClass="create-post-header" text="Recipe Title">
+               <HBox.margin>
+                  <Insets right="212.0" />
+               </HBox.margin>
+            </Label>
+         </children>
+      </HBox>
+      <HBox prefHeight="58.0" prefWidth="420.0">
+         <children>
+            <MFXTextField fx:id="title" maxWidth="-Infinity" prefHeight="59.0" prefWidth="281.0" promptText="e.g., Avocado Guacamole">
+               <padding>
+                  <Insets bottom="18.0" left="20.0" />
+               </padding>
+            </MFXTextField>
+            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="59.0" prefWidth="130.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <MFXButton fx:id="imagepicker" maxWidth="-Infinity" prefHeight="22.0" prefWidth="110.0" styleClass="create-post-desc" text="Choose Image" textOverrun="CLIP">
+                     <VBox.margin>
+                        <Insets left="15.0" top="5.0" />
+                     </VBox.margin>
+                  </MFXButton>
+                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="152.0" styleClass="create-post-desc" text="No image picked">
+                     <padding>
+                        <Insets left="33.0" />
+                     </padding>
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </Label>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
+      <Label styleClass="create-post-header" text="Description">
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </Label>
+      <MFXTextField fx:id="description" prefHeight="60.0" prefWidth="420.0" promptText="Tell us about your recipe" VBox.vgrow="ALWAYS">
+         <padding>
+            <Insets bottom="50.0" left="20.0" />
+         </padding>
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </MFXTextField>
+      <Label styleClass="create-post-header" text="Ingredients">
+         <VBox.margin>
+            <Insets bottom="5.0" top="5.0" />
+         </VBox.margin>
+      </Label>
+      <MFXTextField fx:id="ingredients" prefHeight="128.0" prefWidth="420.0" promptText="List Ingredients (one per line)">
+         <padding>
+            <Insets bottom="100.0" left="20.0" />
+         </padding>
+         <VBox.margin>
+            <Insets bottom="10.0" />
+         </VBox.margin>
+      </MFXTextField>
+      <Label prefWidth="155.0" styleClass="create-post-header" text="Directions" />
+      <MFXTextField fx:id="directions" prefHeight="128.0" prefWidth="420.0" promptText="Explain how to cook">
+         <padding>
+            <Insets bottom="100.0" left="20.0" />
+         </padding>
+         <VBox.margin>
+            <Insets bottom="15.0" />
+         </VBox.margin>
+      </MFXTextField>
+      <HBox prefHeight="100.0" prefWidth="200.0">
+         <children>
+            <MFXButton fx:id="submit" alignment="BASELINE_RIGHT" nodeOrientation="RIGHT_TO_LEFT" styleClass="create-post-header" text="Submit">
+               <HBox.margin>
+                  <Insets right="10.0" />
+               </HBox.margin>
+            </MFXButton>
+            <MFXButton fx:id="cancel" cancelButton="true" text="Cancel">
+               <styleClass>
+                  <String fx:value="create-post-header" />
+                  <String fx:value="c" />
+               </styleClass></MFXButton>
+            <Label fx:id="status" styleClass="create-post-desc">
+               <HBox.margin>
+                  <Insets left="10.0" top="5.0" />
+               </HBox.margin>
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="32.0" left="50.0" right="50.0" top="32.0" />
+   </padding>
+</VBox>
