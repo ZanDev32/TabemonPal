@@ -1,4 +1,9 @@
-com/starlight/App.class
 module-info.class
-com/starlight/PrimaryController.class
-com/starlight/SecondaryController.class
+com/starlight/controller/AchivementController.class
+com/starlight/controller/HomeController.class
+com/starlight/controller/CommunityController.class
+com/starlight/controller/ConsultController.class
+com/starlight/controller/MissionController.class
+com/starlight/controller/MainController.class
+com/starlight/controller/WikiController.class
+com/starlight/App.class
