@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="990.0" styleClass="test" stylesheets="@style.css" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.WikiController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="990.0" styleClass="test" stylesheets="@style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.WikiController">
    <children>
       <MFXProgressSpinner layoutX="436.0" layoutY="302.0" prefHeight="116.0" prefWidth="118.0" />
       <Label layoutX="425.0" layoutY="258.0" text="Healthy Wiki" />

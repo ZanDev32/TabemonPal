@@ -1,4 +1,4 @@
-@import "fonts/fontstyle.css";
+@import url("../fonts/fontstyle.css");
 
 .background {
     -fx-background-color: #FEF7E7;
