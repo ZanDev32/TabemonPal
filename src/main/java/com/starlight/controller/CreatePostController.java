@@ -16,6 +16,7 @@ import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Node;
@@ -40,10 +41,10 @@ public class CreatePostController implements Initializable {
     private MFXTextField description;
 
     @FXML
-    private MFXTextField ingredients;
+    private TextArea ingredients;
 
     @FXML
-    private MFXTextField directions;
+    private TextArea directions;
 
     @FXML
     private MFXButton submit;

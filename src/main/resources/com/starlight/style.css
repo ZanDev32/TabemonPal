@@ -5,13 +5,19 @@
         background-color: #FEF7E7;
 }
 
+.background-window {
+    -fx-background-color: #ffff;
+        background-color:#ffff;
+    -fx-background-radius: 40 40 0 0;
+}
+
 .sideBar{
     -fx-background-color: #EED8AF;
         background-color: #EED8AF;
     -fx-background-radius: 0 50 50 0;
 }
 
-.button {  
+.button-sidebar {  
     -fx-background-color: transparent;
         background-color: transparent;
     -fx-padding: 0px 50px 0px 40px;
@@ -78,9 +84,11 @@
 
 .create-post-header {
     -fx-font-size: 13;
+    font-size: 13;
     
 }
 
 .create-post-desc {
     -fx-font-size: 7;
+    font-size: 7;
 }

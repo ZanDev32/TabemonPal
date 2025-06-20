@@ -13,20 +13,19 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
 public class MainController implements Initializable {
-
+    
     private MFXButton currentActiveButton;
-
+    
     @FXML
     private BorderPane bp;
     
     @FXML
-    private AnchorPane ap;
+    private GridPane gp;
 
     @FXML 
     private Pane activeBar;
@@ -104,7 +103,15 @@ public class MainController implements Initializable {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, "Failed to load FXML page: " + page, ex);
         }
 
-        bp.setCenter(root);
+        if (root != null) {
+            // Optional: remove any existing node in the target cell
+            gp.getChildren().removeIf(node ->
+                GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
+                GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
+            );
+            // Add the new node to the specified cell
+            gp.add(root, 0, 1);
+        }
     }
 
     private void selected(MFXButton button) {

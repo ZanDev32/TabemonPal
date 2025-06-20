@@ -5,11 +5,12 @@
 <?import java.lang.String?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" styleClass="create-post" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" styleClass="create-post" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
    <children>
       <Label styleClass="create-post-header" text="Create New Recipes">
          <VBox.margin>
@@ -34,12 +35,12 @@
             </MFXTextField>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="59.0" prefWidth="130.0" HBox.hgrow="ALWAYS">
                <children>
-                  <MFXButton fx:id="imagepicker" maxWidth="-Infinity" prefHeight="22.0" prefWidth="110.0" styleClass="create-post-desc" text="Choose Image" textOverrun="CLIP">
+                  <MFXButton fx:id="imagepicker" maxWidth="-Infinity" prefHeight="22.0" prefWidth="110.0" style="-fx-font-size: 10;" text="Choose Image" textOverrun="CLIP">
                      <VBox.margin>
                         <Insets left="15.0" top="5.0" />
                      </VBox.margin>
                   </MFXButton>
-                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="152.0" styleClass="create-post-desc" text="No image picked">
+                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="152.0" text="No image picked">
                      <padding>
                         <Insets left="33.0" />
                      </padding>
@@ -69,26 +70,12 @@
             <Insets bottom="5.0" top="5.0" />
          </VBox.margin>
       </Label>
-      <MFXTextField fx:id="ingredients" prefHeight="128.0" prefWidth="420.0" promptText="List Ingredients (one per line)">
-         <padding>
-            <Insets bottom="100.0" left="20.0" />
-         </padding>
-         <VBox.margin>
-            <Insets bottom="10.0" />
-         </VBox.margin>
-      </MFXTextField>
+      <TextArea fx:id="ingredients" prefHeight="200.0" prefWidth="200.0" promptText="Tell us about your recipe" />
       <Label prefWidth="155.0" styleClass="create-post-header" text="Directions" />
-      <MFXTextField fx:id="directions" prefHeight="128.0" prefWidth="420.0" promptText="Explain how to cook">
-         <padding>
-            <Insets bottom="100.0" left="20.0" />
-         </padding>
-         <VBox.margin>
-            <Insets bottom="15.0" />
-         </VBox.margin>
-      </MFXTextField>
+      <TextArea fx:id="directions" prefHeight="200.0" prefWidth="200.0" promptText="Explain step by step" />
       <HBox prefHeight="100.0" prefWidth="200.0">
          <children>
-            <MFXButton fx:id="submit" alignment="BASELINE_RIGHT" nodeOrientation="RIGHT_TO_LEFT" styleClass="create-post-header" text="Submit">
+            <MFXButton fx:id="submit" alignment="BASELINE_RIGHT" nodeOrientation="RIGHT_TO_LEFT" prefHeight="26.0" prefWidth="65.0" styleClass="create-post-header" text="Submit">
                <HBox.margin>
                   <Insets right="10.0" />
                </HBox.margin>
