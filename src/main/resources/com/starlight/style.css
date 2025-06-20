@@ -5,13 +5,19 @@
         background-color: #FEF7E7;
 }
 
+.background-window {
+    -fx-background-color: #ffff;
+        background-color:#ffff;
+    -fx-background-radius: 40 40 0 0;
+}
+
 .sideBar{
     -fx-background-color: #EED8AF;
         background-color: #EED8AF;
     -fx-background-radius: 0 50 50 0;
 }
 
-.button {  
+.button-sidebar {  
     -fx-background-color: transparent;
         background-color: transparent;
     -fx-padding: 0px 50px 0px 40px;
@@ -25,12 +31,21 @@
     -fx-text-fill: #3F3F5B;
 }
 
-.button-active {
-    -fx-background-color: rgba(255, 255, 255, 0.3);
-        background-color: rgba(255, 255, 255, 0.3);
+.button-active {  
+    -fx-background-color: rgba(255, 255, 255, 0.3);;
+        background-color: rgba(255, 255, 255, 0.3);;
+    -fx-padding: 0px 50px 0px 40px;
+        padding: 0px 50px 0px 40px;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #000000;
 }
 
-.label {
+.menu {
     -fx-padding: 0px 50px 0px 40px;
         padding: 0px 50px 0px 40px;
     -fx-font-family: Poppins;
@@ -50,4 +65,30 @@
 .icon{
     -fx-padding: 0px 26px 0px 0px;
         padding: 0px 26px 0px 0px;
+}
+
+.label2 {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 15;
+        font-size: 15;
+    -fx-text-fill: #5b543f;
+}
+
+.create-post {
+    -fx-background-color: #FEF7E7;
+    background-color: #FEF7E7;
+}
+
+.create-post-header {
+    -fx-font-size: 13;
+    font-size: 13;
+    
+}
+
+.create-post-desc {
+    -fx-font-size: 7;
+    font-size: 7;
 }
