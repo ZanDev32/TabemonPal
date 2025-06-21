@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <?xml version="1.0" encoding="UTF-8"?><posts><post><title>Tasty Pancakes</title><description>Fluffy pancakes with syrup.</description><ingredients>- 1 cup flour
 - 2 eggs
 - 1/2 cup milk</ingredients><directions>Mix ingredients.
@@ -6,3 +7,34 @@ Cook on skillet.</directions><image>src/main/resources/com/starlight/images/rece
 - cucumber</ingredients><directions>Combine all veggies.
 Serve chilled.</directions><image>src/main/resources/com/starlight/images/image_2.jpg</image><rating>4.8</rating><uploadtime>2023-11-23 11:00</uploadtime><likecount>8</likecount></post><post><title>asd</title><description>asdas</description><ingredients>asdasd</ingredients><directions>asdasd</directions><image>/home/zan/Documents/main_folder/pfp/52073144.jpg</image><rating>0</rating><uploadtime>2025-06-22 04:03</uploadtime><likecount>0</likecount></post><post><title>doro goreng</title><description>yummy</description><ingredients>doro
 garam secukupnya</ingredients><directions>goreng</directions><image>/home/zan/Downloads/jfajrk7ncpvb1.png</image><rating>0</rating><uploadtime>2025-06-22 04:05</uploadtime><likecount>0</likecount></post></posts>
+=======
+<?xml version="1.0" encoding="UTF-8"?>
+<posts>
+    <post>
+        <title>Tasty Pancakes</title>
+        <description>Fluffy pancakes with syrup.</description>
+        <ingredients>- 1 cup flour
+- 2 eggs
+- 1/2 cup milk</ingredients>
+        <directions>Mix ingredients.
+Cook on skillet.</directions>
+        <image>src/main/resources/com/starlight/images/recent_1.png</image>
+        <rating>4.5</rating>
+        <uploadtime>2023-11-22 10:00</uploadtime>
+        <likecount>12</likecount>
+    </post>
+    <post>
+        <title>Veggie Salad</title>
+        <description>Fresh vegetable salad.</description>
+        <ingredients>- lettuce
+- tomato
+- cucumber</ingredients>
+        <directions>Combine all veggies.
+Serve chilled.</directions>
+        <image>src/main/resources/com/starlight/images/image_2.jpg</image>
+        <rating>4.8</rating>
+        <uploadtime>2023-11-23 11:00</uploadtime>
+        <likecount>8</likecount>
+    </post>
+</posts>
+>>>>>>> 3ee541a8ae7a551b996c4a4f2293a238e939e4cd
