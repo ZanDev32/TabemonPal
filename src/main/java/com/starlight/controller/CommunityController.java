@@ -11,8 +11,10 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -20,13 +22,61 @@ import javafx.util.Duration;
 
 public class CommunityController implements Initializable {
     @FXML
-    private ImageView like1;
+    private Label dailytitle1;
+
     @FXML
-    private ImageView like2;
+    private Label starrating;
+
+    @FXML
+    private Label dailylikecounter;
+
+    @FXML
+    private Label dailytitle2;
+
+    @FXML
+    private Label starrating2;
+
+    @FXML
+    private Label dailylikecounter2;
+
+    @FXML
+    private Label dailytitle3;
+
+    @FXML
+    private Label starrating3;
+
+    @FXML
+    private Label dailylikecounter3;
+
+    @FXML
+    private Label dailytitle4;
+
+    @FXML
+    private Label starrating4;
+
+    @FXML
+    private Label dailylikecounter4;
+
+    @FXML
+    private VBox post1;
+
+    @FXML
+    private Label username;
+
+    @FXML
+    private Label uploadtime;
+
+    @FXML
+    private Label description;
+
+    @FXML
+    private ImageView likebutton1;
+
+    @FXML
+    private Label likecounter;
+
     @FXML
     private ImageView profile1;
-    @FXML
-    private ImageView profile2;
     @FXML
     private ImageView dailyphoto1;
     @FXML
@@ -37,8 +87,6 @@ public class CommunityController implements Initializable {
     private ImageView dailyphoto4;
     @FXML
     private ImageView recentphoto1;
-    @FXML
-    private ImageView recentphoto2;
     @FXML
     private MFXButton CreatePost;
 
@@ -69,10 +117,8 @@ public class CommunityController implements Initializable {
         cropToFit(dailyphoto4, 178, 110, 20);
 
         recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/recent_1.png").toExternalForm()));
-        recentphoto2.setImage(new Image(getClass().getResource("/com/starlight/images/recent_1.png").toExternalForm()));
 
         cropToFit(recentphoto1, 766, 150, 20);
-        cropToFit(recentphoto2, 766, 150, 20);
 
         CreatePost.setOnAction(event -> showCreatePostPopup());
     }

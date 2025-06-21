@@ -67,6 +67,19 @@
         padding: 0px 26px 0px 0px;
 }
 
+.button-community {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 15;
+        font-size: 15;
+    -fx-text-fill: #5b543f;
+    -fx-background-color:#EED8AF;
+        background-color:#EED8AF;
+    -fx-background-radius: 10 10 10 10;
+}
+
 .label2 {
     -fx-font-family: Poppins;
         font-family: Poppins;
