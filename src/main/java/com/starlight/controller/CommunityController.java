@@ -1,8 +1,14 @@
 package com.starlight.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.animation.ScaleTransition;
@@ -76,6 +82,9 @@ public class CommunityController implements Initializable {
     private Label likecounter;
 
     @FXML
+    private VBox postlist;
+
+    @FXML
     private ImageView profile1;
     @FXML
     private ImageView dailyphoto1;
@@ -90,6 +99,8 @@ public class CommunityController implements Initializable {
     @FXML
     private MFXButton CreatePost;
 
+    private final String XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
+
     private void cropToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
         if (imageView.getImage() == null) return;
         Image image = imageView.getImage();
@@ -102,6 +113,137 @@ public class CommunityController implements Initializable {
         clip.setArcWidth(arcRadius);
         clip.setArcHeight(arcRadius);
         imageView.setClip(clip);
+    }
+
+    private static class Post {
+        String title;
+        String description;
+        String image;
+        String uploadtime;
+        String likecount;
+    }
+
+    private void loadPosts() {
+        postlist.getChildren().clear();
+        postlist.getChildren().add(post1);
+
+        List<Post> posts = parsePosts();
+        if (posts.isEmpty()) {
+            username.setText("");
+            uploadtime.setText("");
+            description.setText("");
+            recentphoto1.setImage(null);
+            likecounter.setText("");
+            return;
+        }
+
+        for (int i = 0; i < posts.size(); i++) {
+            Post p = posts.get(i);
+            String title = p.title;
+            String desc = p.description;
+            String image = p.image;
+            String time = p.uploadtime;
+            String likes = p.likecount;
+
+            if (i == 0) {
+                username.setText(title);
+                description.setText(desc);
+                uploadtime.setText(time);
+                likecounter.setText(likes);
+                File f = new File(image);
+                if (f.exists()) {
+                    recentphoto1.setImage(new Image(f.toURI().toString()));
+                } else {
+                    recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                }
+            } else {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
+                    VBox node = loader.load();
+                    Label u = (Label) node.lookup("#username");
+                    Label ut = (Label) node.lookup("#uploadtime");
+                    Label d = (Label) node.lookup("#description");
+                    ImageView img = (ImageView) node.lookup("#image");
+                    Label lc = (Label) node.lookup("#likecounter");
+                    u.setText(title);
+                    ut.setText(time);
+                    d.setText(desc);
+                    lc.setText(likes);
+                    File fi = new File(image);
+                    if (fi.exists()) {
+                        img.setImage(new Image(fi.toURI().toString()));
+                    } else {
+                        img.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                    postlist.getChildren().add(node);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    private List<Post> parsePosts() {
+        List<Post> list = new ArrayList<>();
+        File xmlFile = new File(XML_PATH);
+        if (!xmlFile.exists()) return list;
+        try {
+            XMLInputFactory factory = XMLInputFactory.newInstance();
+            XMLStreamReader reader = factory.createXMLStreamReader(new java.io.FileInputStream(xmlFile));
+            Post current = null;
+            String currentTag = null;
+            StringBuilder buffer = new StringBuilder();
+            while (reader.hasNext()) {
+                int event = reader.next();
+                switch (event) {
+                    case XMLStreamConstants.START_ELEMENT:
+                        currentTag = reader.getLocalName();
+                        if ("post".equals(currentTag)) {
+                            current = new Post();
+                        } else {
+                            buffer.setLength(0);
+                        }
+                        break;
+                    case XMLStreamConstants.CHARACTERS:
+                        if (currentTag != null) {
+                            buffer.append(reader.getText());
+                        }
+                        break;
+                    case XMLStreamConstants.END_ELEMENT:
+                        String end = reader.getLocalName();
+                        if (current != null) {
+                            String text = buffer.toString().trim();
+                            switch (end) {
+                                case "title":
+                                    current.title = text;
+                                    break;
+                                case "description":
+                                    current.description = text;
+                                    break;
+                                case "image":
+                                    current.image = text;
+                                    break;
+                                case "uploadtime":
+                                    current.uploadtime = text;
+                                    break;
+                                case "likecount":
+                                    current.likecount = text;
+                                    break;
+                                case "post":
+                                    list.add(current);
+                                    current = null;
+                                    break;
+                            }
+                        }
+                        currentTag = null;
+                        break;
+                }
+            }
+            reader.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 
     @Override
@@ -120,6 +262,8 @@ public class CommunityController implements Initializable {
 
         cropToFit(recentphoto1, 766, 150, 20);
 
+        loadPosts();
+
         CreatePost.setOnAction(event -> showCreatePostPopup());
     }
 
@@ -127,6 +271,8 @@ public class CommunityController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));
             Parent popupRoot = loader.load();
+
+            CreatePostController controller = loader.getController();
 
             // Scale in animation
             popupRoot.setScaleX(0.7);
@@ -150,6 +296,9 @@ public class CommunityController implements Initializable {
             });
 
             popupStage.showAndWait();
+            if (controller.isSuccess()) {
+                loadPosts();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
