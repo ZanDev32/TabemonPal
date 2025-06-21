@@ -214,58 +214,70 @@
                               <Insets left="50.0" />
                            </VBox.margin>
                         </HBox>
-                        <VBox fx:id="post1" prefHeight="118.0" prefWidth="822.0">
+                        <VBox fx:id="postlist" prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <HBox prefHeight="52.0" prefWidth="820.0">
+                              <VBox fx:id="post1" prefHeight="118.0" prefWidth="822.0">
                                  <children>
-                                    <ImageView fx:id="profile1" fitHeight="60.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                       <image>
-                                          <Image url="@../images/missing.png" />
-                                       </image>
-                                    </ImageView>
-                                    <VBox prefHeight="74.0" prefWidth="190.0">
+                                    <HBox prefHeight="52.0" prefWidth="820.0">
                                        <children>
-                                          <Label fx:id="username" styleClass="label2" text="user">
-                                             <VBox.margin>
-                                                <Insets left="20.0" />
-                                             </VBox.margin></Label>
-                                          <Label fx:id="uploadtime" styleClass="label2" text="Label">
-                                             <VBox.margin>
-                                                <Insets left="20.0" />
-                                             </VBox.margin></Label>
+                                          <ImageView fx:id="profile1" fitHeight="60.0" fitWidth="73.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <image>
+                                                <Image url="@../images/missing.png" />
+                                             </image>
+                                          </ImageView>
+                                          <VBox prefHeight="74.0" prefWidth="190.0">
+                                             <children>
+                                                <Label fx:id="username" styleClass="label2" text="user">
+                                                   <VBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                                <Label fx:id="uploadtime" styleClass="label2" text="Label">
+                                                   <VBox.margin>
+                                                      <Insets left="20.0" />
+                                                   </VBox.margin>
+                                                </Label>
+                                             </children>
+                                          </VBox>
                                        </children>
-                                    </VBox>
-                                 </children>
-                              </HBox>
-                              <Label fx:id="description" styleClass="label2" />
-                              <ImageView fx:id="recentphoto1" fitHeight="150.0" fitWidth="766.0" pickOnBounds="true" preserveRatio="true">
-                                 <VBox.margin>
-                                    <Insets />
-                                 </VBox.margin>
-                                 <viewport>
-                                    <Rectangle2D height="150.0" width="766.0" />
-                                 </viewport></ImageView>
-                              <HBox prefHeight="100.0" prefWidth="200.0">
-                                 <children>
-                                    <ImageView fx:id="likebutton1" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                                       <HBox.margin>
+                                    </HBox>
+                                    <Label fx:id="description" styleClass="label2" />
+                                    <ImageView fx:id="recentphoto1" fitHeight="150.0" fitWidth="766.0" pickOnBounds="true" preserveRatio="true">
+                                       <VBox.margin>
                                           <Insets />
-                                       </HBox.margin>
-                                       <image>
-                                          <Image url="@../images/missing.png" />
-                                       </image></ImageView>
-                                    <Label fx:id="likecounter" styleClass="label2" text="interaction">
-                                       <HBox.margin>
-                                          <Insets left="20.0" />
-                                       </HBox.margin></Label>
+                                       </VBox.margin>
+                                       <viewport>
+                                          <Rectangle2D height="150.0" width="766.0" />
+                                       </viewport>
+                                    </ImageView>
+                                    <HBox prefHeight="100.0" prefWidth="200.0">
+                                       <children>
+                                          <ImageView fx:id="likebutton1" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+                                             <HBox.margin>
+                                                <Insets />
+                                             </HBox.margin>
+                                             <image>
+                                                <Image url="@../images/missing.png" />
+                                             </image>
+                                          </ImageView>
+                                          <Label fx:id="likecounter" styleClass="label2" text="interaction">
+                                             <HBox.margin>
+                                                <Insets left="20.0" />
+                                             </HBox.margin>
+                                          </Label>
+                                       </children>
+                                    </HBox>
                                  </children>
-                              </HBox>
+                                 <VBox.margin>
+                                    <Insets bottom="25.0" />
+                                 </VBox.margin>
+                              </VBox>
                            </children>
                            <VBox.margin>
-                              <Insets bottom="25.0" left="50.0" />
+                              <Insets left="50.0" />
                            </VBox.margin>
                         </VBox>
                         <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
