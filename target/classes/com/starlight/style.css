@@ -92,3 +92,12 @@
     -fx-font-size: 7;
     font-size: 7;
 }
+
+/* debugging only
+
+.VBox {
+    -fx-border-color: red;
+    -fx-border-width: 1;
+}
+
+*/

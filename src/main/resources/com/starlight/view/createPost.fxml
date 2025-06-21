@@ -28,9 +28,9 @@
       </HBox>
       <HBox prefHeight="58.0" prefWidth="420.0">
          <children>
-            <MFXTextField fx:id="title" maxWidth="-Infinity" prefHeight="59.0" prefWidth="281.0" promptText="e.g., Avocado Guacamole">
+            <MFXTextField fx:id="title" floatMode="BORDER" maxWidth="-Infinity" prefHeight="59.0" prefWidth="281.0" promptText="e.g., Avocado Guacamole">
                <padding>
-                  <Insets bottom="18.0" left="20.0" />
+                  <Insets bottom="18.0" left="10.0" />
                </padding>
             </MFXTextField>
             <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="59.0" prefWidth="130.0" HBox.hgrow="ALWAYS">
@@ -40,13 +40,13 @@
                         <Insets left="15.0" top="5.0" />
                      </VBox.margin>
                   </MFXButton>
-                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="152.0" text="No image picked">
-                     <padding>
-                        <Insets left="33.0" />
-                     </padding>
+                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="80.0" text="No image picked">
                      <font>
                         <Font size="10.0" />
                      </font>
+                     <VBox.margin>
+                        <Insets left="30.0" />
+                     </VBox.margin>
                   </Label>
                </children>
             </VBox>
@@ -57,9 +57,9 @@
             <Insets bottom="5.0" top="5.0" />
          </VBox.margin>
       </Label>
-      <MFXTextField fx:id="description" prefHeight="60.0" prefWidth="420.0" promptText="Tell us about your recipe" VBox.vgrow="ALWAYS">
+      <MFXTextField fx:id="description" floatMode="BORDER" prefHeight="60.0" prefWidth="420.0" promptText="Tell us about your recipe" VBox.vgrow="ALWAYS">
          <padding>
-            <Insets bottom="50.0" left="20.0" />
+            <Insets bottom="50.0" left="8.0" />
          </padding>
          <VBox.margin>
             <Insets bottom="5.0" />
@@ -94,6 +94,9 @@
                </font>
             </Label>
          </children>
+         <VBox.margin>
+            <Insets top="5.0" />
+         </VBox.margin>
       </HBox>
    </children>
    <padding>

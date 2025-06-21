@@ -161,6 +161,7 @@ public class CreatePostController implements Initializable {
 
             root.appendChild(post);
 
+            removeWhitespaceNodes(root);
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
@@ -172,6 +173,20 @@ public class CreatePostController implements Initializable {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    private void removeWhitespaceNodes(Element element) {
+        org.w3c.dom.NodeList children = element.getChildNodes();
+        for (int i = children.getLength() - 1; i >= 0; i--) {
+            org.w3c.dom.Node child = children.item(i);
+            if (child.getNodeType() == org.w3c.dom.Node.TEXT_NODE) {
+                if (child.getTextContent().trim().isEmpty()) {
+                    element.removeChild(child);
+                }
+            } else if (child.getNodeType() == org.w3c.dom.Node.ELEMENT_NODE) {
+                removeWhitespaceNodes((Element) child);
+            }
         }
     }
 }

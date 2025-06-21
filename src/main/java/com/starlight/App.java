@@ -21,7 +21,7 @@ public class App extends Application {
         scene = new Scene(loadFXML("main"), 1280, 720);
         stage.setScene(scene);
         stage.setTitle("TabemonPal by Starlight Inc.");
-        stage.setResizable(false);
+        stage.setResizable(true);
         stage.show();
     }
 

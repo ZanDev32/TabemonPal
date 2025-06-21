@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <posts>
-        
     <post>
-                
-        <title>mie ayam</title>
-                
-        <description>enak</description>
-                
-        <ingredients>mie, pangsit</ingredients>
-                
-        <directions>masak</directions>
-                
-        <image>/home/zan/Downloads/missing.png</image>
-            
-    </post>
-    
-    <post>
-        <title>asd</title>
-        <description>asd</description>
-        <ingredients>ada</ingredients>
-        <directions>asd</directions>
+        <title>bakso</title>
+        <description>asdads</description>
+        <ingredients>asdasd
+asdads
+asdasd
+asdasd
+asdasd
+asdads
+asdasd
+adsasd
+asd
+</ingredients>
+        <directions>asdasd
+asdas
+dadasda</directions>
         <image>/home/zan/Documents/collage/TabemonPal/src/main/resources/com/starlight/images/missing.png</image>
+    </post>
+    <post>
+        <title>ASDAS</title>
+        <description>3232</description>
+        <ingredients>1231
+123123</ingredients>
+        <directions>123123
+12312</directions>
+        <image>/home/zan/Documents/collage/TabemonPal/src/main/resources/com/starlight/icon/Wiki_1.png</image>
     </post>
 </posts>
