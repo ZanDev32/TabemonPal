@@ -1,3 +1,4 @@
+com/starlight/models/PostDataRepository.class
 com/starlight/controller/AchivementController.class
 com/starlight/controller/CommunityController.class
 com/starlight/util/FXMLVerificator.class
@@ -5,6 +6,7 @@ com/starlight/App.class
 module-info.class
 com/starlight/controller/HomeController.class
 com/starlight/controller/ConsultController.class
+com/starlight/models/Post.class
 com/starlight/controller/MissionController.class
 com/starlight/controller/MainController.class
 com/starlight/controller/WikiController.class

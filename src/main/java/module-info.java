@@ -5,9 +5,11 @@ module com.starlight {
     requires javafx.web;
     requires java.logging;
     requires MaterialFX;
+    requires xstream;
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller to javafx.fxml;
+    opens com.starlight.models to xstream;
     
     exports com.starlight;
     exports com.starlight.controller;
