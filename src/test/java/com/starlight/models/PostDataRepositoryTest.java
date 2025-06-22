@@ -1,3 +1,5 @@
+package com.starlight.models;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
@@ -9,9 +11,6 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
 
 public class PostDataRepositoryTest {
     private Path tempFile;
