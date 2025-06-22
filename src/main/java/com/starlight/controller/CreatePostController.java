@@ -22,8 +22,6 @@ import javafx.scene.Node;
 
 
 public class CreatePostController implements Initializable {
-    @FXML
-    private Label status;
 
     @FXML
     private MFXTextField title;
@@ -87,7 +85,7 @@ public class CreatePostController implements Initializable {
             String postDirections = directions.getText();
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty() || selectedImage == null) {
-                status.setText("Please complete all fields and select an image.");
+                System.err.println("Please complete all fields and select an image.");
                 return;
             }
 
@@ -99,11 +97,11 @@ public class CreatePostController implements Initializable {
                 ingredients.clear();
                 directions.clear();
                 selectedImage = null;
-                status.setText("Post submitted and saved!");
+                System.out.println("Post submitted and saved!");
                 Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
                 stage.close();
             } else {
-                status.setText("Error saving post.");
+                System.err.println("Error saving post.");
             }
         });
 
@@ -113,7 +111,7 @@ public class CreatePostController implements Initializable {
             ingredients.clear();
             directions.clear();
             selectedImage = null;
-            status.setText("Post creation canceled.");
+            System.err.println("Post creation canceled.");
 
             Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             stage.close();

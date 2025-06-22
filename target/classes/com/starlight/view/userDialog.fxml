@@ -10,7 +10,6 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -67,20 +66,16 @@
                      </VBox.margin>
                   </MFXTextField>
                   <Label text="BirthDay" />
-                  <MFXDatePicker fx:id="birthday" maxWidth="1.7976931348623157E308" />
-                  <HBox prefHeight="34.0" prefWidth="277.0">
-                     <children>
-                        <MFXButton fx:id="savebutton" styleClass="button-community" text="Save" />
-                        <MFXButton fx:id="cancelbutton" cancelButton="true" styleClass="button-community" text="Cancel">
-                           <HBox.margin>
-                              <Insets left="5.0" />
-                           </HBox.margin>
-                        </MFXButton>
-                     </children>
+                  <MFXDatePicker fx:id="birthday" maxWidth="1.7976931348623157E308">
                      <VBox.margin>
-                        <Insets top="20.0" />
+                        <Insets bottom="20.0" />
+                     </VBox.margin></MFXDatePicker>
+                  <MFXButton fx:id="savebutton" maxWidth="1.7976931348623157E308" styleClass="button-community" text="Save">
+                     <VBox.margin>
+                        <Insets bottom="10.0" />
                      </VBox.margin>
-                  </HBox>
+                  </MFXButton>
+                  <MFXButton fx:id="cancelbutton" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" style="-fx-border-color: #EED8AF; -fx-background-radius: 25; -fx-border-radius: 25;" text="Cancel" />
                </children>
                <GridPane.margin>
                   <Insets top="20.0" />
