@@ -50,7 +50,7 @@
                   <Insets left="120.0" top="120.0" />
                </GridPane.margin>
             </MFXButton>
-            <Label fx:id="username" text="Hello,  {username}" GridPane.rowIndex="2" />
+            <Label fx:id="username" text="Hello, {username}" GridPane.rowIndex="2" />
             <VBox maxWidth="-Infinity" prefHeight="233.0" prefWidth="277.0" GridPane.rowIndex="3">
                <children>
                   <Label text="New Email" />

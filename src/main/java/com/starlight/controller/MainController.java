@@ -48,7 +48,7 @@ public class MainController implements Initializable {
     @FXML 
     private MFXButton games;
     @FXML 
-    private MFXButton achivement;
+    private MFXButton achievement;
     
     @FXML
     void home(MouseEvent event) {
@@ -57,9 +57,9 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    void achivement(MouseEvent event) {
-        loadPage("achivement");
-        selected(achivement);
+    void achievement(MouseEvent event) {
+        loadPage("achievement");
+        selected(achievement);
     }
 
     @FXML

@@ -121,13 +121,13 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton fx:id="achivement" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achivement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Achivements" GridPane.rowIndex="10">
+            <MFXButton fx:id="achievement" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achievement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Achievements" GridPane.rowIndex="10">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
                         <ImageView fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../icon/Achivements_1.png" />
+                              <Image url="@../icon/Achievements_1.png" />
                            </image>
                         </ImageView>
                      </children>

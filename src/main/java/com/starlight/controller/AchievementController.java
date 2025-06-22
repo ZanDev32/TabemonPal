@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.Initializable;
 
-public class AchivementController implements Initializable{
+public class AchievementController implements Initializable{
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
