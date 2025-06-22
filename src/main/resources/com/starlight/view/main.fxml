@@ -144,7 +144,7 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
-          <RowConstraints maxHeight="635.0" minHeight="10.0" prefHeight="625.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="625.0" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
             <AnchorPane prefHeight="200.0" prefWidth="200.0" style="-fx-border-color: red;" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
