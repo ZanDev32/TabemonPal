@@ -177,20 +177,7 @@ public class CommunityController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        dailyphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/image_1.jpg").toExternalForm()));
-        dailyphoto2.setImage(new Image(getClass().getResource("/com/starlight/images/image_2.jpg").toExternalForm()));
-        dailyphoto3.setImage(new Image(getClass().getResource("/com/starlight/images/image_3.jpg").toExternalForm()));
-        dailyphoto4.setImage(new Image(getClass().getResource("/com/starlight/images/image_4.png").toExternalForm()));
-
-        cropToFit(dailyphoto1, 178, 110, 20);
-        cropToFit(dailyphoto2, 178, 110, 20);
-        cropToFit(dailyphoto3, 178, 110, 20);
-        cropToFit(dailyphoto4, 178, 110, 20);
-
-        recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/recent_1.png").toExternalForm()));
-
-        cropToFit(recentphoto1, 766, 150, 20);
-
+        
         loadPosts();
 
         CreatePost.setOnAction(event -> showCreatePostPopup());

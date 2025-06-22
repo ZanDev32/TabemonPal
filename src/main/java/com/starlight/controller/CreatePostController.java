@@ -120,8 +120,7 @@ public class CreatePostController implements Initializable {
         });
     }
 
-    private boolean savePostToXML(String title, String description, String ingredients,
-                                  String directions, String imagePath) {
+    private boolean savePostToXML(String title, String description, String ingredients, String directions, String imagePath) {
         try {
             List<Post> posts = repository.loadPosts();
             Post post = new Post();
