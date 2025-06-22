@@ -6,6 +6,7 @@ module com.starlight {
     requires java.logging;
     requires MaterialFX;
     requires xstream;
+    requires jdk.httpserver;
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller to javafx.fxml;
@@ -14,4 +15,5 @@ module com.starlight {
     exports com.starlight;
     exports com.starlight.controller;
     exports com.starlight.util;
+    exports com.starlight.api;
 }
