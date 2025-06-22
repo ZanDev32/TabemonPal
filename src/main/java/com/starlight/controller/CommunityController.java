@@ -178,6 +178,7 @@ public class CommunityController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         
+        repository.ensureDummyData();
         loadPosts();
 
         CreatePost.setOnAction(event -> showCreatePostPopup());

@@ -10,7 +10,7 @@ module com.starlight {
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller to javafx.fxml;
-    opens com.starlight.models to xstream;
+    opens com.starlight.models;
     
     exports com.starlight;
     exports com.starlight.controller;

@@ -10,6 +10,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class PostDataRepository {
     private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
+    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
 
     private final String xmlPath;
     private final XStream xstream;
@@ -26,11 +27,31 @@ public class PostDataRepository {
         xstream.alias("post", Post.class);
     }
 
-    @SuppressWarnings("unchecked")
-
     public List<Post> loadPosts() {
-        File xmlFile = new File(xmlPath);
-        if (!xmlFile.exists()) return new ArrayList<>();
+        return loadPosts(false, true);
+    }
+
+    /**
+     * @param useDummy If true, loads from dummy file. If false, loads from main file.
+     * @return The list of posts.
+     */
+    public List<Post> loadPosts(boolean useDummy) {
+        return loadPosts(useDummy, false);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Post> loadPosts(boolean useDummy, boolean fallbackToDummyIfMissing) {
+        File xmlFile = new File(useDummy ? DUMMY_XML_PATH : xmlPath);
+        if (!xmlFile.exists() || xmlFile.length() == 0) {
+            if (!useDummy && fallbackToDummyIfMissing) {
+                xmlFile = new File(DUMMY_XML_PATH);
+                if (!xmlFile.exists()) {
+                    return new ArrayList<>();
+                }
+            } else {
+                return new ArrayList<>();
+            }
+        }
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
@@ -42,9 +63,24 @@ public class PostDataRepository {
         return new ArrayList<>();
     }
 
+    public void ensureDummyData() {
+        File xmlFile = new File(xmlPath);
+        if (!xmlFile.exists() || xmlFile.length() == 0) {
+            File dummy = new File(DUMMY_XML_PATH);
+            if (dummy.exists()) {
+                try (FileInputStream fis = new FileInputStream(dummy);
+                     FileOutputStream fos = new FileOutputStream(xmlFile)) {
+                    fos.write(fis.readAllBytes());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public void savePosts(List<Post> posts) {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
-            xstream.toXML(posts, fos);;
+            xstream.toXML(posts, fos);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save posts", e);
         }
