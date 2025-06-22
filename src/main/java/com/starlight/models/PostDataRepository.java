@@ -9,11 +9,17 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class PostDataRepository {
-    private static final String XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
+    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
 
-        private final XStream xstream;
+    private final String xmlPath;
+    private final XStream xstream;
 
     public PostDataRepository() {
+        this(DEFAULT_XML_PATH);
+    }
+
+    public PostDataRepository(String xmlPath) {
+        this.xmlPath = xmlPath;
         xstream = new XStream(new DomDriver());
         xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
         xstream.alias("posts", List.class);
@@ -23,7 +29,7 @@ public class PostDataRepository {
     @SuppressWarnings("unchecked")
 
     public List<Post> loadPosts() {
-        File xmlFile = new File(XML_PATH);
+        File xmlFile = new File(xmlPath);
         if (!xmlFile.exists()) return new ArrayList<>();
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
@@ -37,7 +43,7 @@ public class PostDataRepository {
     }
 
     public void savePosts(List<Post> posts) {
-        try (FileOutputStream fos = new FileOutputStream(XML_PATH)) {
+        try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             xstream.toXML(posts, fos);;
         } catch (Exception e) {
             throw new RuntimeException("Failed to save posts", e);

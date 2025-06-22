@@ -16,4 +16,5 @@ module com.starlight {
     exports com.starlight.controller;
     exports com.starlight.util;
     exports com.starlight.api;
+    exports com.starlight.models;
 }
