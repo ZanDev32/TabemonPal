@@ -3,12 +3,11 @@ package com.starlight.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamReader;
+
+import com.starlight.models.Post;
+import com.starlight.models.PostDataRepository;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.animation.ScaleTransition;
@@ -99,7 +98,7 @@ public class CommunityController implements Initializable {
     @FXML
     private MFXButton CreatePost;
 
-    private final String XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
+    private final PostDataRepository repository = new PostDataRepository();
 
     private void cropToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
         if (imageView.getImage() == null) return;
@@ -115,19 +114,11 @@ public class CommunityController implements Initializable {
         imageView.setClip(clip);
     }
 
-    private static class Post {
-        String title;
-        String description;
-        String image;
-        String uploadtime;
-        String likecount;
-    }
-
     private void loadPosts() {
         postlist.getChildren().clear();
         postlist.getChildren().add(post1);
 
-        List<Post> posts = parsePosts();
+        List<Post> posts = repository.loadPosts();
         if (posts.isEmpty()) {
             username.setText("");
             uploadtime.setText("");
@@ -183,68 +174,6 @@ public class CommunityController implements Initializable {
         }
     }
 
-    private List<Post> parsePosts() {
-        List<Post> list = new ArrayList<>();
-        File xmlFile = new File(XML_PATH);
-        if (!xmlFile.exists()) return list;
-        try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory.createXMLStreamReader(new java.io.FileInputStream(xmlFile));
-            Post current = null;
-            String currentTag = null;
-            StringBuilder buffer = new StringBuilder();
-            while (reader.hasNext()) {
-                int event = reader.next();
-                switch (event) {
-                    case XMLStreamConstants.START_ELEMENT:
-                        currentTag = reader.getLocalName();
-                        if ("post".equals(currentTag)) {
-                            current = new Post();
-                        } else {
-                            buffer.setLength(0);
-                        }
-                        break;
-                    case XMLStreamConstants.CHARACTERS:
-                        if (currentTag != null) {
-                            buffer.append(reader.getText());
-                        }
-                        break;
-                    case XMLStreamConstants.END_ELEMENT:
-                        String end = reader.getLocalName();
-                        if (current != null) {
-                            String text = buffer.toString().trim();
-                            switch (end) {
-                                case "title":
-                                    current.title = text;
-                                    break;
-                                case "description":
-                                    current.description = text;
-                                    break;
-                                case "image":
-                                    current.image = text;
-                                    break;
-                                case "uploadtime":
-                                    current.uploadtime = text;
-                                    break;
-                                case "likecount":
-                                    current.likecount = text;
-                                    break;
-                                case "post":
-                                    list.add(current);
-                                    current = null;
-                                    break;
-                            }
-                        }
-                        currentTag = null;
-                        break;
-                }
-            }
-            reader.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
