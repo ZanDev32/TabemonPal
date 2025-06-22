@@ -6,11 +6,24 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 public class PostDataRepository {
     private static final String XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
@@ -89,50 +102,28 @@ public class PostDataRepository {
 
     public void savePosts(List<Post> posts) {
         try {
-            XMLOutputFactory outFactory = XMLOutputFactory.newInstance();
-            XMLStreamWriter writer = outFactory.createXMLStreamWriter(new FileOutputStream(XML_PATH), "UTF-8");
-            writer.writeStartDocument("UTF-8", "1.0");
-            writer.writeStartElement("posts");
-            for (Post p : posts) {
-                writer.writeStartElement("post");
+            XStream xstream = new XStream(new StaxDriver());
+            xstream.alias("posts", List.class);
+            xstream.alias("post", Post.class);
 
-                writer.writeStartElement("title");
-                writer.writeCharacters(p.title != null ? p.title : "");
-                writer.writeEndElement();
+            StringWriter sw = new StringWriter();
+            xstream.toXML(posts, sw);
 
-                writer.writeStartElement("description");
-                writer.writeCharacters(p.description != null ? p.description : "");
-                writer.writeEndElement();
+            String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + sw.toString();
 
-                writer.writeStartElement("ingredients");
-                writer.writeCharacters(p.ingredients != null ? p.ingredients : "");
-                writer.writeEndElement();
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document doc = db.parse(new InputSource(new StringReader(xml)));
 
-                writer.writeStartElement("directions");
-                writer.writeCharacters(p.directions != null ? p.directions : "");
-                writer.writeEndElement();
+            TransformerFactory tf = TransformerFactory.newInstance();
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "4");
 
-                writer.writeStartElement("image");
-                writer.writeCharacters(p.image != null ? p.image : "");
-                writer.writeEndElement();
-
-                writer.writeStartElement("rating");
-                writer.writeCharacters(p.rating != null ? p.rating : "");
-                writer.writeEndElement();
-
-                writer.writeStartElement("uploadtime");
-                writer.writeCharacters(p.uploadtime != null ? p.uploadtime : "");
-                writer.writeEndElement();
-
-                writer.writeStartElement("likecount");
-                writer.writeCharacters(p.likecount != null ? p.likecount : "");
-                writer.writeEndElement();
-
-                writer.writeEndElement();
+            try (OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(XML_PATH), StandardCharsets.UTF_8)) {
+                transformer.transform(new DOMSource(doc), new StreamResult(osw));
             }
-            writer.writeEndElement();
-            writer.writeEndDocument();
-            writer.close();
         } catch (Exception e) {
             throw new RuntimeException("Failed to save posts", e);
         }
