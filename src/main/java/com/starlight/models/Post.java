@@ -2,6 +2,8 @@ package com.starlight.models;
 
 public class Post {
     public String uuid;
+    public String username;
+    public String profilepicture;
     public String title;
     public String description;
     public String ingredients;

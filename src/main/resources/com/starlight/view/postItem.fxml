@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
 <?import javafx.scene.control.Label?>
@@ -7,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="118.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<VBox prefHeight="118.0" prefWidth="822.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
     <children>
         <HBox prefHeight="52.0" prefWidth="820.0">
             <children>
@@ -35,7 +37,8 @@
                 </VBox>
             </children>
         </HBox>
-        <Label fx:id="description" styleClass="label2" />
+        <Label fx:id="title" styleClass="label2" />
+      <Label fx:id="description" styleClass="label2" />
         <ImageView fx:id="image" fitHeight="150.0" fitWidth="766.0" pickOnBounds="true" preserveRatio="true">
             <VBox.margin>
                 <Insets />
@@ -46,14 +49,7 @@
         </ImageView>
         <HBox prefHeight="100.0" prefWidth="200.0">
             <children>
-                <ImageView fx:id="likebutton" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                    <HBox.margin>
-                        <Insets />
-                    </HBox.margin>
-                    <image>
-                        <Image url="@../images/missing.png" />
-                    </image>
-                </ImageView>
+            <MFXButton fx:id="likebutton" text="Like" />
                 <Label fx:id="likecounter" styleClass="label2">
                     <HBox.margin>
                         <Insets left="20.0" />

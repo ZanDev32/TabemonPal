@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1300.0" prefWidth="1002.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
+<GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1300.0" prefWidth="1002.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
    <columnConstraints>
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" prefWidth="66.0" />
       <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" prefWidth="924.0" />
@@ -242,6 +242,7 @@
                                     </VBox>
                                  </children>
                               </HBox>
+                              <Label fx:id="title" styleClass="label2" />
                               <Label fx:id="description" styleClass="label2" />
                               <ImageView fx:id="recentphoto1" fitHeight="150.0" fitWidth="766.0" pickOnBounds="true" preserveRatio="true">
                                  <VBox.margin>
@@ -250,18 +251,14 @@
                                  <viewport>
                                     <Rectangle2D height="150.0" width="766.0" />
                                  </viewport>
+                                 <image>
+                                    <Image url="@../images/missing.png" />
+                                 </image>
                               </ImageView>
                               <HBox prefHeight="100.0" prefWidth="200.0">
                                  <children>
-                                    <ImageView fx:id="likebutton1" fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-                                       <HBox.margin>
-                                          <Insets />
-                                       </HBox.margin>
-                                       <image>
-                                          <Image url="@../images/missing.png" />
-                                       </image>
-                                    </ImageView>
-                                    <Label fx:id="likecounter" styleClass="label2" text="interaction">
+                                    <MFXButton fx:id="likebutton" text="Like" />
+                                    <Label fx:id="likecounter" styleClass="label2" text="like">
                                        <HBox.margin>
                                           <Insets left="20.0" />
                                        </HBox.margin>

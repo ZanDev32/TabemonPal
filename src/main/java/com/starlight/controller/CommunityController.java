@@ -26,6 +26,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class CommunityController implements Initializable {
+
     @FXML
     private Label dailytitle1;
 
@@ -34,6 +35,9 @@ public class CommunityController implements Initializable {
 
     @FXML
     private Label dailylikecounter;
+
+    @FXML
+    private Label title;
 
     @FXML
     private Label dailytitle2;
@@ -75,7 +79,7 @@ public class CommunityController implements Initializable {
     private Label description;
 
     @FXML
-    private ImageView likebutton1;
+    private MFXButton likebutton;
 
     @FXML
     private Label likecounter;
@@ -122,6 +126,7 @@ public class CommunityController implements Initializable {
         if (posts.isEmpty()) {
             username.setText("");
             uploadtime.setText("");
+            title.setText("");
             description.setText("");
             recentphoto1.setImage(null);
             likecounter.setText("");
@@ -130,17 +135,26 @@ public class CommunityController implements Initializable {
 
         for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
-            String title = p.title;
+            String tits = p.title;
+            String pp = p.profilepicture;
+            String usr = p.username;
             String desc = p.description;
             String image = p.image;
             String time = p.uploadtime;
             String likes = p.likecount;
 
             if (i == 0) {
-                username.setText(title);
+                username.setText(usr);
+                title.setText(tits);
                 description.setText(desc);
                 uploadtime.setText(time);
                 likecounter.setText(likes);
+                File fp = new File(pp);
+                if (fp.exists()) {
+                    profile1.setImage(new Image(fp.toURI().toString()));
+                } else {
+                    profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                }
                 File f = new File(image);
                 if (f.exists()) {
                     recentphoto1.setImage(new Image(f.toURI().toString()));
@@ -153,10 +167,12 @@ public class CommunityController implements Initializable {
                     VBox node = loader.load();
                     Label u = (Label) node.lookup("#username");
                     Label ut = (Label) node.lookup("#uploadtime");
+                    Label t = (Label) node.lookup("#title");
                     Label d = (Label) node.lookup("#description");
                     ImageView img = (ImageView) node.lookup("#image");
                     Label lc = (Label) node.lookup("#likecounter");
-                    u.setText(title);
+                    u.setText(usr);
+                    t.setText(tits);
                     ut.setText(time);
                     d.setText(desc);
                     lc.setText(likes);
