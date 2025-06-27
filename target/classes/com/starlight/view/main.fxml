@@ -145,6 +145,9 @@
           <RowConstraints maxHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="625.0" vgrow="ALWAYS" />
         </rowConstraints>
+        <children>
+          <fx:include source="navbar.fxml" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        </children>
       </GridPane>
-   </center>
+  </center>
 </BorderPane>

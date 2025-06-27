@@ -29,30 +29,34 @@ public class UserDataRepository {
     }
 
     public List<User> loadUsers() {
-        return loadUsers(false, true);
+        return loadUsers(true);
     }
 
     /**
-     * @param useDummy If true, loads from dummy file. If false, loads from main file.
-     * @return The list of users.
+     * @param includeDummy whether to also include dummy users
+     * @return the list of users from the main file combined with dummy users if requested
      */
-    public List<User> loadUsers(boolean useDummy) {
-        return loadUsers(useDummy, false);
+    public List<User> loadUsers(boolean includeDummy) {
+        List<User> users = readUsersFromFile(new File(xmlPath));
+
+        if (includeDummy || users.isEmpty()) {
+            List<User> dummy = readUsersFromFile(new File(DUMMY_XML_PATH));
+            if (includeDummy) {
+                users.addAll(dummy);
+            } else if (users.isEmpty()) {
+                users = dummy;
+            }
+        }
+
+        return users;
     }
 
     @SuppressWarnings("unchecked")
-    private List<User> loadUsers(boolean useDummy, boolean fallbackToDummyIfMissing) {
-        File xmlFile = new File(useDummy ? DUMMY_XML_PATH : xmlPath);
+    private List<User> readUsersFromFile(File xmlFile) {
         if (!xmlFile.exists() || xmlFile.length() == 0) {
-            if (!useDummy && fallbackToDummyIfMissing) {
-                xmlFile = new File(DUMMY_XML_PATH);
-                if (!xmlFile.exists()) {
-                    return new ArrayList<>();
-                }
-            } else {
-                return new ArrayList<>();
-            }
+            return new ArrayList<>();
         }
+
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
@@ -61,12 +65,29 @@ public class UserDataRepository {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return new ArrayList<>();
     }
 
     public void ensureDummyData() {
         File xmlFile = new File(xmlPath);
+        boolean copy = false;
+
         if (!xmlFile.exists() || xmlFile.length() == 0) {
+            copy = true;
+        } else {
+            try (FileInputStream fis = new FileInputStream(xmlFile)) {
+                Object obj = xstream.fromXML(fis);
+                if (obj instanceof List && ((List<?>) obj).isEmpty()) {
+                    copy = true;
+                }
+            } catch (Exception e) {
+                // if parsing fails, fall back to dummy
+                copy = true;
+            }
+        }
+
+        if (copy) {
             File dummy = new File(DUMMY_XML_PATH);
             if (dummy.exists()) {
                 try (FileInputStream fis = new FileInputStream(dummy);
