@@ -1,5 +1,6 @@
 <posts>
   <post>
+    <username>M. Fakih Sahman</username>
     <title>Tasty Pancakes</title>
     <description>Fluffy pancakes with syrup.</description>
     <ingredients>- 1 cup flour
@@ -13,6 +14,7 @@ Cook on skillet.</directions>
     <likecount>12</likecount>
   </post>
   <post>
+    <username>Khairun Nissa</username>
     <title>Veggie Salad</title>
     <description>Fresh vegetable salad.</description>
     <ingredients>- lettuce
@@ -26,6 +28,7 @@ Serve chilled.</directions>
     <likecount>8</likecount>
   </post>
   <post>
+    <username>gw</username>
     <title>qwert</title>
     <description>asdfg</description>
     <ingredients>zxcvb</ingredients>

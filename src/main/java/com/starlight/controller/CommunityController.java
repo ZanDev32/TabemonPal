@@ -27,6 +27,7 @@ import javafx.util.Duration;
 
 public class CommunityController implements Initializable {
 
+
     @FXML
     private Label dailytitle1;
 
@@ -123,7 +124,7 @@ public class CommunityController implements Initializable {
         postlist.getChildren().add(post1);
 
         List<Post> posts = repository.loadPosts();
-        if (posts.isEmpty()) {
+        if (posts == null || posts.isEmpty()) {
             username.setText("");
             uploadtime.setText("");
             title.setText("");
@@ -149,18 +150,29 @@ public class CommunityController implements Initializable {
                 description.setText(desc);
                 uploadtime.setText(time);
                 likecounter.setText(likes);
-                File fp = new File(pp);
-                if (fp.exists()) {
-                    profile1.setImage(new Image(fp.toURI().toString()));
+
+                if (pp != null) {
+                    File fp = new File(pp);
+                    if (fp.exists()) {
+                        profile1.setImage(new Image(fp.toURI().toString()));
+                    } else {
+                        profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
                 } else {
                     profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                 }
-                File f = new File(image);
-                if (f.exists()) {
-                    recentphoto1.setImage(new Image(f.toURI().toString()));
+
+                if (image != null) {
+                    File f = new File(image);
+                    if (f.exists()) {
+                        recentphoto1.setImage(new Image(f.toURI().toString()));
+                    } else {
+                        recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
                 } else {
                     recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                 }
+
             } else {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
@@ -171,17 +183,24 @@ public class CommunityController implements Initializable {
                     Label d = (Label) node.lookup("#description");
                     ImageView img = (ImageView) node.lookup("#image");
                     Label lc = (Label) node.lookup("#likecounter");
+
                     u.setText(usr);
                     t.setText(tits);
                     ut.setText(time);
                     d.setText(desc);
                     lc.setText(likes);
-                    File fi = new File(image);
-                    if (fi.exists()) {
-                        img.setImage(new Image(fi.toURI().toString()));
+
+                    if (image != null) {
+                        File fi = new File(image);
+                        if (fi.exists()) {
+                            img.setImage(new Image(fi.toURI().toString()));
+                        } else {
+                            img.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                        }
                     } else {
                         img.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                     }
+
                     postlist.getChildren().add(node);
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -190,13 +209,10 @@ public class CommunityController implements Initializable {
         }
     }
 
-
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        
         repository.ensureDummyData();
         loadPosts();
-
         CreatePost.setOnAction(event -> showCreatePostPopup());
     }
 
@@ -204,10 +220,8 @@ public class CommunityController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));
             Parent popupRoot = loader.load();
-
             CreatePostController controller = loader.getController();
 
-            // Scale in animation
             popupRoot.setScaleX(0.7);
             popupRoot.setScaleY(0.7);
 
@@ -218,7 +232,6 @@ public class CommunityController implements Initializable {
             popupStage.setTitle("Create Post");
             popupStage.setResizable(false);
 
-            // Center animation after showing
             popupStage.setOnShown(e -> {
                 ScaleTransition st = new ScaleTransition(Duration.millis(220), popupRoot);
                 st.setFromX(0.7);
