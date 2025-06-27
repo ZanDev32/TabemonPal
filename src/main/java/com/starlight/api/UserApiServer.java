@@ -24,6 +24,7 @@ public class UserApiServer {
         xstream.allowTypesByWildcard(new String[]{"com.starlight.models.*", "java.util.*"});
         xstream.alias("user", User.class);
         xstream.alias("users", List.class);
+        repository.ensureDummyData();
         server = HttpServer.create(new InetSocketAddress(port), 0);
         server.createContext("/login", new LoginHandler());
         server.createContext("/register", new RegisterHandler());

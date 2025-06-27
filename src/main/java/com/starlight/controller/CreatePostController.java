@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
+import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -122,6 +123,7 @@ public class CreatePostController implements Initializable {
         try {
             List<Post> posts = repository.loadPosts();
             Post post = new Post();
+            post.username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : null;
             post.title = title;
             post.description = description;
             post.ingredients = ingredients;

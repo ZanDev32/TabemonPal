@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
+import java.io.InputStream;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -21,6 +22,8 @@ import javafx.stage.Stage;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
+import com.starlight.util.Session;
+import com.starlight.App;
 
 public class LoginController implements Initializable{
     @FXML
@@ -53,18 +56,27 @@ public class LoginController implements Initializable{
                 conn.setRequestMethod("POST");
                 conn.setRequestProperty("Content-Type", "application/xml");
                 conn.setDoOutput(true);
-                User u = new User();
-                u.email = em;
-                u.password = pass;
+
+                User creds = new User();
+                creds.email = em;
+                creds.password = pass;
+
                 XStream xs = new XStream(new DomDriver());
                 xs.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
                 xs.alias("user", User.class);
-                String xml = xs.toXML(u);
+
+                String xml = xs.toXML(creds);
                 try (OutputStream os = conn.getOutputStream()) {
                     os.write(xml.getBytes(StandardCharsets.UTF_8));
                 }
+
                 if (conn.getResponseCode() == 200) {
+                    try (InputStream is = conn.getInputStream()) {
+                        User logged = (User) xs.fromXML(is);
+                        Session.setCurrentUser(logged);
+                    }
                     System.out.println("Login success");
+                    App.loadMainWithSplash();
                 } else {
                     System.out.println("Login failed: " + conn.getResponseCode());
                 }
