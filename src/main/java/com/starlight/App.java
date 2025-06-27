@@ -9,17 +9,27 @@ import javafx.animation.PauseTransition;
 import javafx.concurrent.Task;
 import javafx.util.Duration;
 import com.starlight.util.FXMLVerificator;
+import com.starlight.api.UserApiServer;
 
 import java.io.IOException;
 
 public class App extends Application {
 
-    
-    private static Scene scene;
 
+    private static Scene scene;
+    private UserApiServer apiServer;
+    private Thread apiThread;
+    
     @Override
     public void start(Stage stage) throws IOException {
+        apiServer = new UserApiServer(8000);
+        apiThread = new Thread(apiServer::start);
+        apiThread.setDaemon(true);
+        apiThread.start();
+
         FXMLVerificator.verifyAll();
+        scene = new Scene(loadFXML("splashScreen"), 1280, 720);
+
         scene = new Scene(loadFXML("splashScreen"), 1280, 720);
         stage.setScene(scene);
         stage.setTitle("TabemonPal by Starlight Inc.");
@@ -63,6 +73,14 @@ public class App extends Application {
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view/" + fxml + ".fxml"));
         return fxmlLoader.load();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        if (apiServer != null) {
+            apiServer.stop();
+        }
+        super.stop();
     }
 
     public static void main(String[] args) {
