@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+
+
+<HBox maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="861.0" xmlns="http://javafx.com/javafx/24" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane HBox.hgrow="ALWAYS">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="602.9999694824219" minWidth="10.0" prefWidth="438.0" />
+            <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="56.000030517578125" prefWidth="56.000030517578125" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="425.3333435058594" minWidth="10.0" prefWidth="65.33331298828125" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="425.3333435058594" minWidth="10.0" prefWidth="78.66668701171875" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="425.3333435058594" minWidth="10.0" prefWidth="78.5" />
+            <ColumnConstraints hgrow="ALWAYS" maxWidth="425.3333435058594" minWidth="10.0" prefWidth="108.5" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <MFXTextField fx:id="searchbar" floatMode="ABOVE" prefHeight="62.0" prefWidth="553.0" promptText="Search Anything" GridPane.halignment="CENTER" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER">
+               <GridPane.margin>
+                  <Insets left="20.0" />
+               </GridPane.margin>
+            </MFXTextField>
+            <MFXButton fx:id="setting" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="41.0" text=" " GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true" translateX="-8.0">
+                     <image>
+                        <Image url="@../icon/cog-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </MFXButton>
+            <MFXButton fx:id="message" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="48.0" text=" " GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
+                     <image>
+                        <Image url="@../icon/email-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </MFXButton>
+            <MFXButton fx:id="notification" minHeight="-Infinity" minWidth="-Infinity" prefHeight="43.0" prefWidth="40.0" text=" " GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-10.0">
+                     <image>
+                        <Image url="@../icon/bell-badge-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </MFXButton>
+            <MFXButton fx:id="profile" prefHeight="48.0" prefWidth="91.0" text="User" GridPane.columnIndex="5" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/account-circle-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </MFXButton>
+         </children>
+      </GridPane>
+   </children>
+</HBox>
