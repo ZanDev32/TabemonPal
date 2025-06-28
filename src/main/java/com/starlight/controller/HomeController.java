@@ -5,11 +5,17 @@ import java.util.ResourceBundle;
 
 import javafx.fxml.Initializable;
 
-public class HomeController implements Initializable{
+/**
+ * Controller for the home view of the application.
+ */
+public class HomeController implements Initializable {
 
+    /**
+     * Initializes the controller. No initialization logic required.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        // no-op
     }
     
 }

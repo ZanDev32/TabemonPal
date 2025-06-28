@@ -15,11 +15,23 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+/**
+ * Very small HTTP server exposing basic user related endpoints. It uses
+ * {@link XStream} for XML serialization of {@link User} objects.
+ */
 public class UserApiServer {
+    /** Underlying lightweight HTTP server. */
     private final HttpServer server;
+    /** Repository used to read and write user data. */
     private final UserDataRepository repository = new UserDataRepository();
+    /** XStream instance configured for the user model. */
     private final XStream xstream = new XStream(new DomDriver());
 
+    /**
+     * Creates the API server bound to the given port.
+     *
+     * @param port the port to bind the server to
+     */
     public UserApiServer(int port) throws IOException {
         xstream.allowTypesByWildcard(new String[]{"com.starlight.models.*", "java.util.*"});
         xstream.alias("user", User.class);
@@ -31,14 +43,21 @@ public class UserApiServer {
         server.createContext("/users", new UsersHandler());
     }
 
+    /**
+     * Starts the HTTP server.
+     */
     public void start() {
         server.start();
     }
 
+    /**
+     * Stops the HTTP server.
+     */
     public void stop() {
         server.stop(0);
     }
 
+    /** Handler for user login requests. */
     private class LoginHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -60,6 +79,7 @@ public class UserApiServer {
         }
     }
 
+    /** Handler for user registration requests. */
     private class RegisterHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -81,6 +101,7 @@ public class UserApiServer {
         }
     }
 
+    /** Handler for user profile retrieval and update. */
     private class UsersHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
@@ -123,6 +144,13 @@ public class UserApiServer {
         }
     }
 
+    /**
+     * Utility to send an XML response.
+     *
+     * @param exchange HTTP exchange
+     * @param code HTTP status code
+     * @param xml XML payload to send
+     */
     private void sendXml(HttpExchange exchange, int code, String xml) throws IOException {
         byte[] bytes = xml.getBytes(StandardCharsets.UTF_8);
         exchange.getResponseHeaders().add("Content-Type", "application/xml");
@@ -132,6 +160,9 @@ public class UserApiServer {
         }
     }
 
+    /**
+     * Convenience main method to run the server outside of JavaFX.
+     */
     public static void main(String[] args) throws Exception {
         UserApiServer server = new UserApiServer(8000);
         System.out.println("User API server running on port 8000");

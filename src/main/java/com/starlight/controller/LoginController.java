@@ -25,7 +25,10 @@ import com.starlight.models.User;
 import com.starlight.util.Session;
 import com.starlight.App;
 
-public class LoginController implements Initializable{
+/**
+ * Controller handling user login and transition to the main application.
+ */
+public class LoginController implements Initializable {
     @FXML
     private ImageView AppLogo;
 
@@ -45,6 +48,9 @@ public class LoginController implements Initializable{
     private MFXButton register;
 
 
+    /**
+     * Wires up login and registration button handlers.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         Loginbutton.setOnAction(event -> {

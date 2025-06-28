@@ -12,6 +12,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Unit tests for {@link PostDataRepository}.
+ */
 public class PostDataRepositoryTest {
     private Path tempFile;
     private PostDataRepository repository;

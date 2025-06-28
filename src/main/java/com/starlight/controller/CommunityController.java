@@ -25,6 +25,10 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * Controller backing the community page. It displays recent posts and allows
+ * the user to create new posts.
+ */
 public class CommunityController implements Initializable {
 
 
@@ -105,6 +109,10 @@ public class CommunityController implements Initializable {
 
     private final PostDataRepository repository = new PostDataRepository();
 
+    /**
+     * Crops the given {@link ImageView} to fit inside the specified frame size
+     * while preserving aspect ratio and applying rounded corners.
+     */
     private void cropToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
         if (imageView.getImage() == null) return;
         Image image = imageView.getImage();
@@ -119,6 +127,10 @@ public class CommunityController implements Initializable {
         imageView.setClip(clip);
     }
 
+    /**
+     * Loads posts from the repository and populates the UI. The first post is
+     * shown in the main area while the rest are added to a list below.
+     */
     private void loadPosts() {
         postlist.getChildren().clear();
         postlist.getChildren().add(post1);
@@ -209,6 +221,9 @@ public class CommunityController implements Initializable {
         }
     }
 
+    /**
+     * Initializes the controller by loading dummy data and wiring up actions.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
@@ -216,6 +231,9 @@ public class CommunityController implements Initializable {
         CreatePost.setOnAction(event -> showCreatePostPopup());
     }
 
+    /**
+     * Displays a modal dialog that allows the user to create a new post.
+     */
     private void showCreatePostPopup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));

@@ -1,3 +1,6 @@
+/**
+ * Java module declaration for the TabemonPal application.
+ */
 module com.starlight {
     requires transitive javafx.graphics;
     requires javafx.controls;

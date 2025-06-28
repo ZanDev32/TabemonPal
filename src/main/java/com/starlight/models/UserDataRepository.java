@@ -9,6 +9,9 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * Repository for persisting {@link User} objects to an XML file.
+ */
 public class UserDataRepository {
     private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/UserData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/UserDataDummy.xml";
@@ -16,10 +19,16 @@ public class UserDataRepository {
     private final String xmlPath;
     private final XStream xstream;
 
+    /**
+     * Creates a repository that reads/writes the default user XML file.
+     */
     public UserDataRepository() {
         this(DEFAULT_XML_PATH);
     }
 
+    /**
+     * Creates a repository storing users in the specified path.
+     */
     public UserDataRepository(String xmlPath) {
         this.xmlPath = xmlPath;
         xstream = new XStream(new DomDriver());
@@ -28,6 +37,9 @@ public class UserDataRepository {
         xstream.alias("user", User.class);
     }
 
+    /**
+     * Loads users including dummy data.
+     */
     public List<User> loadUsers() {
         return loadUsers(true);
     }
@@ -69,6 +81,9 @@ public class UserDataRepository {
         return new ArrayList<>();
     }
 
+    /**
+     * Ensures the main XML file contains at least the dummy users.
+     */
     public void ensureDummyData() {
         File xmlFile = new File(xmlPath);
         boolean copy = false;
@@ -100,6 +115,9 @@ public class UserDataRepository {
         }
     }
 
+    /**
+     * Saves the provided list of users.
+     */
     public void saveUsers(List<User> users) {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             xstream.toXML(users, fos);

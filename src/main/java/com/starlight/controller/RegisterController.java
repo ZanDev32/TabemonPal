@@ -22,7 +22,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
 
-public class RegisterController implements Initializable{
+/**
+ * Controller used for registering a new user account.
+ */
+public class RegisterController implements Initializable {
     @FXML
     private ImageView AppLogo;
 
@@ -45,6 +48,9 @@ public class RegisterController implements Initializable{
     private MFXButton login;
 
 
+    /**
+     * Sets up button handlers for registration and login navigation.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         register.setOnAction(event -> {

@@ -17,6 +17,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 
+/**
+ * Controller for the main application shell which loads sub-pages and keeps
+ * track of the active navigation button.
+ */
 public class MainController implements Initializable {
     
     private MFXButton currentActiveButton;
@@ -50,48 +54,58 @@ public class MainController implements Initializable {
     @FXML 
     private MFXButton achievement;
     
+    /** Handles navigation to the home view. */
     @FXML
     void home(MouseEvent event) {
         loadPage("home");
         selected(home);
     }
 
+    /** Handles navigation to the achievement view. */
     @FXML
     void achievement(MouseEvent event) {
         loadPage("achievement");
         selected(achievement);
     }
 
+    /** Handles navigation to the community view. */
     @FXML
     void community(MouseEvent event) {
         loadPage("community");
         selected(community);
     }
 
+    /** Handles navigation to the consult view. */
     @FXML
     void consult(MouseEvent event) {
         loadPage("consult");
         selected(consult);
     }
 
+    /** Handles navigation to the games view. */
     @FXML
     void games(MouseEvent event) {
         loadPage("games");
         selected(games);
     }
 
+    /** Handles navigation to the mission view. */
     @FXML
     void mission(MouseEvent event) {
         loadPage("mission");
         selected(mission);
     }
 
+    /** Handles navigation to the wiki view. */
     @FXML
     void wiki(MouseEvent event) {
         loadPage("wiki");
         selected(wiki);
     }
 
+    /**
+     * Loads the given FXML page into the grid pane container.
+     */
     private void loadPage (String page) {
         Parent root = null;
 
@@ -114,6 +128,9 @@ public class MainController implements Initializable {
         }
     }
 
+    /**
+     * Updates the navigation bar to mark the given button as active.
+     */
     private void selected(MFXButton button) {
 
         Integer row = GridPane.getRowIndex(button);
@@ -133,6 +150,7 @@ public class MainController implements Initializable {
         currentActiveButton = button;
     }
 
+    /** Initializes the controller by showing the home view. */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         loadPage("home");

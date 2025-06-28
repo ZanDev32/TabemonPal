@@ -8,6 +8,9 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 
+/**
+ * Controller for the missions and rewards view.
+ */
 public class MissionController implements Initializable {
     @FXML
     private Button missionButton;
@@ -18,8 +21,12 @@ public class MissionController implements Initializable {
     @FXML
     private Button rewardButton;
     
+    /**
+     * Initializes the controller. Currently does nothing.
+     */
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // no-op
     }
     
 }

@@ -22,6 +22,9 @@ import javafx.stage.Stage;
 import javafx.scene.Node;
 
 
+/**
+ * Controller responsible for the "create post" dialog.
+ */
 public class CreatePostController implements Initializable {
 
     @FXML
@@ -54,10 +57,17 @@ public class CreatePostController implements Initializable {
 
     private final PostDataRepository repository = new PostDataRepository();
 
+    /**
+     * Indicates whether the user successfully created a post.
+     */
     public boolean isSuccess() {
         return success;
     }
 
+    /**
+     * Initializes the controller by wiring up button actions and the image
+     * picker logic.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         pickerstatus.setText("No image selected");
@@ -119,6 +129,11 @@ public class CreatePostController implements Initializable {
         });
     }
 
+    /**
+     * Persists a newly created post to XML storage.
+     *
+     * @return {@code true} if saving succeeded, otherwise {@code false}
+     */
     private boolean savePostToXML(String title, String description, String ingredients, String directions, String imagePath) {
         try {
             List<Post> posts = repository.loadPosts();

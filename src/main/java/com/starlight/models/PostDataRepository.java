@@ -8,6 +8,9 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
+/**
+ * Repository for loading and saving {@link Post} objects to an XML file.
+ */
 public class PostDataRepository {
     private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
@@ -15,10 +18,16 @@ public class PostDataRepository {
     private final String xmlPath;
     private final XStream xstream;
 
+    /**
+     * Creates a repository using the default XML file location.
+     */
     public PostDataRepository() {
         this(DEFAULT_XML_PATH);
     }
 
+    /**
+     * Creates a repository storing data at the specified path.
+     */
     public PostDataRepository(String xmlPath) {
         this.xmlPath = xmlPath;
         xstream = new XStream(new DomDriver());
@@ -27,6 +36,9 @@ public class PostDataRepository {
         xstream.alias("post", Post.class);
     }
 
+    /**
+     * Loads posts from the default XML file.
+     */
     public List<Post> loadPosts() {
         return loadPosts(false, true);
     }
@@ -63,6 +75,10 @@ public class PostDataRepository {
         return new ArrayList<>();
     }
 
+    /**
+     * Copies the dummy data file to the main XML file if the main file is
+     * missing or empty.
+     */
     public void ensureDummyData() {
         File xmlFile = new File(xmlPath);
         if (!xmlFile.exists() || xmlFile.length() == 0) {
@@ -78,6 +94,9 @@ public class PostDataRepository {
         }
     }
 
+    /**
+     * Saves the given list of posts to disk.
+     */
     public void savePosts(List<Post> posts) {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             xstream.toXML(posts, fos);

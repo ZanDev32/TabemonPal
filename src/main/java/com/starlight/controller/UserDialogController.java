@@ -18,7 +18,11 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
 
-public class UserDialogController implements Initializable{
+/**
+ * Controller for the user settings dialog where profile information can be
+ * edited.
+ */
+public class UserDialogController implements Initializable {
     @FXML
     private ImageView profile;
 
@@ -44,6 +48,9 @@ public class UserDialogController implements Initializable{
     private MFXButton cancelbutton;
 
 
+    /**
+     * Wires up the save and cancel buttons for the dialog.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         savebutton.setOnAction(event -> {

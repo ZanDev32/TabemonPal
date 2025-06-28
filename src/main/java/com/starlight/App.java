@@ -13,13 +13,24 @@ import com.starlight.api.UserApiServer;
 
 import java.io.IOException;
 
+/**
+ * Main JavaFX application entry point. This class starts the embedded
+ * {@link UserApiServer} and loads the initial FXML views.
+ */
 public class App extends Application {
 
 
+    /** Main application scene used to swap views. */
     private static Scene scene;
+    /** Embedded HTTP server providing user API endpoints. */
     private UserApiServer apiServer;
+    /** Thread running the API server. */
     private Thread apiThread;
     
+    /**
+     * Starts the JavaFX application and shows the splash screen. The user API
+     * server is started in a background thread.
+     */
     @Override
     public void start(Stage stage) throws IOException {
         apiServer = new UserApiServer(8000);
@@ -41,10 +52,18 @@ public class App extends Application {
         delay.play();
     }
 
+    /**
+     * Replaces the current scene root with the given FXML view.
+     *
+     * @param fxml name of the FXML file without extension
+     */
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
     }
 
+    /**
+     * Loads and displays the login screen.
+     */
     public static void showLogin() {
         try {
             scene.setRoot(loadFXML("login"));
@@ -53,6 +72,10 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Shows the splash screen while the main view is loaded in the
+     * background.
+     */
     public static void loadMainWithSplash() {
         try {
             scene.setRoot(loadFXML("splashScreen"));
@@ -70,11 +93,20 @@ public class App extends Application {
         new Thread(task).start();
     }
 
+    /**
+     * Utility method to load an FXML file from the view directory.
+     *
+     * @param fxml name of the FXML file without extension
+     * @return the loaded {@link Parent}
+     */
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view/" + fxml + ".fxml"));
         return fxmlLoader.load();
     }
 
+    /**
+     * Stops the API server when the JavaFX application terminates.
+     */
     @Override
     public void stop() throws Exception {
         if (apiServer != null) {
@@ -83,6 +115,11 @@ public class App extends Application {
         super.stop();
     }
 
+    /**
+     * Launches the JavaFX application.
+     *
+     * @param args command line arguments
+     */
     public static void main(String[] args) {
         launch();
     }
