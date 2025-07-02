@@ -17,4 +17,10 @@
     <email>gw@example.com</email>
     <birthDay>1998-07-30</birthDay>
   </user>
+  <user>
+    <username>admin</username>
+    <password>admin</password>
+    <email>admin</email>
+    <birthDay>1998-07-30</birthDay>
+  </user>
 </users>

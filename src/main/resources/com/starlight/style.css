@@ -88,6 +88,8 @@
     -fx-font-size: 15;
         font-size: 15;
     -fx-text-fill: #5b543f;
+    -fx-font-weight: 100;
+        font-weight: 100;
 }
 
 .create-post {
@@ -125,7 +127,7 @@
     -fx-font-size: 18;
         font-size: 18;
     -fx-font-weight: 800;
-        font-weight: 8  00;
+        font-weight: 800;
 }
 /* debugging only
 
