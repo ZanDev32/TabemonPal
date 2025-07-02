@@ -8,7 +8,7 @@
 .background-window {
     -fx-background-color: #ffff;
         background-color:#ffff;
-    -fx-background-radius: 40 40 0 0;
+    -fx-background-radius: 20 20 20 20;
 }
 
 .sideBar{
@@ -106,6 +106,27 @@
     font-size: 7;
 }
 
+.interaction-button {
+    -fx-font-family: Poppons;
+        font-family: Poppons;
+    -fx-background-color: #F2F2F2;
+        background-color: #F2F2F2;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.label-date-community {
+    -fx-font-size: 9;
+        font-size: 9;
+    -fx-fill: #B0B0B0;
+        fill: #B0B0B0;
+}
+
+.label-title-community {
+    -fx-font-size: 18;
+        font-size: 18;
+    -fx-font-weight: 800;
+        font-weight: 8  00;
+}
 /* debugging only
 
 .VBox {
