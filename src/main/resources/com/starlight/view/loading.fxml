@@ -6,16 +6,16 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1000.0" prefWidth="1331.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="500.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.LoadingController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
       <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
     <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints maxHeight="524.6666564941406" minHeight="10.0" prefHeight="448.6666564941406" vgrow="SOMETIMES" />
-    <RowConstraints maxHeight="325.0" minHeight="10.0" prefHeight="52.333343505859375" vgrow="SOMETIMES" />
-    <RowConstraints maxHeight="540.3333435058594" minHeight="10.0" prefHeight="499.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="524.6666564941406" minHeight="10.0" prefHeight="228.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="325.0" minHeight="10.0" prefHeight="27.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="540.3333435058594" minHeight="10.0" prefHeight="261.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
       <MFXProgressBar prefHeight="4.0" prefWidth="297.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER" />

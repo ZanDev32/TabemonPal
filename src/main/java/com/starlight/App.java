@@ -6,7 +6,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.animation.PauseTransition;
-import javafx.concurrent.Task;
 import javafx.util.Duration;
 import com.starlight.util.FXMLVerificator;
 import com.starlight.api.UserApiServer;
@@ -38,7 +37,7 @@ public class App extends Application {
         apiThread.setDaemon(true);
         apiThread.start();
 
-        //FXMLVerificator.verifyAll();
+        FXMLVerificator.verifyAll();
         scene = new Scene(loadFXML("splashScreen"), 1280, 720);
 
         scene = new Scene(loadFXML("splashScreen"), 1280, 720);
@@ -81,16 +80,18 @@ public class App extends Application {
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
             ex.printStackTrace();
+            return;
         }
 
-        Task<Parent> task = new Task<>() {
-            @Override
-            protected Parent call() throws Exception {
-                return loadFXML("main");
+        PauseTransition delay = new PauseTransition(Duration.seconds(1));
+        delay.setOnFinished(e -> {
+            try {
+                scene.setRoot(loadFXML("main"));
+            } catch (IOException ex) {
+                ex.printStackTrace();
             }
-        };
-        task.setOnSucceeded(e -> scene.setRoot(task.getValue()));
-        new Thread(task).start();
+        });
+        delay.play();
     }
 
     /**

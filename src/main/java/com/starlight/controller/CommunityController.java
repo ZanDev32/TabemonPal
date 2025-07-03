@@ -187,6 +187,7 @@ public class CommunityController implements Initializable {
                 } else {
                     profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                 }
+                cropToFit(profile1, 40, 40, 20);
 
                 if (image != null) {
                     File f = new File(image);
@@ -198,34 +199,43 @@ public class CommunityController implements Initializable {
                 } else {
                     recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                 }
+                cropToFit(recentphoto1, 425, 322, 20);
 
             } else {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
                     VBox node = loader.load();
-                    Label u = (Label) node.lookup("#username");
-                    Label ut = (Label) node.lookup("#uploadtime");
-                    Label t = (Label) node.lookup("#title");
-                    Label d = (Label) node.lookup("#description");
-                    ImageView img = (ImageView) node.lookup("#recentphoto1");
-                    MFXButton lc = (MFXButton) node.lookup("#likecounter");
+                    PostItemController c = loader.getController();
 
-                    u.setText(usr);
-                    t.setText(tits);
-                    ut.setText(time);
-                    d.setText(desc);
-                    lc.setText(likes);
+                    c.username.setText(usr);
+                    c.title.setText(tits);
+                    c.uploadtime.setText(time);
+                    c.description.setText(desc);
+                    c.likecounter.setText(likes);
+
+                    if (pp != null) {
+                        File fp = new File(pp);
+                        if (fp.exists()) {
+                            c.profile1.setImage(new Image(fp.toURI().toString()));
+                        } else {
+                            c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                        }
+                    } else {
+                        c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                    cropToFit(c.profile1, 40, 40, 20);
 
                     if (image != null) {
                         File fi = new File(image);
                         if (fi.exists()) {
-                            img.setImage(new Image(fi.toURI().toString()));
+                            c.recentphoto1.setImage(new Image(fi.toURI().toString()));
                         } else {
-                            img.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                            c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                         }
                     } else {
-                        img.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                        c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
                     }
+                    cropToFit(c.recentphoto1, 425, 322, 20);
 
                     postlist.getChildren().add(node);
                 } catch (IOException e) {
@@ -242,6 +252,12 @@ public class CommunityController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
         loadPosts();
+        createpost.setOnAction(e -> showCreatePostPopup());
+    }
+
+    @FXML
+    private void handleCreatePost() {
+        showCreatePostPopup();
     }
 
     /**

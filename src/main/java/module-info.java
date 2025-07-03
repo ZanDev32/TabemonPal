@@ -3,11 +3,11 @@
  */
 module com.starlight {
     requires transitive javafx.graphics;
-    requires javafx.controls;
+    requires transitive javafx.controls;
     requires javafx.fxml;
     requires javafx.web;
     requires java.logging;
-    requires MaterialFX;
+    requires transitive MaterialFX;
     requires xstream;
     requires jdk.httpserver;
 

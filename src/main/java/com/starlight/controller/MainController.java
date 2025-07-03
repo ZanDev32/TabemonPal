@@ -11,11 +11,14 @@ import java.util.logging.Level;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.HPos;
+import javafx.geometry.VPos;
 import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.concurrent.Task;
 
 /**
  * Controller for the main application shell which loads sub-pages and keeps
@@ -106,25 +109,47 @@ public class MainController implements Initializable {
     /**
      * Loads the given FXML page into the grid pane container.
      */
-    private void loadPage (String page) {
-        Parent root = null;
-
-        page = "/com/starlight/view/" + page;
+    private void loadPage(String page) {
+        String fxmlPath = "/com/starlight/view/" + page + ".fxml";
 
         try {
-            root = FXMLLoader.load(getClass().getResource(page + ".fxml"));
-        } catch (IOException ex) {
-            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, "Failed to load FXML page: " + page, ex);
-        }
-
-        if (root != null) {
-            // Optional: remove any existing node in the target cell
+            // Show the loading screen inside the main grid pane while loading
+            Parent loadingRoot = FXMLLoader.load(getClass().getResource("/com/starlight/view/loading.fxml"));
             gp.getChildren().removeIf(node ->
                 GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
                 GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
             );
-            // Add the new node to the specified cell
-            gp.add(root, 0, 1);
+            gp.add(loadingRoot, 0, 1);
+            GridPane.setValignment(loadingRoot, VPos.CENTER);
+            GridPane.setHalignment(loadingRoot, HPos.CENTER);
+
+            Task<Parent> task = new Task<>() {
+                @Override
+                protected Parent call() throws Exception {
+                    return FXMLLoader.load(getClass().getResource(fxmlPath));
+                }
+            };
+
+            task.setOnSucceeded(ev -> {
+                Parent root = task.getValue();
+                gp.getChildren().remove(loadingRoot);
+                gp.getChildren().removeIf(node ->
+                    GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
+                    GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
+                );
+                gp.add(root, 0, 1);
+            });
+
+            task.setOnFailed(ev -> {
+                gp.getChildren().remove(loadingRoot);
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE,
+                        "Failed to load FXML page: " + fxmlPath, task.getException());
+            });
+
+            new Thread(task).start();
+        } catch (IOException e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE,
+                    "Failed to load loading.fxml", e);
         }
     }
 
