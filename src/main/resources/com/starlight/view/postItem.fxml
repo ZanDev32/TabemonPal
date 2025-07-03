@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="post" prefHeight="512.0" prefWidth="465.0" style="-fx-background-color: #ffff;" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="post" cache="true" prefHeight="512.0" prefWidth="465.0" style="-fx-background-color: #ffff;" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <VBox fx:id="post1" prefHeight="428.0" prefWidth="425.0">
          <children>
-            <HBox prefHeight="36.0" prefWidth="425.0" style="-fx-background-color: fffff;" styleClass="background-window">
+            <HBox prefHeight="36.0" prefWidth="425.0" style="-fx-background-color: #ffff;" styleClass="background-window">
                <children>
                   <ImageView fx:id="profile1" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                      <HBox.margin>
@@ -113,4 +113,7 @@
          </children>
       </VBox>
    </children>
+   <opaqueInsets>
+      <Insets bottom="20.0" />
+   </opaqueInsets>
 </VBox>

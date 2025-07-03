@@ -38,7 +38,7 @@ public class App extends Application {
         apiThread.setDaemon(true);
         apiThread.start();
 
-        FXMLVerificator.verifyAll();
+        //FXMLVerificator.verifyAll();
         scene = new Scene(loadFXML("splashScreen"), 1280, 720);
 
         scene = new Scene(loadFXML("splashScreen"), 1280, 720);

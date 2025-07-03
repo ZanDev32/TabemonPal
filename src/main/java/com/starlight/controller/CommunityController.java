@@ -30,7 +30,23 @@ import javafx.util.Duration;
  * the user to create new posts.
  */
 public class CommunityController implements Initializable {
+    @FXML
+    private VBox post;
 
+    @FXML
+    private ImageView likebutton;
+
+    @FXML
+    private MFXButton commentcounter;
+
+    @FXML
+    private ImageView likebutton1;
+
+    @FXML
+    private MFXButton sharebutton;
+
+    @FXML
+    private ImageView likebutton11;
 
     @FXML
     private Label dailytitle1;
@@ -84,10 +100,7 @@ public class CommunityController implements Initializable {
     private Label description;
 
     @FXML
-    private MFXButton likebutton;
-
-    @FXML
-    private Label likecounter;
+    private MFXButton likecounter;
 
     @FXML
     private VBox postlist;
@@ -104,8 +117,6 @@ public class CommunityController implements Initializable {
     private ImageView dailyphoto4;
     @FXML
     private ImageView recentphoto1;
-    @FXML
-    private MFXButton CreatePost;
 
     private final PostDataRepository repository = new PostDataRepository();
 
@@ -193,8 +204,8 @@ public class CommunityController implements Initializable {
                     Label ut = (Label) node.lookup("#uploadtime");
                     Label t = (Label) node.lookup("#title");
                     Label d = (Label) node.lookup("#description");
-                    ImageView img = (ImageView) node.lookup("#image");
-                    Label lc = (Label) node.lookup("#likecounter");
+                    ImageView img = (ImageView) node.lookup("#recentphoto1");
+                    MFXButton lc = (MFXButton) node.lookup("#likecounter");
 
                     u.setText(usr);
                     t.setText(tits);
@@ -228,7 +239,6 @@ public class CommunityController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
         loadPosts();
-        CreatePost.setOnAction(event -> showCreatePostPopup());
     }
 
     /**
