@@ -333,7 +333,7 @@
                                     <Insets bottom="15.0" />
                                  </VBox.margin>
                     </VBox>
-                              <MFXButton text="Create new post" />
+                              <MFXButton fx:id="createpost" text="Create new post" />
                   </children>
                   <GridPane.margin>
                     <Insets left="35.0" />

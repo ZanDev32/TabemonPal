@@ -31,6 +31,9 @@ import javafx.util.Duration;
  */
 public class CommunityController implements Initializable {
     @FXML
+    private MFXButton createpost;
+
+    @FXML
     private VBox post;
 
     @FXML
