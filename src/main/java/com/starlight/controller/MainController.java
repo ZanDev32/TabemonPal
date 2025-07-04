@@ -18,6 +18,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.RowConstraints;
 import javafx.concurrent.Task;
 
 /**
@@ -25,6 +26,9 @@ import javafx.concurrent.Task;
  * track of the active navigation button.
  */
 public class MainController implements Initializable {
+    
+    @FXML
+    private RowConstraints navbar;
     
     private MFXButton currentActiveButton;
     

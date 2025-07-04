@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="post" cache="true" prefHeight="512.0" prefWidth="465.0" style="-fx-background-color: #ffff;" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.PostItemController">
+<VBox fx:id="post" cache="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="512.0" prefWidth="465.0" style="-fx-background-color: #ffff; -fx-border-image-width: 40;" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.PostItemController">
    <children>
       <VBox fx:id="post1" prefHeight="428.0" prefWidth="425.0">
          <children>

@@ -1,19 +1,5 @@
 <posts>
   <post>
-    <username>M. Fakih Sahman</username>
-    <title>Tasty Pancakes</title>
-    <description>Fluffy pancakes with syrup.</description>
-    <ingredients>- 1 cup flour
-- 2 eggs
-- 1/2 cup milk</ingredients>
-    <directions>Mix ingredients.
-Cook on skillet.</directions>
-    <image>src/main/resources/com/starlight/images/dummy/recent_1.png</image>
-    <rating>4.5</rating>
-    <uploadtime>2023-11-22 10:00</uploadtime>
-    <likecount>12</likecount>
-  </post>
-  <post>
     <username>Khairun Nissa</username>
     <title>Veggie Salad</title>
     <description>Fresh vegetable salad.</description>
@@ -26,27 +12,5 @@ Serve chilled.</directions>
     <rating>4.8</rating>
     <uploadtime>2023-11-23 11:00</uploadtime>
     <likecount>8</likecount>
-  </post>
-  <post>
-    <username>gw</username>
-    <title>qwert</title>
-    <description>asdfg</description>
-    <ingredients>zxcvb</ingredients>
-    <directions>123344</directions>
-    <image>/home/zan/Documents/main_folder/pfp/52073144.jpg</image>
-    <rating>0</rating>
-    <uploadtime>2025-06-22 10:09</uploadtime>
-    <likecount>0</likecount>
-  </post>
-  <post>
-    <username>admin</username>
-    <title>asdas</title>
-    <description>asdasd</description>
-    <ingredients>asdasd</ingredients>
-    <directions>asdas</directions>
-    <image>/home/zan/Documents/collage/TabemonPal/src/main/resources/com/starlight/icon/fire.png</image>
-    <rating>0</rating>
-    <uploadtime>2025-07-04 02:18</uploadtime>
-    <likecount>0</likecount>
   </post>
 </posts>

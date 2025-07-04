@@ -3,8 +3,12 @@ package com.starlight.controller;
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
+import javafx.scene.layout.HBox;
 
 public class NavbarController {
+    @FXML
+    private HBox navbar;
+
     @FXML
     private MFXTextField searchbar;
 

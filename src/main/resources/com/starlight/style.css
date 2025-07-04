@@ -129,6 +129,11 @@
     -fx-font-weight: 800;
         font-weight: 800;
 }
+
+.button-icon {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
 /* debugging only
 
 .VBox {
