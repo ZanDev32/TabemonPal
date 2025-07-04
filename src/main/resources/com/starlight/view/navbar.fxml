@@ -7,7 +7,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 
-<HBox fx:id="navbar" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="861.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.NavbarController">
+<HBox fx:id="navbar" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="861.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.NavbarController">
    <children>
       <MFXTextField fx:id="searchbar" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="62.0" prefWidth="378.0" promptText="Search Anything" HBox.hgrow="ALWAYS">
          <HBox.margin>

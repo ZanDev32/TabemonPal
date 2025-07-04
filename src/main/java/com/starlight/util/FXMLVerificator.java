@@ -41,7 +41,7 @@ public class FXMLVerificator {
             String original = content;
 
             // Downgrade xmlns version
-            content = content.replaceAll("http://javafx.com/javafx/\\d+", EXPECTED_NAMESPACE);
+            content = content.replaceAll("http://javafx.com/javafx/\\d+(?:\\.\\d+)*", EXPECTED_NAMESPACE);
 
             // Detect illegal fx attributes
             for (String attr : ILLEGAL_ATTRIBUTES) {
