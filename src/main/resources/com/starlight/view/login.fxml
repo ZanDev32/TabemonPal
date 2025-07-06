@@ -43,7 +43,7 @@
                         <Label fx:id="username" text="Welcome Back!" GridPane.rowIndex="2" />
                         <VBox maxWidth="-Infinity" prefHeight="319.0" prefWidth="390.0" GridPane.rowIndex="4">
                            <children>
-                              <MFXTextField fx:id="email" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="285.0" promptText="Username / Email">
+                              <MFXTextField fx:id="emailOrUsername" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="285.0" promptText="Username / Email">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
@@ -53,12 +53,12 @@
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </MFXPasswordField>
-                              <MFXButton fx:id="Loginbutton" buttonType="RAISED" maxWidth="1.7976931348623157E308" styleClass="button-community" text="Login Now">
+                              <MFXButton fx:id="loginButton" buttonType="RAISED" maxWidth="1.7976931348623157E308" onMouseClicked="#handleLogin" styleClass="button-community" text="Login Now">
                                  <VBox.margin>
                                     <Insets bottom="20.0" />
                                  </VBox.margin>
                               </MFXButton>
-                              <MFXButton fx:id="register" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" style="-fx-border-color: #EED8AF; -fx-background-radius: 25; -fx-border-radius: 25;" text="Register" />
+                              <MFXButton fx:id="register" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" onMouseClicked="#handleRegister" style="-fx-border-color: #EED8AF; -fx-background-radius: 25; -fx-border-radius: 25;" text="Register" />
                            </children>
                            <GridPane.margin>
                               <Insets top="20.0" />

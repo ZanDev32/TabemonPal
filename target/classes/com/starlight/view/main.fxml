@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1178.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
+<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1178.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
       <GridPane prefHeight="719.0" prefWidth="290.0" styleClass="sideBar" stylesheets="@../style.css">
         <columnConstraints>
@@ -142,11 +142,10 @@
           <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints fx:id="navbar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="625.0" vgrow="ALWAYS" />
         </rowConstraints>
         <children>
-          <fx:include source="navbar.fxml" GridPane.columnIndex="0" GridPane.rowIndex="0" />
         </children>
       </GridPane>
   </center>

@@ -17,6 +17,7 @@ import javafx.stage.Stage;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
+import com.starlight.util.Session;
 
 /**
  * Controller for the user settings dialog where profile information can be
@@ -24,7 +25,7 @@ import com.starlight.models.User;
  */
 public class UserSettingController implements Initializable {
     @FXML
-    private ImageView profile;
+    private ImageView profileimage;
 
     @FXML
     private MFXButton imagepicker;
@@ -123,6 +124,10 @@ public class UserSettingController implements Initializable {
                     stage.close();
                 }
             });
+        }
+        User currentSessionUser = Session.getCurrentUser();
+        if (currentSessionUser != null && welcomeLabel != null) {
+            welcomeLabel.setText("Hello, " + currentSessionUser.username);
         }
     }
 

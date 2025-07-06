@@ -5,6 +5,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import com.starlight.util.Session;
+
 import io.github.palexdev.materialfx.controls.MFXButton;
 
 import java.util.logging.Level;
@@ -17,8 +19,8 @@ import javafx.scene.Parent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.layout.RowConstraints;
 import javafx.concurrent.Task;
 
 /**
@@ -27,8 +29,7 @@ import javafx.concurrent.Task;
  */
 public class MainController implements Initializable {
     
-    @FXML
-    private RowConstraints navbar;
+    private NavbarController navbarController;
     
     private MFXButton currentActiveButton;
     
@@ -112,8 +113,8 @@ public class MainController implements Initializable {
 
     /**
      * Loads the given FXML page into the grid pane container.
-     */
-    private void loadPage(String page) {
+    */
+    void loadPage(String page) {
         String fxmlPath = "/com/starlight/view/" + page + ".fxml";
 
         try {
@@ -128,11 +129,22 @@ public class MainController implements Initializable {
             GridPane.setHalignment(loadingRoot, HPos.CENTER);
 
             Task<Parent> task = new Task<>() {
-                @Override
-                protected Parent call() throws Exception {
-                    return FXMLLoader.load(getClass().getResource(fxmlPath));
+            @Override
+            protected Parent call() throws Exception {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Parent root = loader.load();
+                
+                // Get the controller and pass user data if applicable
+                Object controller = loader.getController();
+                if (controller instanceof UserSettingController) {
+                    ((UserSettingController) controller).setUser(
+                        Session.getCurrentUser()
+                    );
                 }
-            };
+                
+                return root;
+            }
+        };
 
             task.setOnSucceeded(ev -> {
                 Parent root = task.getValue();
@@ -142,6 +154,8 @@ public class MainController implements Initializable {
                     GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
                 );
                 gp.add(root, 0, 1);
+                GridPane.setValignment(root, VPos.CENTER);
+                GridPane.setHalignment(root, HPos.CENTER);
             });
 
             task.setOnFailed(ev -> {
@@ -160,7 +174,7 @@ public class MainController implements Initializable {
     /**
      * Updates the navigation bar to mark the given button as active.
      */
-    private void selected(MFXButton button) {
+    void selected(MFXButton button) {
 
         Integer row = GridPane.getRowIndex(button);
         if (row == null) row = 0;
@@ -182,6 +196,22 @@ public class MainController implements Initializable {
     /** Initializes the controller by showing the home view. */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Load navbar and set up controller communication
+        try {
+            FXMLLoader navbarLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/navbar.fxml"));
+            HBox navbarNode = navbarLoader.load();
+            navbarController = navbarLoader.getController();
+            navbarController.setMainController(this);
+            
+            // Add navbar to the GridPane at row 0
+            gp.add(navbarNode, 0, 0);
+            navbarNode.setMaxWidth(Double.MAX_VALUE);
+
+        } catch (IOException e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE,
+                    "Failed to load navbar.fxml", e);
+        }
+        
         loadPage("home");
         selected(home);
     }

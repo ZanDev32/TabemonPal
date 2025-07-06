@@ -62,20 +62,35 @@ public class UserApiServer {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-                exchange.sendResponseHeaders(405, -1);
+                sendErrorResponse(exchange, 405, "Method not allowed. Use POST for login requests.");
                 return;
             }
+            
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             User creds = (User) xstream.fromXML(body);
             List<User> users = repository.loadUsers();
+            
+            // Check for either email or username match
             Optional<User> match = users.stream()
-                    .filter(u -> u.email != null && u.email.equals(creds.email) && u.password.equals(creds.password))
+                    .filter(u -> ((u.email != null && u.email.equals(creds.email)) || 
+                                 (u.username != null && u.username.equals(creds.email))) && 
+                                 u.password.equals(creds.password))
                     .findFirst();
+                    
             if (match.isPresent()) {
                 sendXml(exchange, 200, xstream.toXML(match.get()));
             } else {
-                sendXml(exchange, 401, "<error/>");
+                // More descriptive error message for authentication failure
+                sendErrorResponse(exchange, 401, "Invalid username/email or password");
             }
+        }
+        
+        /**
+         * Sends an error response with the specified status code and message
+         */
+        private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+            String errorXml = "<error><message>" + message + "</message></error>";
+            sendXml(exchange, statusCode, errorXml);
         }
     }
 
@@ -105,42 +120,118 @@ public class UserApiServer {
     private class UsersHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange exchange) throws IOException {
-            String path = exchange.getRequestURI().getPath();
+            try {
+                // Parse path to extract username
+                String path = exchange.getRequestURI().getPath();
+                String username = extractUsername(path);
+                
+                if (username == null) {
+                    sendErrorResponse(exchange, 404, "Invalid user path. Expected format: /users/{username}");
+                    return;
+                }
+                
+                // Route to appropriate method based on HTTP method
+                String method = exchange.getRequestMethod();
+                switch (method) {
+                    case "GET":
+                        handleGetUser(exchange, username);
+                        break;
+                    case "PUT":
+                        handleUpdateUser(exchange, username);
+                        break;
+                    default:
+                        sendErrorResponse(exchange, 405, "Method not allowed. Supported methods: GET, PUT");
+                        break;
+                }
+            } catch (Exception e) {
+                // Log the exception
+                System.err.println("Error handling user request: " + e.getMessage());
+                e.printStackTrace();
+                sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
+            }
+        }
+        
+        /**
+         * Extracts username from the path.
+         * Valid path format: /users/{username}
+         */
+        private String extractUsername(String path) {
+            if (path == null) return null;
+            
             String[] parts = path.split("/");
-            if (parts.length < 3) {
-                exchange.sendResponseHeaders(404, -1);
+            // Path should be: "", "users", "{username}"
+            if (parts.length != 3) return null;
+            
+            return parts[2];
+        }
+        
+        /**
+         * Handles GET request to retrieve user profile
+         */
+        private void handleGetUser(HttpExchange exchange, String username) throws IOException {
+            List<User> users = repository.loadUsers();
+            Optional<User> user = users.stream()
+                    .filter(u -> u.username != null && u.username.equals(username))
+                    .findFirst();
+                    
+            if (user.isPresent()) {
+                sendXml(exchange, 200, xstream.toXML(user.get()));
+            } else {
+                sendErrorResponse(exchange, 404, "User not found: " + username);
+            }
+        }
+        
+        /**
+         * Handles PUT request to update user profile
+         */
+        private void handleUpdateUser(HttpExchange exchange, String username) throws IOException {
+            // Read and parse request body
+            String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+            if (body == null || body.isEmpty()) {
+                sendErrorResponse(exchange, 400, "Request body is empty");
                 return;
             }
-            String username = parts[2];
-            if ("PUT".equalsIgnoreCase(exchange.getRequestMethod())) {
-                String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
-                User updated = (User) xstream.fromXML(body);
-                List<User> users = repository.loadUsers();
-                for (int i = 0; i < users.size(); i++) {
-                    if (users.get(i).username != null && users.get(i).username.equals(username)) {
-                        User u = users.get(i);
-                        if (updated.email != null) u.email = updated.email;
-                        if (updated.password != null) u.password = updated.password;
-                        if (updated.birthDay != null) u.birthDay = updated.birthDay;
-                        repository.saveUsers(users);
-                        sendXml(exchange, 200, xstream.toXML(u));
-                        return;
-                    }
-                }
-                exchange.sendResponseHeaders(404, -1);
-            } else if ("GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-                List<User> users = repository.loadUsers();
-                Optional<User> user = users.stream()
-                        .filter(u -> u.username != null && u.username.equals(username))
-                        .findFirst();
-                if (user.isPresent()) {
-                    sendXml(exchange, 200, xstream.toXML(user.get()));
-                } else {
-                    exchange.sendResponseHeaders(404, -1);
-                }
-            } else {
-                exchange.sendResponseHeaders(405, -1);
+            
+            // Parse user object
+            User updated;
+            try {
+                updated = (User) xstream.fromXML(body);
+            } catch (Exception e) {
+                sendErrorResponse(exchange, 400, "Invalid user data format: " + e.getMessage());
+                return;
             }
+            
+            // Find and update user
+            List<User> users = repository.loadUsers();
+            boolean userFound = false;
+            
+            for (int i = 0; i < users.size(); i++) {
+                User existingUser = users.get(i);
+                if (existingUser.username != null && existingUser.username.equals(username)) {
+                    // Update user fields if provided
+                    if (updated.email != null) existingUser.email = updated.email;
+                    if (updated.password != null) existingUser.password = updated.password;
+                    if (updated.birthDay != null) existingUser.birthDay = updated.birthDay;
+                    
+                    // Save updates and send response
+                    repository.saveUsers(users);
+                    sendXml(exchange, 200, xstream.toXML(existingUser));
+                    userFound = true;
+                    break;
+                }
+            }
+            
+            if (!userFound) {
+                sendErrorResponse(exchange, 404, "User not found: " + username);
+            }
+        }
+        
+        /**
+         * Sends an error response with the specified status code and message
+         */
+        private void sendErrorResponse(HttpExchange exchange, int statusCode, String message) throws IOException {
+            String errorXml = "<error><message>" + message + "</message></error>";
+            sendXml(exchange, statusCode, errorXml);
         }
     }
 

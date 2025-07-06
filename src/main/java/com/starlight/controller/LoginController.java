@@ -15,9 +15,12 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.Scene;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.input.KeyCode;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -36,74 +39,107 @@ public class LoginController implements Initializable {
     private Label username;
 
     @FXML
-    private MFXTextField email;
+    private MFXTextField emailOrUsername;
 
     @FXML
     private MFXTextField password;
 
     @FXML
-    private MFXButton Loginbutton;
+    private MFXButton loginButton;
 
     @FXML
     private MFXButton register;
 
+    /**
+     * Handles login button click event.
+     */
+    @FXML
+    void handleLogin(MouseEvent event) {
+        performLogin();
+    }
+    
+    /**
+     * Handles Enter key press in password field.
+     */
+    @FXML
+    void handleLogin(KeyEvent event) {
+        // Only proceed if Enter key is pressed
+        if (event.getCode() == KeyCode.ENTER) {
+            performLogin();
+        }
+    }
+    
+    /**
+     * Common login logic shared between mouse click and Enter key press.
+     */
+    private void performLogin() {
+        String em = emailOrUsername.getText();
+        String pass = password.getText();
+        try {
+            URL url = new URL("http://localhost:8000/login");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/xml");
+            conn.setDoOutput(true);
+
+            User creds = new User();
+            creds.email = em;
+            creds.password = pass;
+
+            XStream xs = new XStream(new DomDriver());
+            xs.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
+            xs.alias("user", User.class);
+
+            String xml = xs.toXML(creds);
+            try (OutputStream os = conn.getOutputStream()) {
+                os.write(xml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            if (conn.getResponseCode() == 200) {
+                try (InputStream is = conn.getInputStream()) {
+                    User logged = (User) xs.fromXML(is);
+                    Session.setCurrentUser(logged);
+                }
+                System.out.println("Login success");
+                App.loadMainWithSplash();
+            } else {
+                System.out.println("Login failed: " + conn.getResponseCode());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
-     * Wires up login and registration button handlers.
+     * Handles register button click event.
      */
+    @FXML
+    void handleRegister(MouseEvent event) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/RegisterDialog.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.APPLICATION_MODAL);
+            stage.setResizable(false);
+            stage.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Loginbutton.setOnAction(event -> {
-            String em = email.getText();
-            String pass = password.getText();
-            try {
-                URL url = new URL("http://localhost:8000/login");
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setRequestMethod("POST");
-                conn.setRequestProperty("Content-Type", "application/xml");
-                conn.setDoOutput(true);
-
-                User creds = new User();
-                creds.email = em;
-                creds.password = pass;
-
-                XStream xs = new XStream(new DomDriver());
-                xs.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
-                xs.alias("user", User.class);
-
-                String xml = xs.toXML(creds);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(xml.getBytes(StandardCharsets.UTF_8));
-                }
-
-                if (conn.getResponseCode() == 200) {
-                    try (InputStream is = conn.getInputStream()) {
-                        User logged = (User) xs.fromXML(is);
-                        Session.setCurrentUser(logged);
-                    }
-                    System.out.println("Login success");
-                    App.loadMainWithSplash();
-                } else {
-                    System.out.println("Login failed: " + conn.getResponseCode());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
+        password.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                performLogin();
             }
         });
 
-        register.setOnAction(event -> {
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/RegisterDialog.fxml"));
-                Parent root = loader.load();
-                Stage stage = new Stage();
-                stage.setScene(new Scene(root));
-                stage.initModality(Modality.APPLICATION_MODAL);
-                stage.setResizable(false);
-                stage.showAndWait();
-            } catch (Exception e) {
-                e.printStackTrace();
+        emailOrUsername.setOnKeyPressed(event -> {
+            if (event.getCode() == KeyCode.ENTER) {
+                performLogin();
             }
         });
     }
-
 }

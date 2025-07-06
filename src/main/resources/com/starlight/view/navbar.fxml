@@ -16,7 +16,7 @@
       </MFXTextField>
       <HBox alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="95.0" prefWidth="325.0" HBox.hgrow="ALWAYS">
          <children>
-            <MFXButton fx:id="setting" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="41.0" style="-fx-background-color: tra;" styleClass="button-icon" text=" ">
+            <MFXButton fx:id="setting" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#setting" prefHeight="40.0" prefWidth="41.0" style="-fx-background-color: transparent;" styleClass="button-icon" text=" ">
                <graphic>
                   <ImageView fitHeight="40.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true" translateX="-8.0">
                      <image>
@@ -28,7 +28,7 @@
                   <Insets />
                </HBox.margin>
             </MFXButton>
-            <MFXButton fx:id="message" minHeight="-Infinity" minWidth="-Infinity" prefHeight="37.0" prefWidth="48.0" styleClass="button-icon" text=" ">
+            <MFXButton fx:id="inbox" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#inbox" prefHeight="37.0" prefWidth="48.0" styleClass="button-icon" text=" ">
                <graphic>
                   <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
                      <image>
@@ -40,7 +40,7 @@
                   <Insets left="35.0" />
                </HBox.margin>
             </MFXButton>
-            <MFXButton fx:id="notification" minHeight="-Infinity" minWidth="-Infinity" prefHeight="43.0" prefWidth="40.0" styleClass="button-icon" text=" ">
+            <MFXButton fx:id="notification" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#notification" prefHeight="43.0" prefWidth="40.0" styleClass="button-icon" text=" ">
                <graphic>
                   <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-10.0">
                      <image>
@@ -52,7 +52,7 @@
                   <Insets left="35.0" />
                </HBox.margin>
             </MFXButton>
-            <MFXButton fx:id="profile" prefHeight="48.0" prefWidth="91.0" styleClass="button-icon" text="User">
+            <MFXButton fx:id="profile" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#profile" prefHeight="48.0" styleClass="button-icon" text="user">
                <graphic>
                   <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                      <image>
@@ -65,6 +65,9 @@
                </HBox.margin>
             </MFXButton>
          </children>
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
       </HBox>
    </children>
 </HBox>
