@@ -3,6 +3,7 @@ package com.starlight.api;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.BindException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -21,23 +22,50 @@ import com.sun.net.httpserver.HttpServer;
  */
 public class UserApiServer {
     /** Underlying lightweight HTTP server. */
-    private final HttpServer server;
+    private HttpServer server;
     /** Repository used to read and write user data. */
     private final UserDataRepository repository = new UserDataRepository();
     /** XStream instance configured for the user model. */
     private final XStream xstream = new XStream(new DomDriver());
+    /** Flag to prevent multiple starts */
+    private boolean started = false;
 
     /**
      * Creates the API server bound to the given port.
+     * Only allows instantiation from the App class.
      *
      * @param port the port to bind the server to
+     * @throws IOException if the server cannot be created
+     * @throws SecurityException if called from a class other than App
      */
     public UserApiServer(int port) throws IOException {
+
         xstream.allowTypesByWildcard(new String[]{"com.starlight.models.*", "java.util.*"});
         xstream.alias("user", User.class);
         xstream.alias("users", List.class);
         repository.ensureDummyData();
-        server = HttpServer.create(new InetSocketAddress(port), 0);
+        
+        // Try to create server with port, if fails try next ports
+        int currentPort = port;
+        int maxAttempts = 10;
+        boolean serverCreated = false;
+        
+        for (int attempt = 0; attempt < maxAttempts; attempt++) {
+            try {
+                server = HttpServer.create(new InetSocketAddress(currentPort), 0);
+                System.out.println("Server created on port " + currentPort);
+                serverCreated = true;
+                break;
+            } catch (BindException e) {
+                System.out.println("Port " + currentPort + " already in use, trying next port...");
+                currentPort++;
+            }
+        }
+        
+        if (!serverCreated) {
+            throw new IOException("Failed to bind server to any port after " + maxAttempts + " attempts");
+        }
+        
         server.createContext("/login", new LoginHandler());
         server.createContext("/register", new RegisterHandler());
         server.createContext("/users", new UsersHandler());
@@ -45,17 +73,25 @@ public class UserApiServer {
 
     /**
      * Starts the HTTP server.
+     * Only allows start if called by App class.
      */
     public void start() {
-        server.start();
+        if (!started) {
+            server.start();
+            started = true;
+        }
     }
 
     /**
      * Stops the HTTP server.
      */
     public void stop() {
-        server.stop(0);
+        if (started) {
+            server.stop(0);
+            started = false;
+        }
     }
+
 
     /** Handler for user login requests. */
     private class LoginHandler implements HttpHandler {
@@ -249,14 +285,5 @@ public class UserApiServer {
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
-    }
-
-    /**
-     * Convenience main method to run the server outside of JavaFX.
-     */
-    public static void main(String[] args) throws Exception {
-        UserApiServer server = new UserApiServer(8000);
-        System.out.println("User API server running on port 8000");
-        server.start();
     }
 }

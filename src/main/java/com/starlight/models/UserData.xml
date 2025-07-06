@@ -18,9 +18,21 @@
     <birthDay>1998-07-30</birthDay>
   </user>
   <user>
-    <username>admin</username>
-    <email>user</email>
-    <password>user</password>
+    <username>M. Fakih Sahman</username>
+    <email>fakih@example.com</email>
+    <password>pancake</password>
+    <birthDay>1990-01-01</birthDay>
+  </user>
+  <user>
+    <username>Khairun Nissa</username>
+    <email>nissa@example.com</email>
+    <password>salad</password>
+    <birthDay>1992-05-12</birthDay>
+  </user>
+  <user>
+    <username>gw</username>
+    <email>gw@example.com</email>
+    <password>qwerty</password>
     <birthDay>1998-07-30</birthDay>
   </user>
   <user>
@@ -46,5 +58,10 @@
     <email>fumo@example.com</email>
     <password>fumo</password>
     <birthDay>1999-09-09</birthDay>
+  </user>
+  <user>
+    <username>fumbo</username>
+    <email>fumbo@fumo.com</email>
+    <password>123456</password>
   </user>
 </users>

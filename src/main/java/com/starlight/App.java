@@ -65,9 +65,9 @@ public class App extends Application {
      */
     public static void showLogin() {
         try {
-            scene.setRoot(loadFXML("login"));
-        } catch (IOException ex) {
-            ex.printStackTrace();
+            setRoot("Authorization");
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -77,8 +77,10 @@ public class App extends Application {
      */
     public static void loadMainWithSplash() {
         try {
+            System.out.println("Loading splash screen before main view");
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
+            System.err.println("Failed to load splash screen: " + ex.getMessage());
             ex.printStackTrace();
             return;
         }
@@ -86,9 +88,21 @@ public class App extends Application {
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(e -> {
             try {
+                System.out.println("Now loading main view");
                 scene.setRoot(loadFXML("main"));
+                System.out.println("Main view loaded successfully");
             } catch (IOException ex) {
+                System.err.println("Failed to load main view: " + ex.getMessage());
                 ex.printStackTrace();
+                
+                // Fallback - try to load main directly if there was an error
+                try {
+                    System.out.println("Attempting direct load of main view");
+                    scene.setRoot(loadFXML("main"));
+                } catch (IOException fallbackEx) {
+                    System.err.println("Fallback failed too: " + fallbackEx.getMessage());
+                    fallbackEx.printStackTrace();
+                }
             }
         });
         delay.play();
@@ -101,7 +115,21 @@ public class App extends Application {
      * @return the loaded {@link Parent}
      */
     private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("view/" + fxml + ".fxml"));
+        String resourcePath = "view/" + fxml + ".fxml";
+        
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(resourcePath));
+        if (fxmlLoader.getLocation() == null) {
+            System.err.println("FXML resource not found: " + resourcePath);
+            // Try with leading slash
+            resourcePath = "/com/starlight/view/" + fxml + ".fxml";
+            System.out.println("Trying alternative path: " + resourcePath);
+            fxmlLoader = new FXMLLoader(App.class.getClassLoader().getResource(resourcePath));
+            
+            if (fxmlLoader.getLocation() == null) {
+                throw new IOException("Could not find FXML resource: " + fxml + ".fxml");
+            }
+        }
+        
         return fxmlLoader.load();
     }
 

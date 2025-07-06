@@ -1,5 +1,6 @@
 package com.starlight.controller;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -10,7 +11,9 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
@@ -23,7 +26,7 @@ import com.starlight.util.Session;
  * Controller for the user settings dialog where profile information can be
  * edited.
  */
-public class UserSettingController implements Initializable {
+public class ProfileController implements Initializable {
     @FXML
     private ImageView profileimage;
 
@@ -46,15 +49,12 @@ public class UserSettingController implements Initializable {
     private MFXButton savebutton;
 
     @FXML
-    private MFXButton cancelbutton;
-
-    @FXML
     private MFXButton deleteaccbutton;
 
     private User currentUser;
     private Runnable onLogout;
+    private Stage previousStage;
 
-    // Remove usernameField, use currentUser.username for all username logic
     public void setUser(User user) {
         this.currentUser = user;
         if (welcomeLabel != null) welcomeLabel.setText("Hello, " + user.username);
@@ -67,6 +67,15 @@ public class UserSettingController implements Initializable {
 
     public void setOnLogout(Runnable onLogout) {
         this.onLogout = onLogout;
+    }
+    
+    /**
+     * Sets the stage to return to when the "Back to previous menu" button is clicked.
+     *
+     * @param stage the stage to return to
+     */
+    public void setPreviousStage(Stage stage) {
+        this.previousStage = stage;
     }
 
     /**
@@ -105,26 +114,9 @@ public class UserSettingController implements Initializable {
             }
         });
 
-        cancelbutton.setOnAction(event -> {
-            Stage stage = (Stage) cancelbutton.getScene().getWindow();
-            stage.close();
-        });
-        // Add delete logic
-        if (cancelbutton.getParent() != null && cancelbutton.getParent().lookup("#deleteBtn") != null) {
-            MFXButton deleteBtn = (MFXButton) cancelbutton.getParent().lookup("#deleteBtn");
-            deleteBtn.setOnAction(event -> {
-                // Remove user from UserDataRepository
-                if (currentUser != null) {
-                    com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-                    java.util.List<com.starlight.models.User> users = repo.loadUsers();
-                    users.removeIf(u -> u.username.equals(currentUser.username));
-                    repo.saveUsers(users);
-                    if (onLogout != null) onLogout.run();
-                    Stage stage = (Stage) deleteBtn.getScene().getWindow();
-                    stage.close();
-                }
-            });
-        }
+        // Add delete account button handler
+        deleteaccbutton.setOnAction(event -> onDelete(event));
+
         User currentSessionUser = Session.getCurrentUser();
         if (currentSessionUser != null && welcomeLabel != null) {
             welcomeLabel.setText("Hello, " + currentSessionUser.username);
@@ -132,7 +124,7 @@ public class UserSettingController implements Initializable {
     }
 
     @FXML
-    private void onUpdate() {
+    private void onUpdate(javafx.event.ActionEvent event) {
         String email = emailField.getText();
         String password = passwordField.getText();
         java.time.LocalDate birthDay = birthDayPicker.getValue();
@@ -158,14 +150,55 @@ public class UserSettingController implements Initializable {
     }
 
     @FXML
-    private void onDelete() {
+    private void onDelete(javafx.event.ActionEvent event) {
+        // Remove user from UserDataRepository using the new deleteUser method
         com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-        java.util.List<com.starlight.models.User> users = repo.loadUsers();
-        users.removeIf(u -> u.username.equals(currentUser.username));
-        repo.saveUsers(users);
-        if (onLogout != null) onLogout.run();
-        Stage stage = (Stage) deleteaccbutton.getScene().getWindow();
-        stage.close();
+        boolean userDeleted = repo.deleteUser(currentUser.username);
+        
+        if (!userDeleted) {
+            System.err.println("User could not be deleted.");
+            return;
+        }
+        
+        // Clear current user session
+        com.starlight.util.Session.setCurrentUser(null);
+        
+        // Execute logout callback if provided
+        if (onLogout != null) {
+            onLogout.run();
+        }
+        
+        try {
+            // Load the authorization view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/Authorization.fxml"));
+            Parent authView = loader.load();
+            
+            // Get the current stage
+            Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
+            
+            // Set the authorization view in the current stage
+            javafx.scene.Scene scene = new javafx.scene.Scene(authView);
+            currentStage.setScene(scene);
+            currentStage.setTitle("Login/Register");
+            currentStage.show();
+            
+            // Display a confirmation message
+            System.out.println("User account deleted successfully");
+            
+        } catch (IOException e) {
+            System.err.println("Failed to load authorization view: " + e.getMessage());
+            e.printStackTrace();
+            
+            // Fallback to previous behavior if authorization view can't be loaded
+            Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
+            currentStage.hide();
+            
+            if (previousStage != null) {
+                previousStage.show();
+                previousStage.toFront();
+                previousStage.requestFocus();
+            }
+        }
     }
 
 }

@@ -125,4 +125,26 @@ public class UserDataRepository {
             throw new RuntimeException("Failed to save users", e);
         }
     }
+
+    /**
+     * Deletes a user by username and saves the updated user list
+     * @param username the username of the user to delete
+     * @return true if user was found and deleted, false otherwise
+     */
+    public boolean deleteUser(String username) {
+        List<User> users = loadUsers(false); // Load only real users, not dummy ones
+        int initialSize = users.size();
+        
+        // Remove all instances of the user (in case of duplicates)
+        users.removeIf(user -> user.username.equals(username));
+        
+        // Check if any users were removed
+        if (users.size() < initialSize) {
+            // Save the updated list
+            saveUsers(users);
+            return true;
+        }
+        
+        return false;
+    }
 }

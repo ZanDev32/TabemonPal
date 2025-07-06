@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
 <?import io.github.palexdev.materialfx.controls.MFXTextField?>
 <?import javafx.geometry.Insets?>
 <?import javafx.geometry.Rectangle2D?>
@@ -11,7 +12,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" styleClass="create-post" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.RegisterController">
+<VBox fx:id="registerView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="575.0" styleClass="create-post" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.RegisterViewController">
    <padding>
       <Insets bottom="32.0" left="50.0" right="50.0" top="32.0" />
    </padding>
@@ -22,9 +23,9 @@
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="24.0" vgrow="NEVER" />
-          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="185.0" vgrow="ALWAYS" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="3.0" prefHeight="26.0" vgrow="ALWAYS" />
-            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="351.0" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="167.0" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="3.0" prefHeight="18.0" vgrow="ALWAYS" />
+            <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="376.0" vgrow="ALWAYS" />
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="20.0" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
@@ -33,33 +34,27 @@
                   <Rectangle2D height="150.0" width="150.0" />
                </viewport>
             </ImageView>
-            <Label fx:id="username" text="Welcome Pal!" GridPane.rowIndex="2" />
-            <VBox maxWidth="-Infinity" prefHeight="233.0" prefWidth="277.0" GridPane.rowIndex="3">
+            <Label text="Welcome Pal!" GridPane.rowIndex="2" />
+            <VBox maxWidth="-Infinity" prefHeight="319.0" prefWidth="390.0" GridPane.rowIndex="3">
                <children>
-                  <Label text="Username" />
-                  <MFXTextField fx:id="email" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" prefWidth="277.0">
+                  <MFXTextField fx:id="username" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="277.0" promptText="Username">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </MFXTextField>
-                  <Label text="Email" />
-                  <MFXTextField fx:id="email1" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" prefWidth="277.0">
+                  <MFXTextField fx:id="email" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="277.0" promptText="Email">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </MFXTextField>
-                  <Label text="Password" />
-                  <MFXTextField fx:id="password" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="35.0" prefWidth="277.0">
-                     <VBox.margin>
-                        <Insets bottom="20.0" />
-                     </VBox.margin>
-                  </MFXTextField>
-                  <MFXButton fx:id="register" buttonType="RAISED" maxWidth="1.7976931348623157E308" styleClass="button-community" text="Register">
+                  <MFXPasswordField fx:id="password" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="277.0" promptText="Password" />
+                  <Label fx:id="errorMessage" text="Error message" textFill="RED" visible="false" />
+                  <MFXButton fx:id="register" buttonType="RAISED" maxWidth="1.7976931348623157E308" onMouseClicked="#handleRegister" styleClass="button-community" text="Register">
                      <VBox.margin>
                         <Insets bottom="20.0" />
                      </VBox.margin>
                   </MFXButton>
-                  <MFXButton fx:id="login" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" style="-fx-border-color: #EED8AF; -fx-background-radius: 25; -fx-border-radius: 25;" text="Return to Login" />
+                  <MFXButton fx:id="login" depthLevel="LEVEL1" maxWidth="1.7976931348623157E308" onMouseClicked="#handleLogin" style="-fx-border-color: #EED8AF; -fx-background-radius: 25; -fx-border-radius: 25;" text="Return to Login" />
                </children>
                <GridPane.margin>
                   <Insets top="20.0" />
