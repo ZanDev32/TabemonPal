@@ -12,9 +12,10 @@ module com.starlight {
     requires jdk.httpserver;
 
     opens com.starlight to javafx.fxml;
-    opens com.starlight.controller to javafx.fxml;
+    opens com.starlight.controller;
     opens com.starlight.models;
     opens com.starlight.util;
+    opens com.starlight.api;
     
     exports com.starlight;
     exports com.starlight.controller;

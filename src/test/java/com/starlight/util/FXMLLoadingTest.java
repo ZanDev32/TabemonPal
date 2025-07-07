@@ -10,7 +10,6 @@ import java.util.stream.Stream;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.stage.Stage;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -23,10 +22,20 @@ import org.testfx.framework.junit5.ApplicationTest;
 public class FXMLLoadingTest extends ApplicationTest {
 
     static {
-        // Headless mode for TestFX (helpful for CI and local dev)
+        // Enable TestFX headless mode so JavaFX doesn't require a display
         System.setProperty("testfx.robot", "glass");
+        System.setProperty("testfx.headless", "true");
+        System.setProperty("glass.platform", "Monocle");
+        System.setProperty("monocle.platform", "Headless");
+        System.setProperty("prism.order", "sw");
+        System.setProperty("prism.text", "t2k");
         System.setProperty("java.awt.headless", "true");
-        System.setProperty("headless", "true");
+        
+        // Required for proper module access with Monocle in JavaFX 19
+        System.setProperty("javafx.platform", "monocle");
+        System.setProperty("monocle.headless.update", "false");
+        System.setProperty("monocle.keyboard", "null");
+        System.setProperty("monocle.mouse", "null");
     }
 
     // Collect all FXML file resource paths in the view package
@@ -35,12 +44,6 @@ public class FXMLLoadingTest extends ApplicationTest {
         return Files.list(dir)
                 .filter(p -> p.toString().endsWith(".fxml"))
                 .map(p -> "/com/starlight/view/" + p.getFileName().toString());
-    }
-
-    @Override
-    public void start(Stage stage) {
-        // Not needed for FXML loading tests, but required by ApplicationTest
-        // You can use stage.setScene(new Scene(...)) if you want to show nodes.
     }
 
     @ParameterizedTest
