@@ -5,7 +5,7 @@
 
     <groupId>com.starlight</groupId>
     <artifactId>tabemonpal</artifactId>
-    <version>0.1-ALPHA</version>
+    <version>0.5-ALPHA</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -142,21 +142,6 @@
                         --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
                     </argLine>
-                </configuration>
-            </plugin>
-            <plugin>
-                <!-- Build an executable JAR -->
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-                <configuration>
-                    <archive>
-                    <manifest>
-                        <addClasspath>true</addClasspath>
-                        <classpathPrefix>lib/</classpathPrefix>
-                        <mainClass>com.starlight.App</mainClass>
-                    </manifest>
-                    </archive>
                 </configuration>
             </plugin>
         </plugins>
