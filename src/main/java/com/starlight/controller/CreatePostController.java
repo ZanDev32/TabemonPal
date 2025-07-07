@@ -2,14 +2,14 @@ package com.starlight.controller;
 
 import java.io.File;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
+import java.util.List;
+
+import com.starlight.models.Post;
+import com.starlight.models.PostDataRepository;
+import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -21,12 +21,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
+/**
+ * Controller responsible for the "create post" dialog.
+ */
 public class CreatePostController implements Initializable {
-    @FXML
-    private Label status;
 
     @FXML
     private MFXTextField title;
@@ -54,8 +53,21 @@ public class CreatePostController implements Initializable {
 
     private File selectedImage;
 
-    private final String XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
+    private boolean success;
 
+    private final PostDataRepository repository = new PostDataRepository();
+
+    /**
+     * Indicates whether the user successfully created a post.
+     */
+    public boolean isSuccess() {
+        return success;
+    }
+
+    /**
+     * Initializes the controller by wiring up button actions and the image
+     * picker logic.
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         pickerstatus.setText("No image selected");
@@ -84,20 +96,23 @@ public class CreatePostController implements Initializable {
             String postDirections = directions.getText();
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty() || selectedImage == null) {
-                status.setText("Please complete all fields and select an image.");
+                System.err.println("Please complete all fields and select an image.");
                 return;
             }
 
-            boolean success = savePostToXML(postTitle, postDescription, postIngredients, postDirections, selectedImage.getAbsolutePath());
-            if (success) {
+            boolean result = savePostToXML(postTitle, postDescription, postIngredients, postDirections, selectedImage.getAbsolutePath());
+            success = result;
+            if (result) {
                 title.clear();
                 description.clear();
                 ingredients.clear();
                 directions.clear();
                 selectedImage = null;
-                status.setText("Post submitted and saved!");
+                System.out.println("Post submitted and saved!");
+                Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+                stage.close();
             } else {
-                status.setText("Error saving post.");
+                System.err.println("Error saving post.");
             }
         });
 
@@ -107,71 +122,38 @@ public class CreatePostController implements Initializable {
             ingredients.clear();
             directions.clear();
             selectedImage = null;
-            status.setText("Post creation canceled.");
+            System.err.println("Post creation canceled.");
 
             Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
             stage.close();
         });
     }
 
+    /**
+     * Persists a newly created post to XML storage.
+     *
+     * @return {@code true} if saving succeeded, otherwise {@code false}
+     */
     private boolean savePostToXML(String title, String description, String ingredients, String directions, String imagePath) {
         try {
-            File xmlFile = new File(XML_PATH);
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            Document doc;
-
-            if (!xmlFile.exists() || xmlFile.length() == 0) {
-                doc = dBuilder.newDocument();
-                Element root = doc.createElement("posts");
-                doc.appendChild(root);
-            } else {
-                try {
-                    doc = dBuilder.parse(xmlFile);
-                } catch (Exception ex) {
-                    doc = dBuilder.newDocument();
-                    Element root = doc.createElement("posts");
-                    doc.appendChild(root);
-                }
-            }
-
-            Element root = doc.getDocumentElement();
-
-            Element post = doc.createElement("post");
-
-            Element titleElem = doc.createElement("title");
-            titleElem.appendChild(doc.createTextNode(title));
-            post.appendChild(titleElem);
-
-            Element descElem = doc.createElement("description");
-            descElem.appendChild(doc.createTextNode(description));
-            post.appendChild(descElem);
-
-            Element ingElem = doc.createElement("ingredients");
-            ingElem.appendChild(doc.createTextNode(ingredients));
-            post.appendChild(ingElem);
-
-            Element dirElem = doc.createElement("directions");
-            dirElem.appendChild(doc.createTextNode(directions));
-            post.appendChild(dirElem);
-
-            Element imgElem = doc.createElement("image");
-            imgElem.appendChild(doc.createTextNode(imagePath));
-            post.appendChild(imgElem);
-
-            root.appendChild(post);
-
-            TransformerFactory transformerFactory = TransformerFactory.newInstance();
-            Transformer transformer = transformerFactory.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(xmlFile);
-            transformer.transform(source, result);
-
+            List<Post> posts = repository.loadPosts();
+            Post post = new Post();
+            post.username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : null;
+            post.title = title;
+            post.description = description;
+            post.ingredients = ingredients;
+            post.directions = directions;
+            post.image = imagePath;
+            post.rating = "0";
+            post.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+            post.likecount = "0";
+            posts.add(post);
+            repository.savePosts(posts);
             return true;
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
     }
+
 }

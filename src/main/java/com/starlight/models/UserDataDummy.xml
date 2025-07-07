@@ -1,0 +1,26 @@
+<users>
+  <user>
+    <username>M. Fakih Sahman</username>
+    <password>pancake</password>
+    <email>fakih@example.com</email>
+    <birthDay>1990-01-01</birthDay>
+  </user>
+  <user>
+    <username>Khairun Nissa</username>
+    <password>salad</password>
+    <email>nissa@example.com</email>
+    <birthDay>1992-05-12</birthDay>
+  </user>
+  <user>
+    <username>gw</username>
+    <password>qwerty</password>
+    <email>gw@example.com</email>
+    <birthDay>1998-07-30</birthDay>
+  </user>
+  <user>
+    <username>fumo</username>
+    <password>fumo</password>
+    <email>fumo@example.com</email>
+    <birthDay>1999-09-09</birthDay>
+  </user>
+</users>

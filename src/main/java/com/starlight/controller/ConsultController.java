@@ -1,19 +1,21 @@
 package com.starlight.controller;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
 
-public class ConsultController implements Initializable{
+/**
+ * Placeholder controller for the consult view.
+ */
+public class ConsultController implements Initializable {
 
+    /**
+     * Initializes the controller. Currently performs no initialization logic.
+     */
     @Override
-    public void initialize(URL location, ResourceBundle resources) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'initialize'");
+    public void initialize(URL url, ResourceBundle rb) {
+        // no-op
     }
     
 }

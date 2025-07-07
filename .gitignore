@@ -1,1 +1,3 @@
 .vscode/
+target/
+!tabemonpal-0.1-ALPHA.jar

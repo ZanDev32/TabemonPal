@@ -6,9 +6,9 @@
 }
 
 .background-window {
-    -fx-background-color: #ffff;
-        background-color:#ffff;
-    -fx-background-radius: 40 40 0 0;
+    -fx-background-color: #FFFFFF;
+        background-color: #FFFFFF;
+    -fx-background-radius: 20 20 20 20;
 }
 
 .sideBar{
@@ -67,6 +67,19 @@
         padding: 0px 26px 0px 0px;
 }
 
+.button-community {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 15;
+        font-size: 15;
+    -fx-text-fill: #5b543f;
+    -fx-background-color:#EED8AF;
+        background-color:#EED8AF;
+    -fx-background-radius: 10 10 10 10;
+}
+
 .label2 {
     -fx-font-family: Poppins;
         font-family: Poppins;
@@ -75,6 +88,8 @@
     -fx-font-size: 15;
         font-size: 15;
     -fx-text-fill: #5b543f;
+    -fx-font-weight: 100;
+        font-weight: 100;
 }
 
 .create-post {
@@ -92,3 +107,38 @@
     -fx-font-size: 7;
     font-size: 7;
 }
+
+.interaction-button {
+    -fx-font-family: Poppons;
+        font-family: Poppons;
+    -fx-background-color: #F2F2F2;
+        background-color: #F2F2F2;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.label-date-community {
+    -fx-font-size: 9;
+        font-size: 9;
+    -fx-fill: #B0B0B0;
+        fill: #B0B0B0;
+}
+
+.label-title-community {
+    -fx-font-size: 18;
+        font-size: 18;
+    -fx-font-weight: 800;
+        font-weight: 800;
+}
+
+.button-icon {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+/* debugging only
+
+.VBox {
+    -fx-border-color: red;
+    -fx-border-width: 1;
+}
+
+*/

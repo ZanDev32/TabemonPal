@@ -1,13 +1,14 @@
 package com.starlight.controller;
 
-import java.net.URL;
-import java.util.ResourceBundle;
-import javafx.fxml.Initializable;
+import java.io.IOException;
+import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 
-public class MissionController implements Initializable {
+public class MissionController {
     
-    @Override
-    public void initialize(URL location, ResourceBundle resources) {
+
+    @FXML
+    private void initialize() {
+        // Hint: initialize() will be called when the associated FXML has been completely loaded.
     }
-    
 }

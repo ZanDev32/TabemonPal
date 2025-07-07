@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -13,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
+<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1178.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
       <GridPane prefHeight="719.0" prefWidth="290.0" styleClass="sideBar" stylesheets="@../style.css">
         <columnConstraints>
@@ -24,20 +23,20 @@
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
             <Label alignment="BASELINE_LEFT" contentDisplay="CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" styleClass="button-sidebar" stylesheets="@../style.css" text="DASHBOARD" textAlignment="CENTER" GridPane.rowIndex="3" />
-            <MFXButton fx:id="home" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#home" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Home" GridPane.rowIndex="4">
+            <MFXButton fx:id="home" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#home" prefHeight="32.0" prefWidth="290.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Home" GridPane.rowIndex="4">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
@@ -121,13 +120,13 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton fx:id="achivement" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achivement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Achivements" GridPane.rowIndex="10">
+            <MFXButton fx:id="achievement" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#achievement" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Achievements" GridPane.rowIndex="10">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
                         <ImageView fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
                            <image>
-                              <Image url="@../icon/Achivements_1.png" />
+                              <Image url="@../icon/Achievements_1.png" />
                            </image>
                         </ImageView>
                      </children>
@@ -138,21 +137,16 @@
       </GridPane>
    </left>
    <center>
-      <GridPane fx:id="gp" BorderPane.alignment="CENTER">
+      <GridPane fx:id="gp" prefWidth="861.0" BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          <ColumnConstraints hgrow="SOMETIMES" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="354.0" minHeight="10.0" prefHeight="95.0" vgrow="SOMETIMES" />
-          <RowConstraints maxHeight="635.0" minHeight="10.0" prefHeight="625.0" vgrow="SOMETIMES" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
+          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="625.0" vgrow="ALWAYS" />
         </rowConstraints>
-         <children>
-            <AnchorPane prefHeight="200.0" prefWidth="200.0">
-               <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutX="390.0" layoutY="37.0" styleClass="label2" text="navbar.java" textAlignment="CENTER" />
-               </children>
-            </AnchorPane>
-         </children>
+        <children>
+        </children>
       </GridPane>
-   </center>
+  </center>
 </BorderPane>

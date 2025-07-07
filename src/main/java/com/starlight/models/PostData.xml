@@ -1,25 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <posts>
-        
-    <post>
-                
-        <title>mie ayam</title>
-                
-        <description>enak</description>
-                
-        <ingredients>mie, pangsit</ingredients>
-                
-        <directions>masak</directions>
-                
-        <image>/home/zan/Downloads/missing.png</image>
-            
-    </post>
-    
-    <post>
-        <title>asd</title>
-        <description>asd</description>
-        <ingredients>ada</ingredients>
-        <directions>asd</directions>
-        <image>/home/zan/Documents/collage/TabemonPal/src/main/resources/com/starlight/images/missing.png</image>
-    </post>
+  <post>
+    <username>Khairun Nissa</username>
+    <title>Veggie Salad</title>
+    <description>Fresh vegetable salad.</description>
+    <ingredients>- lettuce
+- tomato
+- cucumber</ingredients>
+    <directions>Combine all veggies.
+Serve chilled.</directions>
+    <image>src/main/resources/com/starlight/images/dummy/image_2.jpg</image>
+    <rating>4.8</rating>
+    <uploadtime>2023-11-23 11:00</uploadtime>
+    <likecount>8</likecount>
+  </post>
 </posts>

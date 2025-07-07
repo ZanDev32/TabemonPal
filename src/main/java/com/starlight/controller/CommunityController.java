@@ -1,8 +1,13 @@
 package com.starlight.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+
+import com.starlight.models.Post;
+import com.starlight.models.PostDataRepository;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.animation.ScaleTransition;
@@ -11,22 +16,100 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+/**
+ * Controller backing the community page. It displays recent posts and allows
+ * the user to create new posts.
+ */
 public class CommunityController implements Initializable {
     @FXML
-    private ImageView like1;
+    private MFXButton createpost;
+
     @FXML
-    private ImageView like2;
+    private VBox post;
+
+    @FXML
+    private ImageView likebutton;
+
+    @FXML
+    private MFXButton commentcounter;
+
+    @FXML
+    private ImageView likebutton1;
+
+    @FXML
+    private MFXButton sharebutton;
+
+    @FXML
+    private ImageView likebutton11;
+
+    @FXML
+    private Label dailytitle1;
+
+    @FXML
+    private Label starrating;
+
+    @FXML
+    private Label dailylikecounter;
+
+    @FXML
+    private Label title;
+
+    @FXML
+    private Label dailytitle2;
+
+    @FXML
+    private Label starrating2;
+
+    @FXML
+    private Label dailylikecounter2;
+
+    @FXML
+    private Label dailytitle3;
+
+    @FXML
+    private Label starrating3;
+
+    @FXML
+    private Label dailylikecounter3;
+
+    @FXML
+    private Label dailytitle4;
+
+    @FXML
+    private Label starrating4;
+
+    @FXML
+    private Label dailylikecounter4;
+
+    @FXML
+    private VBox post1;
+
+    @FXML
+    private Label username;
+
+    @FXML
+    private Label uploadtime;
+
+    @FXML
+    private Label description;
+
+    @FXML
+    private MFXButton likecounter;
+
+    @FXML
+    private VBox postlist;
+
     @FXML
     private ImageView profile1;
-    @FXML
-    private ImageView profile2;
     @FXML
     private ImageView dailyphoto1;
     @FXML
@@ -37,11 +120,13 @@ public class CommunityController implements Initializable {
     private ImageView dailyphoto4;
     @FXML
     private ImageView recentphoto1;
-    @FXML
-    private ImageView recentphoto2;
-    @FXML
-    private MFXButton CreatePost;
 
+    private final PostDataRepository repository = new PostDataRepository();
+
+    /**
+     * Crops the given {@link ImageView} to fit inside the specified frame size
+     * while preserving aspect ratio and applying rounded corners.
+     */
     private void cropToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
         if (imageView.getImage() == null) return;
         Image image = imageView.getImage();
@@ -56,33 +141,134 @@ public class CommunityController implements Initializable {
         imageView.setClip(clip);
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        dailyphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/image_1.jpg").toExternalForm()));
-        dailyphoto2.setImage(new Image(getClass().getResource("/com/starlight/images/image_2.jpg").toExternalForm()));
-        dailyphoto3.setImage(new Image(getClass().getResource("/com/starlight/images/image_3.jpg").toExternalForm()));
-        dailyphoto4.setImage(new Image(getClass().getResource("/com/starlight/images/image_4.png").toExternalForm()));
+    /**
+     * Loads posts from the repository and populates the UI. The first post is
+     * shown in the main area while the rest are added to a list below.
+     */
+    private void loadPosts() {
+        postlist.getChildren().clear();
+        postlist.getChildren().add(post1);
 
-        cropToFit(dailyphoto1, 178, 110, 20);
-        cropToFit(dailyphoto2, 178, 110, 20);
-        cropToFit(dailyphoto3, 178, 110, 20);
-        cropToFit(dailyphoto4, 178, 110, 20);
+        List<Post> posts = repository.loadPosts();
+        if (posts == null || posts.isEmpty()) {
+            username.setText("");
+            uploadtime.setText("");
+            title.setText("");
+            description.setText("");
+            recentphoto1.setImage(null);
+            likecounter.setText("");
+            return;
+        }
 
-        recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/recent_1.png").toExternalForm()));
-        recentphoto2.setImage(new Image(getClass().getResource("/com/starlight/images/recent_1.png").toExternalForm()));
+        for (int i = 0; i < posts.size(); i++) {
+            Post p = posts.get(i);
+            String tits = p.title;
+            String pp = p.profilepicture;
+            String usr = p.username;
+            String desc = p.description;
+            String image = p.image;
+            String time = p.uploadtime;
+            String likes = p.likecount;
 
-        cropToFit(recentphoto1, 766, 150, 20);
-        cropToFit(recentphoto2, 766, 150, 20);
+            if (i == 0) {
+                username.setText(usr);
+                title.setText(tits);
+                description.setText(desc);
+                uploadtime.setText(time);
+                likecounter.setText(likes);
 
-        CreatePost.setOnAction(event -> showCreatePostPopup());
+                if (pp != null) {
+                    File fp = new File(pp);
+                    if (fp.exists()) {
+                        profile1.setImage(new Image(fp.toURI().toString()));
+                    } else {
+                        profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                } else {
+                    profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                }
+                cropToFit(profile1, 40, 40, 20);
+
+                if (image != null) {
+                    File f = new File(image);
+                    if (f.exists()) {
+                        recentphoto1.setImage(new Image(f.toURI().toString()));
+                    } else {
+                        recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                } else {
+                    recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                }
+                cropToFit(recentphoto1, 425, 322, 20);
+
+            } else {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
+                    VBox node = loader.load();
+                    PostItemController c = loader.getController();
+
+                    c.username.setText(usr);
+                    c.title.setText(tits);
+                    c.uploadtime.setText(time);
+                    c.description.setText(desc);
+                    c.likecounter.setText(likes);
+
+                    if (pp != null) {
+                        File fp = new File(pp);
+                        if (fp.exists()) {
+                            c.profile1.setImage(new Image(fp.toURI().toString()));
+                        } else {
+                            c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                        }
+                    } else {
+                        c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                    cropToFit(c.profile1, 40, 40, 20);
+
+                    if (image != null) {
+                        File fi = new File(image);
+                        if (fi.exists()) {
+                            c.recentphoto1.setImage(new Image(fi.toURI().toString()));
+                        } else {
+                            c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                        }
+                    } else {
+                        c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                    }
+                    cropToFit(c.recentphoto1, 425, 322, 20);
+
+                    postlist.getChildren().add(node);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
+    /**
+     * Initializes the controller by loading dummy data and wiring up actions.
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        repository.ensureDummyData();
+        loadPosts();
+        createpost.setOnAction(e -> showCreatePostPopup());
+    }
+
+    @FXML
+    private void handleCreatePost() {
+        showCreatePostPopup();
+    }
+
+    /**
+     * Displays a modal dialog that allows the user to create a new post.
+     */
     private void showCreatePostPopup() {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));
             Parent popupRoot = loader.load();
+            CreatePostController controller = loader.getController();
 
-            // Scale in animation
             popupRoot.setScaleX(0.7);
             popupRoot.setScaleY(0.7);
 
@@ -93,7 +279,6 @@ public class CommunityController implements Initializable {
             popupStage.setTitle("Create Post");
             popupStage.setResizable(false);
 
-            // Center animation after showing
             popupStage.setOnShown(e -> {
                 ScaleTransition st = new ScaleTransition(Duration.millis(220), popupRoot);
                 st.setFromX(0.7);
@@ -104,6 +289,9 @@ public class CommunityController implements Initializable {
             });
 
             popupStage.showAndWait();
+            if (controller.isSuccess()) {
+                loadPosts();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

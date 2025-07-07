@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+
+<HBox fx:id="navbar" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="861.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.NavbarController">
+   <children>
+      <MFXTextField fx:id="searchbar" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="62.0" prefWidth="378.0" promptText="Search Anything" HBox.hgrow="ALWAYS">
+         <HBox.margin>
+            <Insets left="55.0" />
+         </HBox.margin>
+      </MFXTextField>
+      <HBox alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="95.0" prefWidth="325.0" HBox.hgrow="ALWAYS">
+         <children>
+            <MFXButton fx:id="setting" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#setting" prefHeight="40.0" prefWidth="41.0" style="-fx-background-color: transparent;" styleClass="button-icon" text=" ">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="46.0" pickOnBounds="true" preserveRatio="true" translateX="-8.0">
+                     <image>
+                        <Image url="@../icon/cog-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets />
+               </HBox.margin>
+            </MFXButton>
+            <MFXButton fx:id="inbox" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#inbox" prefHeight="37.0" prefWidth="48.0" styleClass="button-icon" text=" ">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
+                     <image>
+                        <Image url="@../icon/email-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="35.0" />
+               </HBox.margin>
+            </MFXButton>
+            <MFXButton fx:id="notification" minHeight="-Infinity" minWidth="-Infinity" onMouseClicked="#notification" prefHeight="43.0" prefWidth="40.0" styleClass="button-icon" text=" ">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-10.0">
+                     <image>
+                        <Image url="@../icon/bell-badge-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="35.0" />
+               </HBox.margin>
+            </MFXButton>
+            <MFXButton fx:id="profile" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#profile" prefHeight="48.0" styleClass="button-icon" text="user">
+               <graphic>
+                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/account-circle-outline.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="35.0" right="40.0" />
+               </HBox.margin>
+            </MFXButton>
+         </children>
+         <HBox.margin>
+            <Insets />
+         </HBox.margin>
+      </HBox>
+   </children>
+</HBox>

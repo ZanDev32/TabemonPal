@@ -5,6 +5,10 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Stream;
 
+/**
+ * Utility class for verifying and adjusting FXML files before they are loaded
+ * by JavaFX.
+ */
 public class FXMLVerificator {
 
     // You can customize these
@@ -13,6 +17,10 @@ public class FXMLVerificator {
     private static final List<String> ILLEGAL_ATTRIBUTES = List.of("fx:factory", "fx:constant");
     private static final List<String> UNSUPPORTED_TAGS = List.of("<TextFlow", "<FlowPane", "<ColorPicker", "<TreeTableView");
 
+    /**
+     * Verifies all FXML files under the resources directory and normalizes the
+     * JavaFX namespace version.
+     */
     public static void verifyAll() {
         Path root = Paths.get(FXML_DIR);
 
@@ -24,13 +32,16 @@ public class FXMLVerificator {
         }
     }
 
+    /**
+     * Processes a single FXML file and normalizes/validates its contents.
+     */
     private static void verifyOneFile(Path fxmlPath) {
         try {
             String content = Files.readString(fxmlPath);
             String original = content;
 
             // Downgrade xmlns version
-            content = content.replaceAll("http://javafx.com/javafx/\\d+", EXPECTED_NAMESPACE);
+            content = content.replaceAll("http://javafx.com/javafx/\\d+(?:\\.\\d+)*", EXPECTED_NAMESPACE);
 
             // Detect illegal fx attributes
             for (String attr : ILLEGAL_ATTRIBUTES) {

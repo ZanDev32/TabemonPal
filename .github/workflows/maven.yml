@@ -32,4 +32,5 @@ jobs:
     - name: Build with Maven
       run: mvn -B clean install
 
-    # Optional: run JavaFX app tests or jar packaging here
+    - name: Run unit tests
+      run: xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' mvn -B test

@@ -1,9 +1,21 @@
 package com.starlight.controller;
 
-import java.io.IOException;
-import javafx.fxml.FXML;
-import javafx.scene.control.Button;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class HomeController {
+import javafx.fxml.Initializable;
+
+/**
+ * Controller for the home view of the application.
+ */
+public class HomeController implements Initializable {
+
+    /**
+     * Initializes the controller. No initialization logic required.
+     */
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        // no-op
+    }
     
 }
