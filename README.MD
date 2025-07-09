@@ -40,7 +40,7 @@ Follow these steps to set up the project locally:
 
 2. **Build the project with Maven**:
    ```bash
-   mvn install
+   mvn -B clean install
    ```
 
 3. **Run the application**:
