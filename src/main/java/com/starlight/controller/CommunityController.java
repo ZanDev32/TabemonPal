@@ -72,7 +72,7 @@ public class CommunityController implements Initializable {
     /**
      * Resizes and centers the given {@link ImageView} to fit inside the specified frame size
      * while preserving aspect ratio and applying rounded corners.
-     * This method does not scale up images that are smaller than the frame.
+     * This method scales the image to fill the frame, cropping it if necessary.
      */
     private void scaleToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
         if (imageView.getImage() == null) return;
@@ -81,23 +81,35 @@ public class CommunityController implements Initializable {
         double imageWidth = image.getWidth();
         double imageHeight = image.getHeight();
 
-        // Determine the scale factor to fit the image within the frame
-        double widthScale = frameWidth / imageWidth;
-        double heightScale = frameHeight / imageHeight;
-        double scale = Math.min(widthScale, heightScale);
+        // Set the ImageView size to match the frame
+        imageView.setFitWidth(frameWidth);
+        imageView.setFitHeight(frameHeight);
 
-        // If image is smaller than frame, don't scale up
-        if (scale > 1.0) {
-            scale = 1.0;
+        // Calculate aspect ratios
+        double imageAspect = imageWidth / imageHeight;
+        double frameAspect = frameWidth / frameHeight;
+
+        double newWidth, newHeight;
+        double xOffset = 0, yOffset = 0;
+
+        // Determine the cropping area
+        if (imageAspect > frameAspect) {
+            // Image is wider than the frame, so we crop the sides
+            newHeight = imageHeight;
+            newWidth = newHeight * frameAspect;
+            xOffset = (imageWidth - newWidth) / 2;
+        } else {
+            // Image is taller than the frame, so we crop the top and bottom
+            newWidth = imageWidth;
+            newHeight = newWidth / frameAspect;
+            yOffset = (imageHeight - newHeight) / 2;
         }
 
-        double newWidth = imageWidth * scale;
-        double newHeight = imageHeight * scale;
-
-        imageView.setFitWidth(newWidth);
-        imageView.setFitHeight(newHeight);
+        // Set the viewport to the centered, cropped portion of the image
+        imageView.setViewport(new javafx.geometry.Rectangle2D(xOffset, yOffset, newWidth, newHeight));
         
-        Rectangle clip = new Rectangle(newWidth, newHeight);
+        // Apply a clip to round the corners of the ImageView
+        Rectangle clip = new Rectangle(frameWidth, frameHeight);
         clip.setArcWidth(arcRadius);
         clip.setArcHeight(arcRadius);
         imageView.setClip(clip);
