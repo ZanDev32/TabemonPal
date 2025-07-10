@@ -100,60 +100,33 @@ public class CreatePostController implements Initializable {
                 return;
             }
 
-            boolean result = savePostToXML(postTitle, postDescription, postIngredients, postDirections, selectedImage.getAbsolutePath());
-            success = result;
-            if (result) {
-                title.clear();
-                description.clear();
-                ingredients.clear();
-                directions.clear();
-                selectedImage = null;
-                System.out.println("Post submitted and saved!");
-                Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
-                stage.close();
-            } else {
-                System.err.println("Error saving post.");
-            }
+            // Create a new Post object
+            Post newPost = new Post();
+            newPost.username = Session.getCurrentUser().username;
+            newPost.profilepicture = "src/main/resources/com/starlight/images/dummy/2.png";
+            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            newPost.title = postTitle;
+            newPost.description = postDescription;
+            newPost.image = selectedImage.getAbsolutePath();
+            newPost.likecount = "0";
+            newPost.rating = "0.0";
+
+            // Save the new post
+            List<Post> posts = repository.loadPosts();
+            posts.add(0, newPost);
+            repository.savePosts(posts);
+
+            success = true;
+
+            // Close the dialog
+            Stage stage = (Stage) submit.getScene().getWindow();
+            stage.close();
         });
 
         cancel.setOnAction(event -> {
-            title.clear();
-            description.clear();
-            ingredients.clear();
-            directions.clear();
-            selectedImage = null;
-            System.err.println("Post creation canceled.");
-
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            // Close the dialog without saving
+            Stage stage = (Stage) cancel.getScene().getWindow();
             stage.close();
         });
     }
-
-    /**
-     * Persists a newly created post to XML storage.
-     *
-     * @return {@code true} if saving succeeded, otherwise {@code false}
-     */
-    private boolean savePostToXML(String title, String description, String ingredients, String directions, String imagePath) {
-        try {
-            List<Post> posts = repository.loadPosts();
-            Post post = new Post();
-            post.username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : null;
-            post.title = title;
-            post.description = description;
-            post.ingredients = ingredients;
-            post.directions = directions;
-            post.image = imagePath;
-            post.rating = "0";
-            post.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-            post.likecount = "0";
-            posts.add(post);
-            repository.savePosts(posts);
-            return true;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
 }

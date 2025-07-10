@@ -11,7 +11,7 @@ import javafx.scene.layout.VBox;
  */
 public class PostItemController {
     @FXML
-    private VBox post;
+    private VBox postTemplate;
 
     @FXML
     private VBox post1;

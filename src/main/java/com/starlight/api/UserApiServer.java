@@ -140,6 +140,12 @@ public class UserApiServer {
             }
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             User newUser = (User) xstream.fromXML(body);
+            
+            // Set default profile picture for new users
+            if (newUser.profilepicture == null || newUser.profilepicture.trim().isEmpty()) {
+                newUser.profilepicture = "src/main/resources/com/starlight/images/dummy/profiledefault.png";
+            }
+            
             List<User> users = repository.loadUsers();
             boolean exists = users.stream().anyMatch(u -> newUser.email.equals(u.email));
             if (exists) {

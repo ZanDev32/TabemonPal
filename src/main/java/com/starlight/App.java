@@ -18,9 +18,24 @@ import java.io.IOException;
  */
 public class App extends Application {
 
-
     /** Main application scene used to swap views. */
     private static Scene scene;
+
+    /**
+     * Resizes the application window and centers it on the screen.
+     *
+     * @param width  The new width of the window.
+     * @param height The new height of the window.
+     */
+    public static void resizeWindow(double width, double height) {
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.centerOnScreen();
+        }
+    }
+
     /** Embedded HTTP server providing user API endpoints. */
     private UserApiServer apiServer;
     /** Thread running the API server. */
@@ -38,10 +53,12 @@ public class App extends Application {
         apiThread.start();
 
         FXMLVerificator.verifyAll();
-        scene = new Scene(loadFXML("splashScreen"), 1280, 720);
-
-        scene = new Scene(loadFXML("splashScreen"), 1280, 720);
+        scene = new Scene(loadFXML("splashScreen"));
         stage.setScene(scene);
+
+        // Set initial size for the authorization view
+        resizeWindow(1280, 720);
+
         stage.setTitle("TabemonPal by Starlight Inc.");
         stage.setResizable(true);
         stage.show();
@@ -58,6 +75,13 @@ public class App extends Application {
      */
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
+        
+        // Adjust window size based on the loaded FXML
+        if ("main".equals(fxml)) {
+            resizeWindow(1920, 1080);
+        } else if ("Authorization".equals(fxml)) {
+            resizeWindow(1280, 720);
+        }
     }
 
     /**
@@ -89,7 +113,7 @@ public class App extends Application {
         delay.setOnFinished(e -> {
             try {
                 System.out.println("Now loading main view");
-                scene.setRoot(loadFXML("main"));
+                setRoot("main");
                 System.out.println("Main view loaded successfully");
             } catch (IOException ex) {
                 System.err.println("Failed to load main view: " + ex.getMessage());
@@ -98,7 +122,7 @@ public class App extends Application {
                 // Fallback - try to load main directly if there was an error
                 try {
                     System.out.println("Attempting direct load of main view");
-                    scene.setRoot(loadFXML("main"));
+                    setRoot("main");
                 } catch (IOException fallbackEx) {
                     System.err.println("Fallback failed too: " + fallbackEx.getMessage());
                     fallbackEx.printStackTrace();

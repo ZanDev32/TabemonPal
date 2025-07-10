@@ -47,7 +47,118 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
               <children>
-                <VBox fx:id="postlist" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" />
+                <VBox fx:id="postlist" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0">
+                  <children>
+                    <VBox fx:id="post" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="677.0" styleClass="background-window">
+                      <children>
+                        <VBox fx:id="post1" prefHeight="428.0" prefWidth="599.0">
+                          <children>
+                            <HBox prefHeight="36.0" prefWidth="425.0">
+                              <children>
+                                <ImageView fx:id="profile1" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                  <HBox.margin>
+                                    <Insets />
+                                  </HBox.margin>
+                                  <image>
+                                    <Image url="@../images/missing.png" />
+                                  </image>
+                                  <viewport>
+                                    <Rectangle2D height="40.0" width="40.0" />
+                                  </viewport>
+                                </ImageView>
+                                <VBox maxWidth="1.7976931348623157E308">
+                                  <children>
+                                    <Label fx:id="username" maxWidth="1.7976931348623157E308" styleClass="label2" text="user">
+                                      <VBox.margin>
+                                        <Insets left="20.0" />
+                                      </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="uploadtime" maxWidth="1.7976931348623157E308" styleClass="label-date-community" text="time">
+                                      <VBox.margin>
+                                        <Insets left="20.0" />
+                                      </VBox.margin>
+                                    </Label>
+                                  </children>
+                                </VBox>
+                              </children>
+                              <VBox.margin>
+                                <Insets bottom="12.0" />
+                              </VBox.margin>
+                            </HBox>
+                            <Label fx:id="title" maxWidth="1.7976931348623157E308" styleClass="label-title-community" text="Lorem Ipsum" />
+                            <Label fx:id="description" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="638.0" styleClass="label2" text="Lorem Ipsum asdadasdafdadfadfadfasdasdasdasd fgdfgdfgf" wrapText="true" />
+                            <ImageView fx:id="recentphoto1" fitHeight="482.0" fitWidth="637.0" pickOnBounds="true" preserveRatio="true">
+                              <VBox.margin>
+                                <Insets top="25.0" />
+                              </VBox.margin>
+                              <viewport>
+                                <Rectangle2D height="540.0" width="766.0" />
+                              </viewport>
+                              <image>
+                                <Image url="@../images/missing.png" />
+                              </image>
+                            </ImageView>
+                          </children>
+                          <VBox.margin>
+                            <Insets left="20.0" right="20.0" top="20.0" />
+                          </VBox.margin>
+                        </VBox>
+                        <VBox prefHeight="66.0" prefWidth="677.0">
+                          <children>
+                            <HBox prefHeight="1.0" prefWidth="465.0" style="-fx-background-color: #C4C4C44D;">
+                              <VBox.margin>
+                                <Insets top="10.0" />
+                              </VBox.margin>
+                            </HBox>
+                            <HBox prefHeight="31.0" prefWidth="425.0">
+                              <children>
+                                <MFXButton fx:id="likecounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="15">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/like.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                  <HBox.margin>
+                                    <Insets right="4.0" />
+                                  </HBox.margin>
+                                </MFXButton>
+                                <MFXButton fx:id="commentcounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="2">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton1" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/comment.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                  <HBox.margin>
+                                    <Insets right="4.0" />
+                                  </HBox.margin>
+                                </MFXButton>
+                                <MFXButton fx:id="sharebutton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="74.0" styleClass="interaction-button" text="Share">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton11" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/Share.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                </MFXButton>
+                              </children>
+                              <VBox.margin>
+                                <Insets left="20.0" right="20.0" top="6.0" />
+                              </VBox.margin>
+                            </HBox>
+                          </children>
+                        </VBox>
+                      </children>
+                                 <VBox.margin>
+                                    <Insets bottom="25.0" />
+                                 </VBox.margin>
+                    </VBox>
+                  </children>
+                </VBox>
                 <VBox maxWidth="-Infinity" prefHeight="832.0" prefWidth="465.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.vgrow="NEVER">
                   <children>
                     <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="241.0" prefWidth="397.0" styleClass="background-window" VBox.vgrow="NEVER">

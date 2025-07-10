@@ -4,23 +4,27 @@
     <password>pancake</password>
     <email>fakih@example.com</email>
     <birthDay>1990-01-01</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profileman.jpg</profilepicture>
   </user>
   <user>
     <username>Khairun Nissa</username>
     <password>salad</password>
     <email>nissa@example.com</email>
     <birthDay>1992-05-12</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profilewoman.jpg</profilepicture>
   </user>
   <user>
     <username>gw</username>
     <password>qwerty</password>
     <email>gw@example.com</email>
     <birthDay>1998-07-30</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profileman2.jpg</profilepicture>
   </user>
   <user>
     <username>fumo</username>
     <password>fumo</password>
     <email>fumo@example.com</email>
     <birthDay>1999-09-09</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profiledefault.png</profilepicture>
   </user>
 </users>

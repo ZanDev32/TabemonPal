@@ -14,4 +14,6 @@ public class User {
     public String password;
     /** Birthday in ISO format. */
     public String birthDay;
+    /** Path to the profile picture. */
+    public String profilepicture;
 }
