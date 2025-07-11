@@ -21,6 +21,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Modality;
@@ -32,6 +33,9 @@ import javafx.util.Duration;
  * the user to create new posts.
  */
 public class CommunityController implements Initializable {
+    @FXML
+    private GridPane manu;
+
     @FXML
     private MFXButton createpost;
 

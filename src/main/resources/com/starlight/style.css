@@ -134,6 +134,10 @@
     -fx-background-color: transparent;
         background-color: transparent;
 }
+
+.post-list {
+    -fx-border-color: red;
+}
 /* debugging only
 
 .VBox {
