@@ -14,14 +14,14 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1200.0" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="49.0" vgrow="NEVER" />
-    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="766.0" prefHeight="841.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="841.0" vgrow="SOMETIMES" />
   </rowConstraints>
   <children>
     <MFXButton buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" styleClass="button-community" text="My Recipes" GridPane.columnIndex="1" />
@@ -47,7 +47,11 @@
                 <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
               </rowConstraints>
               <children>
-                <VBox fx:id="postlist" styleClass="post-list" GridPane.vgrow="ALWAYS" />
+                <VBox fx:id="postlist" spacing="10.0" styleClass="post-list" GridPane.vgrow="ALWAYS">
+                  <padding>
+                    <Insets bottom="50.0" />
+                  </padding>
+                </VBox>
                 <VBox maxWidth="-Infinity" prefHeight="832.0" prefWidth="465.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.vgrow="NEVER">
                   <children>
                     <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="241.0" prefWidth="397.0" styleClass="background-window" VBox.vgrow="NEVER">
