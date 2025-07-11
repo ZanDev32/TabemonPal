@@ -1,5 +1,25 @@
 <posts>
   <post>
+    <username>meko</username>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/2.png</profilepicture>
+    <title>asdasd</title>
+    <description>asdasd</description>
+    <image>/home/zan/Pictures/hinanawi-tenshi-fumo.png</image>
+    <rating>0.0</rating>
+    <uploadtime>2025-07-11 17:12:55</uploadtime>
+    <likecount>0</likecount>
+  </post>
+  <post>
+    <username>meko</username>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/2.png</profilepicture>
+    <title>Doro goreng</title>
+    <description>asdasda</description>
+    <image>/home/zan/Pictures/Screenshots/Screenshot from 2025-07-04 14:40:47 WIB.png</image>
+    <rating>0.0</rating>
+    <uploadtime>2025-07-11 17:12:20</uploadtime>
+    <likecount>0</likecount>
+  </post>
+  <post>
     <username>Khairun Nissa</username>
     <title>Veggie Salad</title>
     <description>Fresh vegetable salad.</description>

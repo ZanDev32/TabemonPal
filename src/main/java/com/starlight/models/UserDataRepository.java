@@ -119,8 +119,17 @@ public class UserDataRepository {
      * Saves the provided list of users.
      */
     public void saveUsers(List<User> users) {
+        // Prevent duplicate users before saving
+        List<User> distinctUsers = users.stream()
+                .distinct()
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
-            xstream.toXML(users, fos);
+            if (distinctUsers.isEmpty()) {
+                fos.write("<users></users>".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            } else {
+                xstream.toXML(distinctUsers, fos);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to save users", e);
         }

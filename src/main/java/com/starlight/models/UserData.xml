@@ -20,4 +20,23 @@
     <birthDay>1998-07-30</birthDay>
     <profilepicture>src/main/resources/com/starlight/images/dummy/profileman2.jpg</profilepicture>
   </user>
+  <user>
+    <username>fumo</username>
+    <email>fumo@example.com</email>
+    <password>fumo</password>
+    <birthDay>1999-09-09</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profiledefault.png</profilepicture>
+  </user>
+  <user>
+    <username>meko</username>
+    <email>meok@doro.com</email>
+    <password>asdfghj</password>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profiledefault.png</profilepicture>
+  </user>
+  <user>
+    <username>zanzan</username>
+    <email>zan@doro.com</email>
+    <password>asdfghj</password>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profiledefault.png</profilepicture>
+  </user>
 </users>

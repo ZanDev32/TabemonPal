@@ -146,7 +146,7 @@ public class UserApiServer {
                 newUser.profilepicture = "src/main/resources/com/starlight/images/dummy/profiledefault.png";
             }
             
-            List<User> users = repository.loadUsers();
+            List<User> users = repository.loadUsers(false);
             boolean exists = users.stream().anyMatch(u -> newUser.email.equals(u.email));
             if (exists) {
                 sendXml(exchange, 409, "<error/>");

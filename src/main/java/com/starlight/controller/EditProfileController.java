@@ -26,7 +26,7 @@ import com.starlight.util.Session;
  * Controller for the user settings dialog where profile information can be
  * edited.
  */
-public class ProfileController implements Initializable {
+public class EditProfileController implements Initializable {
     @FXML
     private ImageView profileimage;
 

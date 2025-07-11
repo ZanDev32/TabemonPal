@@ -136,8 +136,8 @@ public class MainController implements Initializable {
                 
                 // Get the controller and pass user data if applicable
                 Object controller = loader.getController();
-                if (controller instanceof ProfileController) {
-                    ((ProfileController) controller).setUser(
+                if (controller instanceof EditProfileController) {
+                    ((EditProfileController) controller).setUser(
                         Session.getCurrentUser()
                     );
                 }

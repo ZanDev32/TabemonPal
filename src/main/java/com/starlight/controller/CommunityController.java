@@ -11,12 +11,14 @@ import com.starlight.models.PostDataRepository;
 import com.starlight.models.User;
 import com.starlight.models.UserDataRepository;
 
+import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -30,6 +32,57 @@ import javafx.util.Duration;
  * the user to create new posts.
  */
 public class CommunityController implements Initializable {
+    @FXML
+    private MFXButton createpost;
+
+    @FXML
+    private ImageView dailyphoto1;
+
+    @FXML
+    private Label dailytitle1;
+
+    @FXML
+    private Label starrating;
+
+    @FXML
+    private Label dailylikecounter;
+
+    @FXML
+    private ImageView dailyphoto2;
+
+    @FXML
+    private Label dailytitle2;
+
+    @FXML
+    private Label starrating2;
+
+    @FXML
+    private Label dailylikecounter2;
+
+    @FXML
+    private ImageView dailyphoto3;
+
+    @FXML
+    private Label dailytitle3;
+
+    @FXML
+    private Label starrating3;
+
+    @FXML
+    private Label dailylikecounter3;
+
+    @FXML
+    private ImageView dailyphoto4;
+
+    @FXML
+    private Label dailytitle4;
+
+    @FXML
+    private Label starrating4;
+
+    @FXML
+    private Label dailylikecounter4;
+
 
     @FXML
     private VBox postlist;
