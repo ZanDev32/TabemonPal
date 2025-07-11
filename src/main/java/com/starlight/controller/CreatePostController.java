@@ -6,6 +6,11 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.List;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.UUID;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -58,6 +63,28 @@ public class CreatePostController implements Initializable {
     private final PostDataRepository repository = new PostDataRepository();
 
     /**
+     * Copies the selected image to the user's home data directory.
+     *
+     * @param image the image file selected by the user
+     * @return the copied image file
+     */
+    private File copyImageToUserDir(File image) throws java.io.IOException {
+        Path dir = Paths.get(System.getProperty("user.home"), ".tabemonpal", "images");
+        Files.createDirectories(dir);
+
+        String name = image.getName();
+        String ext = "";
+        int idx = name.lastIndexOf('.');
+        if (idx > 0) {
+            ext = name.substring(idx);
+        }
+
+        Path target = dir.resolve(UUID.randomUUID().toString() + ext);
+        Files.copy(image.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
+        return target.toFile();
+    }
+
+    /**
      * Indicates whether the user successfully created a post.
      */
     public boolean isSuccess() {
@@ -107,7 +134,13 @@ public class CreatePostController implements Initializable {
             newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             newPost.title = postTitle;
             newPost.description = postDescription;
-            newPost.image = selectedImage.getAbsolutePath();
+            try {
+                File stored = copyImageToUserDir(selectedImage);
+                newPost.image = stored.getAbsolutePath();
+            } catch (Exception e) {
+                e.printStackTrace();
+                newPost.image = selectedImage.getAbsolutePath();
+            }
             newPost.likecount = "0";
             newPost.rating = "0.0";
 
