@@ -11,10 +11,7 @@ import javafx.fxml.Initializable;
  */
 public class AchievementController implements Initializable {
 
-    /**
-     * Initializes the controller. No initialization logic is currently
-     * required.
-     */
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // no-op
