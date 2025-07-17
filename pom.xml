@@ -31,6 +31,16 @@
                 <artifactId>javafx-web</artifactId>
                 <version>19</version>
             </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-base</artifactId>
+                <version>19</version>
+            </dependency>
+            <dependency>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-graphics</artifactId>
+                <version>19</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -46,6 +56,14 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.palexdev</groupId>
@@ -190,40 +208,6 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.starlight.App</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
-                        </manifest>
-                    </archive>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.6.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>false</overWriteSnapshots>
-                            <overWriteIfNewer>true</overWriteIfNewer>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.5.1</version>
                 <executions>
@@ -233,13 +217,15 @@
                             <goal>shade</goal>
                         </goals>
                         <configuration>
-                            <shadedArtifactAttached>true</shadedArtifactAttached>
-                            <shadedClassifierName>fat</shadedClassifierName>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>com.starlight.App</mainClass>
+                                    <mainClass>com.starlight.Launcher</mainClass>
                                     <manifestEntries>
-                                        <Add-Opens>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</Add-Opens>
+                                        <Multi-Release>true</Multi-Release>
+                                        <Add-Opens>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED javafx.graphics/com.sun.javafx.application=ALL-UNNAMED javafx.graphics/com.sun.glass.ui=ALL-UNNAMED javafx.graphics/com.sun.javafx.util=ALL-UNNAMED javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED javafx.graphics/com.sun.javafx.application.HostServicesDelegate=ALL-UNNAMED</Add-Opens>
+                                        <Add-Exports>javafx.graphics/com.sun.javafx.application=ALL-UNNAMED javafx.graphics/com.sun.glass.ui=ALL-UNNAMED javafx.graphics/com.sun.javafx.util=ALL-UNNAMED javafx.base/com.sun.javafx.logging=ALL-UNNAMED javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED javafx.graphics/com.sun.glass.ui.monocle.input=ALL-UNNAMED javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED</Add-Exports>
                                     </manifestEntries>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
@@ -251,6 +237,8 @@
                                         <exclude>META-INF/*.SF</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>module-info.class</exclude>
+                                        <exclude>META-INF/versions/*/module-info.class</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
@@ -259,16 +247,39 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.panteleyev</groupId>
-                <artifactId>jpackage-maven-plugin</artifactId>
-                <version>1.6.0</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete file="${project.build.directory}/original-${project.build.finalName}.jar" quiet="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
                 <configuration>
-                    <name>TabemonPal</name>
-                    <appVersion>${project.version}</appVersion>
-                    <vendor>Starlight</vendor>
-                    <destination>target/dist</destination>
-                    <module>com.starlight/com.starlight.App</module>
-                    <runtimeImage>target/image</runtimeImage>
+                    <mainClass>com.starlight.App</mainClass>
+                    <args>
+                        <arg>--add-modules</arg>
+                        <arg>javafx.controls,javafx.fxml,javafx.web</arg>
+                        <arg>--add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</arg>
+                        <arg>--add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</arg>
+                        <arg>--add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED</arg>
+                        <arg>--add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED</arg>
+                        <arg>--add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED</arg>
+                        <arg>--add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED</arg>
+                    </args>
                 </configuration>
             </plugin>
         </plugins>

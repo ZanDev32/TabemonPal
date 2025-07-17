@@ -26,7 +26,7 @@
    <children>
       <VBox alignment="CENTER" prefHeight="235.0" prefWidth="427.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
          <children>
-            <ImageView fitHeight="320.0" fitWidth="320.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="210.0" fitWidth="226.0" pickOnBounds="true" preserveRatio="true">
                <viewport>
                   <Rectangle2D height="320.0" width="320.0" />
                </viewport>
@@ -40,6 +40,6 @@
          </children>
       </VBox>
       <Label text="Copyright © 2025 Starlight Inc." GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
-      <MFXProgressBar GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+      <MFXProgressBar prefHeight="5.0" prefWidth="238.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
    </children>
 </GridPane>
