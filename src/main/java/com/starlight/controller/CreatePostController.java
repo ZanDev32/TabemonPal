@@ -6,11 +6,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.List;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.UUID;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -63,25 +58,20 @@ public class CreatePostController implements Initializable {
     private final PostDataRepository repository = new PostDataRepository();
 
     /**
-     * Copies the selected image to the user's home data directory.
+     * Copies the selected image to the user's data directory.
      *
      * @param image the image file selected by the user
-     * @return the copied image file
+     * @return the copied image file path
      */
-    private File copyImageToUserDir(File image) throws java.io.IOException {
-        Path dir = Paths.get(System.getProperty("user.home"), ".tabemonpal", "images");
-        Files.createDirectories(dir);
-
-        String name = image.getName();
-        String ext = "";
-        int idx = name.lastIndexOf('.');
-        if (idx > 0) {
-            ext = name.substring(idx);
+    private String copyImageToUserDir(File image) {
+        try {
+            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
+            return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
+        } catch (Exception e) {
+            System.err.println("Failed to copy image to user directory: " + e.getMessage());
+            e.printStackTrace();
+            return null;
         }
-
-        Path target = dir.resolve(UUID.randomUUID().toString() + ext);
-        Files.copy(image.toPath(), target, StandardCopyOption.REPLACE_EXISTING);
-        return target.toFile();
     }
 
     /**
@@ -135,8 +125,8 @@ public class CreatePostController implements Initializable {
             newPost.title = postTitle;
             newPost.description = postDescription;
             try {
-                File stored = copyImageToUserDir(selectedImage);
-                newPost.image = stored.getAbsolutePath();
+                String storedPath = copyImageToUserDir(selectedImage);
+                newPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
             } catch (Exception e) {
                 e.printStackTrace();
                 newPost.image = selectedImage.getAbsolutePath();

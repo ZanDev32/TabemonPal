@@ -7,13 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.starlight.util.FileSystemManager;
 
 /**
  * Repository for loading and saving {@link Post} objects to an XML file.
  */
 public class PostDataRepository {
-    private static final String DATA_DIR = System.getProperty("user.home") + File.separator + ".tabemonpal";
-    private static final String DEFAULT_XML_PATH = DATA_DIR + File.separator + "PostData.xml";
+    private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "PostData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
 
     private final String xmlPath;

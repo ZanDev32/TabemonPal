@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import com.starlight.util.FXMLVerificator;
+import com.starlight.util.FileSystemManager;
 import com.starlight.api.UserApiServer;
 
 import java.io.IOException;
@@ -174,6 +175,8 @@ public class App extends Application {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        // Initialize application data directory on startup
+        FileSystemManager.initializeAppDataDirectory();
         launch();
     }
 

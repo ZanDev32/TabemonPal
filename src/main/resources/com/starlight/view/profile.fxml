@@ -157,7 +157,7 @@
         </GridPane>
       </content>
     </MFXScrollPane>
-      <MFXButton fx:id="swapToCommunity" minWidth="-Infinity" onMouseClicked="#swapToCommunity" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparejt;" text=" " GridPane.columnIndex="1">
+      <MFXButton fx:id="swapToCommunity" minWidth="-Infinity" onMouseClicked="#swapToCommunity" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparent;" text=" " GridPane.columnIndex="1">
          <graphic>
             <ImageView fitHeight="26.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
                <image>

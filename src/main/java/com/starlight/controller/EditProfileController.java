@@ -122,41 +122,54 @@ public class EditProfileController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(stage);
         
         if (selectedFile != null) {
-            updateProfileImage(selectedFile.getAbsolutePath());
+            updateProfileImage(selectedFile);
         }
     }
     
     /**
-     * Updates the user's profile image in UserData XML and refreshes the display
+     * Updates the user's profile image in UserData XML and refreshes the display.
+     * Copies the selected file to the user's directory and updates the XML with the new path.
      */
-    private void updateProfileImage(String imagePath) {
+    private void updateProfileImage(File selectedFile) {
         try {
-            // Update the current user's profile picture path
             User currentSessionUser = Session.getCurrentUser();
-            if (currentSessionUser != null) {
-                currentSessionUser.profilepicture = imagePath;
-                
-                // Also update currentUser if it's set
-                if (currentUser != null) {
-                    currentUser.profilepicture = imagePath;
-                }
-                
-                // Update the UserData XML file
-                com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-                java.util.List<com.starlight.models.User> users = repo.loadUsers();
-                for (com.starlight.models.User u : users) {
-                    if (u.username.equals(currentSessionUser.username)) {
-                        u.profilepicture = imagePath;
-                        break;
-                    }
-                }
-                repo.saveUsers(users);
-                
-                // Refresh the profile image display
-                loadCurrentUserProfileImage();
-                
-                System.out.println("Profile image updated successfully: " + imagePath);
+            if (currentSessionUser == null) {
+                System.err.println("No current session user found");
+                return;
             }
+            
+            // Copy the selected file to the user's directory
+            String copiedFilePath = com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(
+                selectedFile, currentSessionUser.username);
+            
+            if (copiedFilePath == null) {
+                System.err.println("Failed to copy image file to user directory");
+                return;
+            }
+            
+            // Update the current user's profile picture path
+            currentSessionUser.profilepicture = copiedFilePath;
+            
+            // Also update currentUser if it's set
+            if (currentUser != null) {
+                currentUser.profilepicture = copiedFilePath;
+            }
+            
+            // Update the UserData XML file
+            com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+            java.util.List<com.starlight.models.User> users = repo.loadUsers();
+            for (com.starlight.models.User u : users) {
+                if (u.username.equals(currentSessionUser.username)) {
+                    u.profilepicture = copiedFilePath;
+                    break;
+                }
+            }
+            repo.saveUsers(users);
+            
+            // Refresh the profile image display
+            loadCurrentUserProfileImage();
+            
+            System.out.println("Profile image updated successfully: " + copiedFilePath);
         } catch (Exception e) {
             System.err.println("Failed to update profile image: " + e.getMessage());
             e.printStackTrace();

@@ -3,6 +3,7 @@ package com.starlight.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.time.LocalDateTime;
@@ -297,28 +298,54 @@ public class CommunityController implements Initializable {
      * @param fallbackPath the classpath-relative path to a fallback image
      */
     public void loadImage(ImageView imageView, String path, String fallbackPath) {
+        // Use FileSystemManager to resolve the image path
+        Path resolvedPath = com.starlight.util.FileSystemManager.resolveImagePath(path);
+        
         Image imageToLoad = null;
-        if (path != null && !path.trim().isEmpty()) {
-            // Check if it's a classpath resource
-            if (path.startsWith("/")) {
-                URL resource = getClass().getResource(path);
+        if (resolvedPath != null) {
+            // Check if it's a special resource marker
+            if (resolvedPath.toString().startsWith("resource:")) {
+                String resourcePath = resolvedPath.toString().substring("resource:".length());
+                URL resource = getClass().getResource(resourcePath);
                 if (resource != null) {
                     imageToLoad = new Image(resource.toExternalForm());
                 }
             } else {
                 // Treat as a file path
-                File file = new File(path);
+                File file = resolvedPath.toFile();
                 if (file.exists()) {
                     imageToLoad = new Image(file.toURI().toString());
                 }
             }
         }
 
-        // If the image failed to load, use the fallback
+        // If the image failed to load, try the fallback
+        if (imageToLoad == null && fallbackPath != null) {
+            Path resolvedFallbackPath = com.starlight.util.FileSystemManager.resolveImagePath(fallbackPath);
+            if (resolvedFallbackPath != null) {
+                if (resolvedFallbackPath.toString().startsWith("resource:")) {
+                    String resourcePath = resolvedFallbackPath.toString().substring("resource:".length());
+                    URL fallbackResource = getClass().getResource(resourcePath);
+                    if (fallbackResource != null) {
+                        imageToLoad = new Image(fallbackResource.toExternalForm());
+                    }
+                } else {
+                    File fallbackFile = resolvedFallbackPath.toFile();
+                    if (fallbackFile.exists()) {
+                        imageToLoad = new Image(fallbackFile.toURI().toString());
+                    }
+                }
+            }
+        }
+        
+        // Final fallback - try to use FileSystemManager's fallback system
         if (imageToLoad == null) {
-            URL fallbackResource = getClass().getResource(fallbackPath);
-            if (fallbackResource != null) {
-                imageToLoad = new Image(fallbackResource.toExternalForm());
+            String defaultFallback = com.starlight.util.FileSystemManager.getFallbackImagePath("default");
+            if (defaultFallback != null) {
+                File defaultFile = new File(defaultFallback);
+                if (defaultFile.exists()) {
+                    imageToLoad = new Image(defaultFile.toURI().toString());
+                }
             }
         }
         

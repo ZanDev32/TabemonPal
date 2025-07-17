@@ -8,13 +8,13 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.starlight.util.FileSystemManager;
 
 /**
  * Repository for persisting {@link User} objects to an XML file.
  */
 public class UserDataRepository {
-    private static final String DATA_DIR = System.getProperty("user.home") + File.separator + ".tabemonpal";
-    private static final String DEFAULT_XML_PATH = DATA_DIR + File.separator + "UserData.xml";
+    private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "UserData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/UserDataDummy.xml";
 
     private final String xmlPath;
