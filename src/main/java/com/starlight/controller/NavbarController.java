@@ -36,7 +36,7 @@ public class NavbarController {
 
     @FXML
     void profile(MouseEvent event) {
-        main.loadPage("profile");
+        main.loadPage("editAccount");
     }
 
     @FXML

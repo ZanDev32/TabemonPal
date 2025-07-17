@@ -1,5 +1,6 @@
 package com.starlight.controller;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -16,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -25,10 +27,13 @@ import com.starlight.util.Session;
 /**
  * Controller for the user settings dialog where profile information can be
  * edited.
+ * 
+ * Architecture: Uses CommunityController's public utility methods for image loading
+ * and scaling to maintain consistency and reduce code redundancy across the application.
  */
 public class EditProfileController implements Initializable {
     @FXML
-    private ImageView profileimage;
+    private ImageView Image;
 
     @FXML
     private MFXButton imagepicker;
@@ -54,6 +59,9 @@ public class EditProfileController implements Initializable {
     private User currentUser;
     private Runnable onLogout;
     private Stage previousStage;
+    
+    // Use CommunityController for shared utility methods (image loading and scaling)
+    private final CommunityController communityController = new CommunityController();
 
     public void setUser(User user) {
         this.currentUser = user;
@@ -62,6 +70,12 @@ public class EditProfileController implements Initializable {
         if (passwordField != null) passwordField.setText(user.password);
         if (birthDayPicker != null && user.birthDay != null && !user.birthDay.isEmpty()) {
             birthDayPicker.setValue(java.time.LocalDate.parse(user.birthDay));
+        }
+        
+        // Load and scale profile image using CommunityController methods
+        if (Image != null) {
+            communityController.loadImage(Image, user.profilepicture, "/com/starlight/images/missing.png");
+            communityController.scaleToFit(Image, 170, 170, 200);
         }
     }
 
@@ -76,6 +90,77 @@ public class EditProfileController implements Initializable {
      */
     public void setPreviousStage(Stage stage) {
         this.previousStage = stage;
+    }
+    
+    /**
+     * Loads the current user's profile image from UserData XML using CommunityController methods
+     */
+    private void loadCurrentUserProfileImage() {
+        User currentSessionUser = Session.getCurrentUser();
+        if (currentSessionUser != null && Image != null) {
+            // Load profile image using CommunityController for consistency
+            communityController.loadImage(Image, currentSessionUser.profilepicture, "/com/starlight/images/missing.png");
+            communityController.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
+        }
+    }
+    
+    /**
+     * Handles the image picker button click to allow user to select a new profile image
+     */
+    @FXML
+    private void onImagePickerClick(javafx.event.ActionEvent event) {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Profile Image");
+        
+        // Set extension filters for image files
+        FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
+            "Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp");
+        fileChooser.getExtensionFilters().add(imageFilter);
+        
+        // Show the file chooser dialog
+        Stage stage = (Stage) imagepicker.getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        
+        if (selectedFile != null) {
+            updateProfileImage(selectedFile.getAbsolutePath());
+        }
+    }
+    
+    /**
+     * Updates the user's profile image in UserData XML and refreshes the display
+     */
+    private void updateProfileImage(String imagePath) {
+        try {
+            // Update the current user's profile picture path
+            User currentSessionUser = Session.getCurrentUser();
+            if (currentSessionUser != null) {
+                currentSessionUser.profilepicture = imagePath;
+                
+                // Also update currentUser if it's set
+                if (currentUser != null) {
+                    currentUser.profilepicture = imagePath;
+                }
+                
+                // Update the UserData XML file
+                com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+                java.util.List<com.starlight.models.User> users = repo.loadUsers();
+                for (com.starlight.models.User u : users) {
+                    if (u.username.equals(currentSessionUser.username)) {
+                        u.profilepicture = imagePath;
+                        break;
+                    }
+                }
+                repo.saveUsers(users);
+                
+                // Refresh the profile image display
+                loadCurrentUserProfileImage();
+                
+                System.out.println("Profile image updated successfully: " + imagePath);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to update profile image: " + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -121,6 +206,9 @@ public class EditProfileController implements Initializable {
         if (currentSessionUser != null && welcomeLabel != null) {
             welcomeLabel.setText("Hello, " + currentSessionUser.username);
         }
+        
+        // Load the current user's profile image
+        loadCurrentUserProfileImage();
     }
 
     @FXML
@@ -147,6 +235,9 @@ public class EditProfileController implements Initializable {
         currentUser.email = email;
         currentUser.password = password;
         currentUser.birthDay = birthDay != null ? birthDay.toString() : null;
+        
+        // Refresh the profile image in case it was updated
+        loadCurrentUserProfileImage();
     }
 
     @FXML

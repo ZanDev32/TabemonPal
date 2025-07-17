@@ -10,7 +10,7 @@
 Cook on skillet.</directions>
     <image>src/main/resources/com/starlight/images/dummy/recent_1.png</image>
     <rating>4.5</rating>
-    <uploadtime>2023-11-22 10:00</uploadtime>
+    <uploadtime>2023-11-22 10:00:00</uploadtime>
     <likecount>12</likecount>
   </post>
   <post>
@@ -24,7 +24,7 @@ Cook on skillet.</directions>
 Serve chilled.</directions>
     <image>src/main/resources/com/starlight/images/dummy/image_2.jpg</image>
     <rating>4.8</rating>
-    <uploadtime>2023-11-23 11:00</uploadtime>
+    <uploadtime>2023-11-23 11:00:00</uploadtime>
     <likecount>8</likecount>
   </post>
   <post>
@@ -35,7 +35,7 @@ Serve chilled.</directions>
     <directions>123344</directions>
     <image>/home/zan/Documents/main_folder/pfp/52073144.jpg</image>
     <rating>0</rating>
-    <uploadtime>2025-06-22 10:09</uploadtime>
+    <uploadtime>2025-06-22 10:09:00</uploadtime>
     <likecount>0</likecount>
   </post>
 </posts>

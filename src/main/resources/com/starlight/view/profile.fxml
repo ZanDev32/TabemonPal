@@ -12,9 +12,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1200.0" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.ProfileController">
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1200.0" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.ProfileController">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
@@ -39,82 +38,12 @@
           <children>
             <MFXScrollPane fx:id="myrepiceList" fitToHeight="true" fitToWidth="false" pannable="true" prefHeight="269.0" prefWidth="1045.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.vgrow="NEVER">
               <content>
-                <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="255.0">
-                  <children>
-                    <VBox maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
-                      <children>
-                        <ImageView fx:id="RecipePhoto" fitHeight="174.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true">
-                          <viewport>
-                            <Rectangle2D height="174.0" width="280.0" />
-                          </viewport>
-                          <image>
-                            <Image url="@../images/missing.png" />
-                          </image>
-                        </ImageView>
-                                    <VBox prefHeight="81.0" prefWidth="254.0">
-                                       <children>
-                              <Label fx:id="RecipeTitle" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
-                                <font>
-                                  <Font size="12.0" />
-                                </font>
-                                <VBox.margin>
-                                  <Insets left="18.0" right="18.0" top="10.0" />
-                                </VBox.margin>
-                              </Label>
-                              <HBox prefHeight="100.0" prefWidth="200.0">
-                                <children>
-                                  <ImageView fitHeight="20.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
-                                    <viewport>
-                                      <Rectangle2D minX="10.0" minY="10.0" />
-                                    </viewport>
-                                    <image>
-                                      <Image url="@../icon/star.png" />
-                                    </image>
-                                  </ImageView>
-                                  <Label fx:id="starrating" prefHeight="21.0" prefWidth="30.0" styleClass="label2" stylesheets="@../style.css" text="0.0" wrapText="true">
-                                    <font>
-                                      <Font size="12.0" />
-                                    </font>
-                                  </Label>
-                                  <ImageView fitHeight="5.0" fitWidth="6.0" pickOnBounds="true" preserveRatio="true">
-                                    <viewport>
-                                      <Rectangle2D />
-                                    </viewport>
-                                    <image>
-                                      <Image url="@../icon/dot.png" />
-                                    </image>
-                                    <HBox.margin>
-                                      <Insets top="10.0" />
-                                    </HBox.margin>
-                                  </ImageView>
-                                  <Label fx:id="likecounter" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
-                                    <font>
-                                      <Font size="12.0" />
-                                    </font>
-                                    <HBox.margin>
-                                      <Insets left="7.0" />
-                                    </HBox.margin>
-                                  </Label>
-                                  <Label prefHeight="21.0" prefWidth="36.0" text="Likes" />
-                                </children>
-                                <VBox.margin>
-                                  <Insets bottom="20.0" left="18.0" right="18.0" />
-                                </VBox.margin>
-                              </HBox>
-                                       </children>
-                                    </VBox>
-                      </children>
-                      <HBox.margin>
-                        <Insets right="30.0" />
-                      </HBox.margin>
-                    </VBox>
-                  </children>
-                </HBox>
+                <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="255.0" />
               </content>
             </MFXScrollPane>
-                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="316.0" prefWidth="1306.0" styleClass="background-window">
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="316.0" prefWidth="1306.0" styleClass="background-window">
                      <children>
-                        <ImageView fx:id="profile" fitHeight="170.0" fitWidth="170.0" pickOnBounds="true" preserveRatio="true">
+                        <ImageView fx:id="profile" fitHeight="170.0" fitWidth="170.0" onMouseClicked="#swapToCommunity" pickOnBounds="true" preserveRatio="true">
                            <viewport>
                               <Rectangle2D height="170.0" width="170.0" />
                            </viewport>
@@ -125,7 +54,7 @@
                               <Image url="@../images/missing.png" />
                            </image>
                         </ImageView>
-                        <VBox maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                        <VBox maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="1306.0" HBox.hgrow="ALWAYS">
                            <children>
                               <Label fx:id="username" styleClass="profile-attribute-text" text="Username">
                                  <VBox.margin>
@@ -137,7 +66,7 @@
                                     <Insets bottom="20.0" right="430.0" />
                                  </VBox.margin>
                               </Label>
-                              <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                              <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="100.0" prefWidth="1010.0" VBox.vgrow="ALWAYS">
                                  <children>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                        <HBox.margin>
@@ -159,7 +88,7 @@
                                     </VBox>
                                     <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
                                        <HBox.margin>
-                                          <Insets right="410.0" />
+                                          <Insets right="210.0" />
                                        </HBox.margin>
                                        <children>
                                           <Label fx:id="following" styleClass="profile-attribute-number" text="0" />
@@ -228,7 +157,7 @@
         </GridPane>
       </content>
     </MFXScrollPane>
-      <MFXButton fx:id="swapToCommunity" minWidth="-Infinity" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparejt;" text=" " GridPane.columnIndex="1">
+      <MFXButton fx:id="swapToCommunity" minWidth="-Infinity" onMouseClicked="#swapToCommunity" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparejt;" text=" " GridPane.columnIndex="1">
          <graphic>
             <ImageView fitHeight="26.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
                <image>

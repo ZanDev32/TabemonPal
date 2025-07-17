@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
@@ -24,7 +24,7 @@
     <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="841.0" vgrow="SOMETIMES" />
   </rowConstraints>
   <children>
-    <MFXButton fx:id="toProfile" buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" styleClass="button-community" text="My Profile" GridPane.columnIndex="1" />
+    <MFXButton fx:id="toProfile" buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" onMouseClicked="#toProfile" styleClass="button-community" text="My Profile" GridPane.columnIndex="1" />
     <MFXScrollPane hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1148.0" prefWidth="960.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
       <content>
         <GridPane fx:id="manu" maxWidth="1.7976931348623157E308" prefWidth="1706.0">
@@ -33,8 +33,8 @@
           </columnConstraints>
           <rowConstraints>
             <RowConstraints prefHeight="77.0" vgrow="NEVER" />
-            <RowConstraints prefHeight="269.0" vgrow="NEVER" />
-            <RowConstraints prefHeight="64.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="287.0" minHeight="-Infinity" prefHeight="287.0" vgrow="NEVER" />
+            <RowConstraints maxHeight="58.0" minHeight="-Infinity" prefHeight="46.0" vgrow="NEVER" />
             <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
           </rowConstraints>
           <children>
@@ -226,7 +226,6 @@
                                     <Insets bottom="15.0" />
                                  </VBox.margin>
                     </VBox>
-                              <MFXButton fx:id="createpost" onAction="#handleCreatePost" text="Create new post" />
                   </children>
                   <GridPane.margin>
                     <Insets left="35.0" />

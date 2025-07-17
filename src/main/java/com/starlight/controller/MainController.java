@@ -141,6 +141,12 @@ public class MainController implements Initializable {
                         Session.getCurrentUser()
                     );
                 }
+                if (controller instanceof CommunityController) {
+                    ((CommunityController) controller).setMainController(MainController.this);
+                }
+                if (controller instanceof ProfileController) {
+                    ((ProfileController) controller).setMainController(MainController.this);
+                }
                 
                 return root;
             }

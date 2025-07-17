@@ -29,12 +29,12 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="325.5" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
-            <ImageView fx:id="profileimage" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="Image" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
                <viewport>
                   <Rectangle2D height="150.0" width="150.0" />
                </viewport>
             </ImageView>
-            <MFXButton fx:id="imagepicker" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #B8145B; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
+            <MFXButton fx:id="imagepicker" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" onAction="#onImagePickerClick" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: #B8145B; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
                <font>
                   <Font name="Comfortaa Medium" size="30.0" />
                </font>
