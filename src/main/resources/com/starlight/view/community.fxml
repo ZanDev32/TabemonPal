@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
@@ -24,7 +24,7 @@
     <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="841.0" vgrow="SOMETIMES" />
   </rowConstraints>
   <children>
-    <MFXButton buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" styleClass="button-community" text="My Recipes" GridPane.columnIndex="1" />
+    <MFXButton fx:id="toProfile" buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" styleClass="button-community" text="My Profile" GridPane.columnIndex="1" />
     <MFXScrollPane hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1148.0" prefWidth="960.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
       <content>
         <GridPane fx:id="manu" maxWidth="1.7976931348623157E308" prefWidth="1706.0">
@@ -244,7 +244,7 @@
               <content>
                 <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="255.0">
                   <children>
-                    <VBox maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="dailypost1" maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto1" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -307,7 +307,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox maxWidth="225.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="dailypost2" maxWidth="225.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto2" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -370,7 +370,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox maxWidth="255.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="dailypost3" maxWidth="255.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto3" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -433,7 +433,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox minWidth="-Infinity" prefHeight="200.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox fx:id="dailypost4" minWidth="-Infinity" prefHeight="200.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto4" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>

@@ -1,7 +1,7 @@
 # TabemonPal: The Healthy Eating Gamification App
 
 
-[![Java](https://img.shields.io/badge/Java-11-red.svg)](https://openjdk.java.net/)
+[![Java](https://img.shields.io/badge/Java-17-red.svg)](https://openjdk.java.net/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-19-blue.svg)](https://openjfx.io/)
 [![MaterialFX](https://img.shields.io/badge/MaterialFX-11.13.5-purple.svg)](https://github.com/palexdev/MaterialFX)
 

@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1200.0" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.ProfileController">
+  <columnConstraints>
+    <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
+    <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="93.0" valignment="BOTTOM" vgrow="NEVER" />
+    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="766.0" prefHeight="1107.0" vgrow="SOMETIMES" />
+  </rowConstraints>
+  <children>
+    <MFXScrollPane hbarPolicy="NEVER" hmax="0.0" maxWidth="1.7976931348623157E308" prefHeight="1148.0" prefWidth="960.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+      <content>
+        <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1938.0" prefWidth="1480.0">
+          <columnConstraints>
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+          </columnConstraints>
+          <rowConstraints>
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="220.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="64.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          </rowConstraints>
+          <children>
+            <MFXScrollPane fx:id="myrepiceList" fitToHeight="true" fitToWidth="false" pannable="true" prefHeight="269.0" prefWidth="1045.0" style="-fx-background-color: transparent;" vbarPolicy="NEVER" GridPane.hgrow="NEVER" GridPane.rowIndex="3" GridPane.vgrow="NEVER">
+              <content>
+                <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="255.0">
+                  <children>
+                    <VBox maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                      <children>
+                        <ImageView fx:id="RecipePhoto" fitHeight="174.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true">
+                          <viewport>
+                            <Rectangle2D height="174.0" width="280.0" />
+                          </viewport>
+                          <image>
+                            <Image url="@../images/missing.png" />
+                          </image>
+                        </ImageView>
+                                    <VBox prefHeight="81.0" prefWidth="254.0">
+                                       <children>
+                              <Label fx:id="RecipeTitle" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
+                                <font>
+                                  <Font size="12.0" />
+                                </font>
+                                <VBox.margin>
+                                  <Insets left="18.0" right="18.0" top="10.0" />
+                                </VBox.margin>
+                              </Label>
+                              <HBox prefHeight="100.0" prefWidth="200.0">
+                                <children>
+                                  <ImageView fitHeight="20.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                                    <viewport>
+                                      <Rectangle2D minX="10.0" minY="10.0" />
+                                    </viewport>
+                                    <image>
+                                      <Image url="@../icon/star.png" />
+                                    </image>
+                                  </ImageView>
+                                  <Label fx:id="starrating" prefHeight="21.0" prefWidth="30.0" styleClass="label2" stylesheets="@../style.css" text="0.0" wrapText="true">
+                                    <font>
+                                      <Font size="12.0" />
+                                    </font>
+                                  </Label>
+                                  <ImageView fitHeight="5.0" fitWidth="6.0" pickOnBounds="true" preserveRatio="true">
+                                    <viewport>
+                                      <Rectangle2D />
+                                    </viewport>
+                                    <image>
+                                      <Image url="@../icon/dot.png" />
+                                    </image>
+                                    <HBox.margin>
+                                      <Insets top="10.0" />
+                                    </HBox.margin>
+                                  </ImageView>
+                                  <Label fx:id="likecounter" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                                    <font>
+                                      <Font size="12.0" />
+                                    </font>
+                                    <HBox.margin>
+                                      <Insets left="7.0" />
+                                    </HBox.margin>
+                                  </Label>
+                                  <Label prefHeight="21.0" prefWidth="36.0" text="Likes" />
+                                </children>
+                                <VBox.margin>
+                                  <Insets bottom="20.0" left="18.0" right="18.0" />
+                                </VBox.margin>
+                              </HBox>
+                                       </children>
+                                    </VBox>
+                      </children>
+                      <HBox.margin>
+                        <Insets right="30.0" />
+                      </HBox.margin>
+                    </VBox>
+                  </children>
+                </HBox>
+              </content>
+            </MFXScrollPane>
+                  <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="316.0" prefWidth="1306.0" styleClass="background-window">
+                     <children>
+                        <ImageView fx:id="profile" fitHeight="170.0" fitWidth="170.0" pickOnBounds="true" preserveRatio="true">
+                           <viewport>
+                              <Rectangle2D height="170.0" width="170.0" />
+                           </viewport>
+                           <HBox.margin>
+                              <Insets left="50.0" right="32.0" />
+                           </HBox.margin>
+                           <image>
+                              <Image url="@../images/missing.png" />
+                           </image>
+                        </ImageView>
+                        <VBox maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                           <children>
+                              <Label fx:id="username" styleClass="profile-attribute-text" text="Username">
+                                 <VBox.margin>
+                                    <Insets bottom="16.0" top="75.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <Label fx:id="bio" prefHeight="77.0" prefWidth="1246.0" styleClass="profile-attribute-text" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec vitae nisi dolor. " wrapText="true">
+                                 <VBox.margin>
+                                    <Insets bottom="20.0" right="430.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                 <children>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets right="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Label fx:id="recipes" styleClass="profile-attribute-number" text="0" />
+                                          <Label styleClass="profile-attribute-text" text="Recipes" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets right="25.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Label fx:id="followers" styleClass="profile-attribute-number" text="0" />
+                                          <Label styleClass="profile-attribute-text" text="Followers" />
+                                       </children>
+                                    </VBox>
+                                    <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0">
+                                       <HBox.margin>
+                                          <Insets right="410.0" />
+                                       </HBox.margin>
+                                       <children>
+                                          <Label fx:id="following" styleClass="profile-attribute-number" text="0" />
+                                          <Label styleClass="profile-attribute-text" text="Following" />
+                                       </children>
+                                    </VBox>
+                                    <MFXButton fx:id="editBio" buttonType="RAISED" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="184.0" styleClass="button-community" text="Edit Bio" />
+                                    <MFXButton fx:id="addRecipe" buttonType="RAISED" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="40.0" prefWidth="184.0" styleClass="button-community" text="Add Recipe">
+                                       <HBox.margin>
+                                          <Insets left="25.0" />
+                                       </HBox.margin>
+                                    </MFXButton>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="30.0" />
+                                 </VBox.margin>
+                              </HBox>
+                           </children>
+                        </VBox>
+                     </children>
+                     <GridPane.margin>
+                        <Insets bottom="35.0" />
+                     </GridPane.margin>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="1">
+                     <children>
+                        <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="1306.0" styleClass="background-window">
+                           <children>
+                              <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0" HBox.hgrow="ALWAYS">
+                                 <HBox.margin>
+                                    <Insets bottom="28.0" left="75.0" right="75.0" top="28.0" />
+                                 </HBox.margin>
+                                 <children>
+                                    <Label styleClass="label2" text="My Badge">
+                                       <VBox.margin>
+                                          <Insets bottom="13.0" />
+                                       </VBox.margin>
+                                    </Label>
+                                    <HBox alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="ALWAYS">
+                                       <children>
+                                          <VBox fx:id="badge" alignment="CENTER" prefHeight="200.0" prefWidth="100.0" styleClass="badge-box">
+                                             <children>
+                                                <ImageView fx:id="badgeICon" fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                                                   <viewport>
+                                                      <Rectangle2D height="45.0" width="45.0" />
+                                                   </viewport>
+                                                   <image>
+                                                      <Image url="@../images/missing.png" />
+                                                   </image>
+                                                </ImageView>
+                                                <Label fx:id="badgeTitle" alignment="TOP_LEFT" prefHeight="38.0" prefWidth="40.0" text="Badge" wrapText="true" />
+                                             </children>
+                                             <HBox.margin>
+                                                <Insets right="25.0" />
+                                             </HBox.margin>
+                                          </VBox>
+                                       </children>
+                                    </HBox>
+                                 </children></VBox>
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+          <Label styleClass="label2" stylesheets="@../style.css" text="My Recipes" GridPane.rowIndex="2" />
+          </children>
+        </GridPane>
+      </content>
+    </MFXScrollPane>
+      <MFXButton fx:id="swapToCommunity" minWidth="-Infinity" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparejt;" text=" " GridPane.columnIndex="1">
+         <graphic>
+            <ImageView fitHeight="26.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
+               <image>
+                  <Image url="@../icon/Arrow%20left.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <GridPane.margin>
+            <Insets bottom="10.0" />
+         </GridPane.margin>
+      </MFXButton>
+  </children>
+</GridPane>

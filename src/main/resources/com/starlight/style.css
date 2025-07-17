@@ -9,6 +9,7 @@
     -fx-background-color: #FFFFFF;
         background-color: #FFFFFF;
     -fx-background-radius: 20 20 20 20;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.2), 10, 0.0, 0.0, 5.0);
 }
 
 .sideBar{
@@ -135,9 +136,30 @@
         background-color: transparent;
 }
 
-.post-list {
-    -fx-border-color: red;
+.profile-attribute-number {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 32;
+        font-size: 32;
 }
+
+.profile-attribute-text {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+}
+
+.badge-box {
+    -fx-background-color: #FEF7E7;
+        background-color: #FEF7E7;
+    -fx-background-radius: 30 30 30 30;
+}
+
 /* debugging only
 
 .VBox {

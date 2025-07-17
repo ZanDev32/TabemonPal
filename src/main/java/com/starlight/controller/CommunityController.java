@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -33,6 +36,21 @@ import javafx.util.Duration;
  * the user to create new posts.
  */
 public class CommunityController implements Initializable {
+    @FXML
+    private MFXButton toProfile;
+
+    @FXML
+    private VBox dailypost1;
+
+    @FXML
+    private VBox dailypost2;
+
+    @FXML
+    private VBox dailypost3;
+
+    @FXML
+    private VBox dailypost4;
+
     @FXML
     private GridPane manu;
 
@@ -173,6 +191,111 @@ public class CommunityController implements Initializable {
     }
 
     /**
+     * Overloaded method that resizes and centers the given {@link ImageView} to fit inside the specified frame size
+     * while preserving aspect ratio and applying rounded corners with individual corner control.
+     * This method scales the image to fill the frame, cropping it if necessary.
+     * 
+     * @param imageView the ImageView to resize and crop
+     * @param frameWidth the target width of the frame
+     * @param frameHeight the target height of the frame
+     * @param topLeftRadius the arc radius for the top-left corner
+     * @param topRightRadius the arc radius for the top-right corner
+     * @param bottomLeftRadius the arc radius for the bottom-left corner
+     * @param bottomRightRadius the arc radius for the bottom-right corner
+     */
+    private void scaleToFit(ImageView imageView, double frameWidth, double frameHeight, 
+                           double topLeftRadius, double topRightRadius, 
+                           double bottomLeftRadius, double bottomRightRadius) {
+        if (imageView.getImage() == null) return;
+        Image image = imageView.getImage();
+        
+        double imageWidth = image.getWidth();
+        double imageHeight = image.getHeight();
+
+        // Set the ImageView size to match the frame
+        imageView.setFitWidth(frameWidth);
+        imageView.setFitHeight(frameHeight);
+
+        // Calculate aspect ratios
+        double imageAspect = imageWidth / imageHeight;
+        double frameAspect = frameWidth / frameHeight;
+
+        double newWidth, newHeight;
+        double xOffset = 0, yOffset = 0;
+
+        // Determine the cropping area
+        if (imageAspect > frameAspect) {
+            // Image is wider than the frame, so we crop the sides
+            newHeight = imageHeight;
+            newWidth = newHeight * frameAspect;
+            xOffset = (imageWidth - newWidth) / 2;
+        } else {
+            // Image is taller than the frame, so we crop the top and bottom
+            newWidth = imageWidth;
+            newHeight = newWidth / frameAspect;
+            yOffset = (imageHeight - newHeight) / 2;
+        }
+
+        // Set the viewport to the centered, cropped portion of the image
+        imageView.setViewport(new javafx.geometry.Rectangle2D(xOffset, yOffset, newWidth, newHeight));
+        
+        // Create a custom clip with individual corner radii using a rounded rectangle approach
+        javafx.scene.shape.Path clipPath = new javafx.scene.shape.Path();
+        
+        // Move to starting point (top-left, accounting for radius)
+        clipPath.getElements().add(new javafx.scene.shape.MoveTo(topLeftRadius, 0));
+        
+        // Top edge to top-right corner
+        clipPath.getElements().add(new javafx.scene.shape.LineTo(frameWidth - topRightRadius, 0));
+        
+        // Top-right corner arc
+        if (topRightRadius > 0) {
+            clipPath.getElements().add(new javafx.scene.shape.QuadCurveTo(
+                frameWidth, 0, frameWidth, topRightRadius));
+        } else {
+            clipPath.getElements().add(new javafx.scene.shape.LineTo(frameWidth, 0));
+        }
+        
+        // Right edge to bottom-right corner
+        clipPath.getElements().add(new javafx.scene.shape.LineTo(frameWidth, frameHeight - bottomRightRadius));
+        
+        // Bottom-right corner arc
+        if (bottomRightRadius > 0) {
+            clipPath.getElements().add(new javafx.scene.shape.QuadCurveTo(
+                frameWidth, frameHeight, frameWidth - bottomRightRadius, frameHeight));
+        } else {
+            clipPath.getElements().add(new javafx.scene.shape.LineTo(frameWidth, frameHeight));
+        }
+        
+        // Bottom edge to bottom-left corner
+        clipPath.getElements().add(new javafx.scene.shape.LineTo(bottomLeftRadius, frameHeight));
+        
+        // Bottom-left corner arc
+        if (bottomLeftRadius > 0) {
+            clipPath.getElements().add(new javafx.scene.shape.QuadCurveTo(
+                0, frameHeight, 0, frameHeight - bottomLeftRadius));
+        } else {
+            clipPath.getElements().add(new javafx.scene.shape.LineTo(0, frameHeight));
+        }
+        
+        // Left edge to top-left corner
+        clipPath.getElements().add(new javafx.scene.shape.LineTo(0, topLeftRadius));
+        
+        // Top-left corner arc
+        if (topLeftRadius > 0) {
+            clipPath.getElements().add(new javafx.scene.shape.QuadCurveTo(
+                0, 0, topLeftRadius, 0));
+        } else {
+            clipPath.getElements().add(new javafx.scene.shape.LineTo(0, 0));
+        }
+        
+        // Close the path
+        clipPath.getElements().add(new javafx.scene.shape.ClosePath());
+        
+        imageView.setClip(clipPath);
+    }
+
+    /**
      * Loads posts from the repository and populates the UI. All posts are
      * added to the postlist container.
      */
@@ -204,7 +327,7 @@ public class CommunityController implements Initializable {
 
                 c.username.setText(displayUsername != null ? displayUsername : usr);
                 c.title.setText(tits);
-                c.uploadtime.setText(time);
+                c.uploadtime.setText(formatRelativeTime(time));
                 c.description.setText(desc);
                 c.likecounter.setText(likes);
 
@@ -219,6 +342,51 @@ public class CommunityController implements Initializable {
                 postlist.getChildren().add(node);
             } catch (IOException e) {
                 e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * Loads the top posts into the daily post slots with relative time formatting
+     */
+    private void loadDailyPosts() {
+        List<Post> posts = repository.loadPosts();
+        if (posts == null || posts.isEmpty()) {
+            return;
+        }
+
+        // Take up to 4 posts for daily posts
+        for (int i = 0; i < Math.min(4, posts.size()); i++) {
+            Post post = posts.get(i);
+            switch (i) {
+                case 0:
+                    dailytitle1.setText(post.title);
+                    starrating.setText(post.rating);
+                    dailylikecounter.setText(post.likecount);
+                    loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
+                    scaleToFit(dailyphoto1, 280, 200, 30);
+                    break;
+                case 1:
+                    dailytitle2.setText(post.title);
+                    starrating2.setText(post.rating);
+                    dailylikecounter2.setText(post.likecount);
+                    loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
+                    scaleToFit(dailyphoto2, 280, 200, 30);
+                    break;
+                case 2:
+                    dailytitle3.setText(post.title);
+                    starrating3.setText(post.rating);
+                    dailylikecounter3.setText(post.likecount);
+                    loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
+                    scaleToFit(dailyphoto3, 280, 200, 30, 30, 0, 0);
+                    break;
+                case 3:
+                    dailytitle4.setText(post.title);
+                    starrating4.setText(post.rating);
+                    dailylikecounter4.setText(post.likecount);
+                    loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
+                    scaleToFit(dailyphoto4, 280, 200, 30, 30, 0, 0);
+                    break;
             }
         }
     }
@@ -267,6 +435,7 @@ public class CommunityController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
         loadPosts();
+        loadDailyPosts();
     }
 
     @FXML
@@ -305,9 +474,39 @@ public class CommunityController implements Initializable {
             popupStage.showAndWait();
             if (controller.isSuccess()) {
                 loadPosts();
+                loadDailyPosts();
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    /**
+     * Formats a timestamp string into a relative time format like "2h ago", "1d ago"
+     */
+    private String formatRelativeTime(String timeString) {
+        if (timeString == null || timeString.trim().isEmpty()) {
+            return "unknown";
+        }
+        
+        try {
+            // Handle the format used in XML: "2025-07-11 17:12:55"
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            LocalDateTime postTime = LocalDateTime.parse(timeString.trim(), formatter);
+            long hours = ChronoUnit.HOURS.between(postTime, LocalDateTime.now());
+            
+            if (hours < 1) return "just now";
+            if (hours < 24) return hours + "h ago";
+            
+            long days = hours / 24;
+            if (days < 30) return days + "d ago";
+            
+            long months = days / 30;
+            if (months < 12) return months + "mo ago";
+            
+            return (months / 12) + "y ago";
+        } catch (Exception e) {
+            return timeString;
         }
     }
 }

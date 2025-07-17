@@ -9,11 +9,11 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="postTemplate" maxHeight="-Infinity" prefHeight="680.0" prefWidth="677.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.PostItemController">
+<VBox fx:id="postTemplate" maxHeight="-Infinity" prefHeight="690.0" prefWidth="677.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.PostItemController">
   <children>
     <VBox fx:id="post1" maxWidth="-Infinity" prefHeight="551.0" prefWidth="650.0">
       <children>
-        <HBox prefHeight="36.0" prefWidth="425.0" style="-fx-background-color: #ffff;" styleClass="background-window">
+        <HBox prefHeight="36.0" prefWidth="425.0" style="-fx-background-color: #ffff;">
           <children>
             <ImageView fx:id="profile1" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
               <HBox.margin>
@@ -63,7 +63,7 @@
         <Insets left="20.0" right="20.0" top="20.0" />
       </VBox.margin>
     </VBox>
-    <VBox prefHeight="66.0" prefWidth="677.0">
+    <VBox prefHeight="120.0" prefWidth="713.0">
       <children>
         <HBox prefHeight="1.0" prefWidth="465.0" style="-fx-background-color: #C4C4C44D;">
           <VBox.margin>
