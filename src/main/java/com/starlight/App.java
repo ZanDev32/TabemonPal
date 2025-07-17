@@ -4,6 +4,7 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
@@ -56,10 +57,16 @@ public class App extends Application {
         FXMLVerificator.verifyAll();
         scene = new Scene(loadFXML("splashScreen"));
         stage.setScene(scene);
-
-        // Set initial size for the authorization view
         resizeWindow(1280, 720);
 
+        try {
+            Image icon = new Image(getClass().getResourceAsStream("/com/starlight/images/AppLogo.png"));
+            stage.getIcons().add(icon);
+        } catch (Exception e) {
+            System.err.println("Could not load application icon: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
         stage.setTitle("TabemonPal by Starlight Inc.");
         stage.setResizable(true);
         stage.show();
@@ -102,7 +109,6 @@ public class App extends Application {
      */
     public static void loadMainWithSplash() {
         try {
-            System.out.println("Loading splash screen before main view");
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
             System.err.println("Failed to load splash screen: " + ex.getMessage());
@@ -113,9 +119,7 @@ public class App extends Application {
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(e -> {
             try {
-                System.out.println("Now loading main view");
                 setRoot("main");
-                System.out.println("Main view loaded successfully");
             } catch (IOException ex) {
                 System.err.println("Failed to load main view: " + ex.getMessage());
                 ex.printStackTrace();
@@ -177,6 +181,14 @@ public class App extends Application {
     public static void main(String[] args) {
         // Initialize application data directory on startup
         FileSystemManager.initializeAppDataDirectory();
+        
+        // Set Linux-specific properties for better icon display
+        String os = System.getProperty("os.name").toLowerCase();
+        if (os.contains("linux")) {
+            System.setProperty("javafx.application.name", "TabemonPal");
+            System.setProperty("glass.gtk.uiScale", "1.0");
+        }
+        
         launch();
     }
 

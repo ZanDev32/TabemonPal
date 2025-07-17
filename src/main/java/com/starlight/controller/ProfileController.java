@@ -76,7 +76,6 @@ public class ProfileController implements Initializable {
     @FXML
     private Label following;
     
-    @SuppressWarnings("unused")
     private MainController main;
     
     private final PostDataRepository repository = new PostDataRepository();

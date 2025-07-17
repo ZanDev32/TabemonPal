@@ -114,7 +114,7 @@ public class EditProfileController implements Initializable {
         
         // Set extension filters for image files
         FileChooser.ExtensionFilter imageFilter = new FileChooser.ExtensionFilter(
-            "Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif", "*.bmp");
+            "Image Files", "*.png", "*.jpg", "*.jpeg");
         fileChooser.getExtensionFilters().add(imageFilter);
         
         // Show the file chooser dialog
