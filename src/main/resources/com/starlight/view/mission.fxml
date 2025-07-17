@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import io.github.palexdev.materialfx.controls.MFXProgressBar?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="990.0" styleClass="test" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MissionController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2925.0" prefWidth="990.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MissionController">
    <children>
       <GridPane prefHeight="720.0" prefWidth="990.0">
          <columnConstraints>
-            <ColumnConstraints hgrow="SOMETIMES" maxWidth="66.0" minWidth="10.0" prefWidth="66.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="66.0" minWidth="10.0" />
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="926.0" minWidth="10.0" prefWidth="924.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="926.0" minWidth="10.0" />
          </columnConstraints>
          <rowConstraints>
             <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
@@ -23,49 +28,140 @@
          <children>
             <VBox prefHeight="200.0" prefWidth="924.0" GridPane.columnIndex="1">
                <children>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
+                  <GridPane maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="873.0" prefWidth="926.0" styleClass="background" VBox.vgrow="SOMETIMES">
+                    <columnConstraints>
+                      <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints maxHeight="60.0" minHeight="10.0" prefHeight="60.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="24.800009155273436" minHeight="10.0" prefHeight="12.000009918212882" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="200.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="128.79999389648435" minHeight="0.0" prefHeight="26.600006103515625" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="319.19999389648433" minHeight="10.0" prefHeight="168.5999755859375" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="263.6000122070312" minHeight="0.7999816894531477" prefHeight="28.399993896484318" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="364.20000610351565" minHeight="10.0" prefHeight="227.60000610351562" vgrow="SOMETIMES" />
+                    </rowConstraints>
                      <children>
-                        <Label text="Your Mission">
-                           <font>
-                              <Font name="System Bold" size="36.0" />
-                           </font>
-                        </Label>
-                     </children></HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                        <Label text="Start your first mission">
-                           <font>
-                              <Font name="System Bold" size="24.0" />
-                           </font>
-                        </Label>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="background-window" GridPane.rowIndex="3">
+                           <center>
+                              <GridPane BorderPane.alignment="CENTER">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Level Up Your Nutrition Journey" textAlignment="CENTER" wrappingWidth="326.76287841796875" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                                       <font>
+                                          <Font size="30.0" />
+                                       </font>
+                                       <GridPane.margin>
+                                          <Insets top="50.0" />
+                                       </GridPane.margin>
+                                    </Text>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Take on daily challenges, track your progress, and unlock exclusive rewards to stay motivated" textAlignment="CENTER" wrappingWidth="544.7005004882812" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="1">
+                                       <GridPane.margin>
+                                          <Insets top="50.0" />
+                                       </GridPane.margin>
+                                       <font>
+                                          <Font size="18.0" />
+                                       </font>
+                                    </Text>
+                                    <Button mnemonicParsing="false" prefHeight="26.0" prefWidth="194.0" styleClass="background" text="Start your first mission" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets top="15.0" />
+                                       </GridPane.margin>
+                                    </Button>
+                                 </children>
+                              </GridPane>
+                           </center>
+                        </BorderPane>
+                        <GridPane prefHeight="66.0" prefWidth="926.0">
+                          <columnConstraints>
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                          </columnConstraints>
+                          <rowConstraints>
+                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                            <RowConstraints maxHeight="27.20000305175781" minHeight="5.200003051757811" prefHeight="6.800001525878905" vgrow="SOMETIMES" />
+                              <RowConstraints maxHeight="22.79999694824219" minHeight="9.599996948242186" prefHeight="21.199998474121095" vgrow="SOMETIMES" />
+                          </rowConstraints>
+                           <children>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Your Mission" GridPane.rowIndex="1">
+                                 <font>
+                                    <Font size="24.0" />
+                                 </font>
+                              </Text>
+                              <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Complete challenges and earn rewards" GridPane.rowIndex="2">
+                                 <font>
+                                    <Font size="14.0" />
+                                 </font>
+                                 <GridPane.margin>
+                                    <Insets top="15.0" />
+                                 </GridPane.margin>
+                              </Text>
+                           </children>
+                        </GridPane>
+                        <BorderPane prefHeight="200.0" prefWidth="200.0" styleClass="background-window" GridPane.rowIndex="5">
+                           <center>
+                              <GridPane BorderPane.alignment="CENTER">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                    <RowConstraints maxHeight="33.599981689453124" minHeight="6.600018310546876" prefHeight="6.600018310546876" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="75.99998168945312" minHeight="10.0" prefHeight="55.999996185302734" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="53.40000381469726" minHeight="10.0" prefHeight="19.999993896484384" vgrow="SOMETIMES" />
+                                  <RowConstraints maxHeight="66.00000610351563" minHeight="10.0" prefHeight="66.00000610351563" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <GridPane GridPane.rowIndex="1">
+                                      <columnConstraints>
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="457.4000244140625" minWidth="10.0" prefWidth="76.00000610351563" />
+                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="865.5999717712402" minWidth="10.0" prefWidth="851.1999938964843" />
+                                      </columnConstraints>
+                                      <rowConstraints>
+                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                      </rowConstraints>
+                                       <children>
+                                          <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true" GridPane.halignment="CENTER" />
+                                          <GridPane GridPane.columnIndex="1">
+                                            <columnConstraints>
+                                              <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                             <children>
+                                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Hydration Hero">
+                                                   <font>
+                                                      <Font size="16.0" />
+                                                   </font>
+                                                </Text>
+                                                <Label prefHeight="18.0" prefWidth="41.0" styleClass="background" text="+50 XP" textAlignment="CENTER" GridPane.rowIndex="1" />
+                                             </children>
+                                          </GridPane>
+                                       </children>
+                                    </GridPane>
+                                    <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Drink at least 8 cup of water today." GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets left="20.0" />
+                                       </GridPane.margin>
+                                    </Text>
+                                    <MFXProgressBar prefHeight="4.0" prefWidth="751.0" progress="0.52" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER" />
+                                 </children>
+                              </GridPane>
+                           </center>
+                        </BorderPane>
                      </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <ImageView fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="35.0" prefWidth="451.0">
-                     <children>
-                        <Label text="Streak">
-                           <font>
-                              <Font name="System Bold" size="24.0" />
-                           </font>
-                        </Label>
-                     </children>
-                  </HBox>
-                  <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" />
+                  </GridPane>
                </children>
             </VBox>
          </children>
