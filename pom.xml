@@ -6,6 +6,7 @@
     <groupId>com.starlight</groupId>
     <artifactId>tabemonpal</artifactId>
     <version>0.5-ALPHA</version>
+    <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -140,7 +141,7 @@
                         --add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED
                         --add-exports=javafx.graphics/com.sun.glass.ui=org.testfx
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED
+                        --add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
                         --add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle=org.testfx
@@ -168,7 +169,7 @@
                         --add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED
                         --add-exports=javafx.graphics/com.sun.glass.ui=org.testfx
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.javafx.scene.control=ALL-UNNAMED
+                        --add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
                         --add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle=org.testfx
@@ -185,6 +186,89 @@
                         --add-opens=com.starlight/com.starlight.util=ALL-UNNAMED
                         --add-opens=com.starlight/com.starlight.controller=ALL-UNNAMED
                     </argLine>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.starlight.App</mainClass>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.5.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <shadedArtifactAttached>true</shadedArtifactAttached>
+                            <shadedClassifierName>fat</shadedClassifierName>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>com.starlight.App</mainClass>
+                                    <manifestEntries>
+                                        <Add-Opens>javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED javafx.graphics/com.sun.javafx.application=ALL-UNNAMED</Add-Opens>
+                                    </manifestEntries>
+                                </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.panteleyev</groupId>
+                <artifactId>jpackage-maven-plugin</artifactId>
+                <version>1.6.0</version>
+                <configuration>
+                    <name>TabemonPal</name>
+                    <appVersion>${project.version}</appVersion>
+                    <vendor>Starlight</vendor>
+                    <destination>target/dist</destination>
+                    <module>com.starlight/com.starlight.App</module>
+                    <runtimeImage>target/image</runtimeImage>
                 </configuration>
             </plugin>
         </plugins>
