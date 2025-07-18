@@ -7,6 +7,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Manages the application's file system operations including directory creation,
@@ -14,6 +16,8 @@ import java.nio.file.StandardCopyOption;
  * user data and application files in the user's home directory.
  */
 public class FileSystemManager {
+
+    private static final Logger LOGGER = Logger.getLogger(FileSystemManager.class.getName());
 
     /** Application data directory path */
     private static final String APP_DATA_DIR = System.getProperty("user.home") + File.separator + ".tabemonpal";
@@ -43,11 +47,10 @@ public class FileSystemManager {
             Path databaseDir = Paths.get(DATABASE_DIR);
             Files.createDirectories(databaseDir);
             
-            System.out.println("App data directory initialized at: " + APP_DATA_DIR);
+            LOGGER.info("App data directory initialized at: " + APP_DATA_DIR);
             
         } catch (IOException e) {
-            System.err.println("Failed to initialize app data directory: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to initialize app data directory: " + e.getMessage(), e);
         }
     }
 
@@ -86,8 +89,7 @@ public class FileSystemManager {
             Files.createDirectories(userDir);
             return userDir.toString();
         } catch (IOException e) {
-            System.err.println("Failed to create user directory for " + username + ": " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to create user directory for " + username + ": " + e.getMessage(), e);
             return null;
         }
     }
@@ -114,12 +116,11 @@ public class FileSystemManager {
             // Copy file
             Files.copy(sourceFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             
-            System.out.println("File copied to: " + targetPath.toString());
+            LOGGER.info("File copied to: " + targetPath.toString());
             return targetPath.toString();
             
         } catch (IOException e) {
-            System.err.println("Failed to copy file to user directory: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to copy file to user directory: " + e.getMessage(), e);
             return null;
         }
     }
@@ -130,7 +131,7 @@ public class FileSystemManager {
      * @param username the username whose directory to copy to
      * @return the path to the copied file in the user directory
      */
-    public static String copyFileToUserDirectoryWithUniqueFilename(File sourceFile, String username) {
+    public static String copyFileToUserDirectoryWithUniqueFilename(File sourceFile, String username) throws IOException {
         try {
             // Get file extension
             String originalName = sourceFile.getName();
@@ -158,8 +159,7 @@ public class FileSystemManager {
             } while (Files.exists(targetPath));
             
             return copyFileToUserDirectory(sourceFile, username, uniqueFileName);
-            
-        } catch (Exception e) {
+        } catch (SecurityException e) {
             System.err.println("Failed to copy file with unique filename: " + e.getMessage());
             e.printStackTrace();
             return null;
@@ -191,7 +191,7 @@ public class FileSystemManager {
             return true;
             
         } catch (Exception e) {
-            System.err.println("App data directory is not accessible: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "App data directory is not accessible: " + e.getMessage(), e);
             return false;
         }
     }
@@ -226,7 +226,7 @@ public class FileSystemManager {
                 }
             }
             
-            System.out.println("Warning: Could not resolve image path: " + imagePath);
+            LOGGER.warning("Could not resolve image path: " + imagePath);
             return null;
         }
         
@@ -236,7 +236,7 @@ public class FileSystemManager {
             if (Files.exists(absolutePath)) {
                 return absolutePath;
             } else {
-                System.out.println("Warning: Could not resolve absolute path: " + imagePath);
+                LOGGER.warning("Could not resolve absolute path: " + imagePath);
                 return null;
             }
         }
@@ -262,7 +262,7 @@ public class FileSystemManager {
                 return projectResourcesPath;
             }
             
-            System.out.println("Warning: Could not resolve resource path: " + imagePath);
+            LOGGER.warning("Could not resolve resource path: " + imagePath);
             return null;
         }
         
@@ -318,11 +318,11 @@ public class FileSystemManager {
         
         String fallbackPath = getFallbackImagePath(imageType);
         if (fallbackPath != null) {
-            System.out.println("Using fallback image for: " + imagePath);
+            LOGGER.info("Using fallback image for: " + imagePath);
             return fallbackPath;
         }
         
-        System.err.println("No image found for path: " + imagePath);
+        LOGGER.severe("No image found for path: " + imagePath);
         return null;
     }
 }

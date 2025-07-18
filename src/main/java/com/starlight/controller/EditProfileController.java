@@ -23,6 +23,7 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
 import com.starlight.util.Session;
+import com.starlight.util.ImageUtils;
 
 /**
  * Controller for the user settings dialog where profile information can be
@@ -59,9 +60,6 @@ public class EditProfileController implements Initializable {
     private User currentUser;
     private Runnable onLogout;
     private Stage previousStage;
-    
-    // Use CommunityController for shared utility methods (image loading and scaling)
-    private final CommunityController communityController = new CommunityController();
 
     public void setUser(User user) {
         this.currentUser = user;
@@ -72,10 +70,10 @@ public class EditProfileController implements Initializable {
             birthDayPicker.setValue(java.time.LocalDate.parse(user.birthDay));
         }
         
-        // Load and scale profile image using CommunityController methods
+        // Load and scale profile image using ImageUtils
         if (Image != null) {
-            communityController.loadImage(Image, user.profilepicture, "/com/starlight/images/missing.png");
-            communityController.scaleToFit(Image, 170, 170, 200);
+            ImageUtils.loadImage(Image, user.profilepicture, "/com/starlight/images/missing.png");
+            ImageUtils.scaleToFit(Image, 170, 170, 200);
         }
     }
 
@@ -93,14 +91,14 @@ public class EditProfileController implements Initializable {
     }
     
     /**
-     * Loads the current user's profile image from UserData XML using CommunityController methods
+     * Loads the current user's profile image using ImageUtils
      */
     private void loadCurrentUserProfileImage() {
         User currentSessionUser = Session.getCurrentUser();
         if (currentSessionUser != null && Image != null) {
-            // Load profile image using CommunityController for consistency
-            communityController.loadImage(Image, currentSessionUser.profilepicture, "/com/starlight/images/missing.png");
-            communityController.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
+            // Load profile image using ImageUtils
+            ImageUtils.loadImage(Image, currentSessionUser.profilepicture, "/com/starlight/images/missing.png");
+            ImageUtils.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
         }
     }
     

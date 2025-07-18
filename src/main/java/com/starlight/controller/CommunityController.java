@@ -1,9 +1,7 @@
 package com.starlight.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.time.LocalDateTime;
@@ -15,18 +13,17 @@ import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
 import com.starlight.models.User;
 import com.starlight.models.UserDataRepository;
+import com.starlight.util.ImageUtils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
 
 /**
  * Controller backing the community page. It displays recent posts and allows
@@ -149,52 +146,6 @@ public class CommunityController implements Initializable {
     }
 
     /**
-     * Resizes and centers the given {@link ImageView} to fit inside the specified frame size
-     * while preserving aspect ratio and applying rounded corners.
-     * This method scales the image to fill the frame, cropping it if necessary.
-     */
-    public void scaleToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
-        if (imageView.getImage() == null) return;
-        Image image = imageView.getImage();
-        
-        double imageWidth = image.getWidth();
-        double imageHeight = image.getHeight();
-
-        // Set the ImageView size to match the frame
-        imageView.setFitWidth(frameWidth);
-        imageView.setFitHeight(frameHeight);
-
-        // Calculate aspect ratios
-        double imageAspect = imageWidth / imageHeight;
-        double frameAspect = frameWidth / frameHeight;
-
-        double newWidth, newHeight;
-        double xOffset = 0, yOffset = 0;
-
-        // Determine the cropping area
-        if (imageAspect > frameAspect) {
-            // Image is wider than the frame, so we crop the sides
-            newHeight = imageHeight;
-            newWidth = newHeight * frameAspect;
-            xOffset = (imageWidth - newWidth) / 2;
-        } else {
-            // Image is taller than the frame, so we crop the top and bottom
-            newWidth = imageWidth;
-            newHeight = newWidth / frameAspect;
-            yOffset = (imageHeight - newHeight) / 2;
-        }
-
-        // Set the viewport to the centered, cropped portion of the image
-        imageView.setViewport(new javafx.geometry.Rectangle2D(xOffset, yOffset, newWidth, newHeight));
-        
-        // Apply a clip to round the corners of the ImageView
-        Rectangle clip = new Rectangle(frameWidth, frameHeight);
-        clip.setArcWidth(arcRadius);
-        clip.setArcHeight(arcRadius);
-        imageView.setClip(clip);
-    }
-
-    /**
      * Loads posts from the repository and populates the UI. All posts are
      * added to the postlist container.
      */
@@ -243,12 +194,12 @@ public class CommunityController implements Initializable {
                 }
 
                 // Load profile picture
-                loadImage(c.profile1, pp, "/com/starlight/images/missing.png");
-                scaleToFit(c.profile1, 40, 40, 40);
+                ImageUtils.loadImage(c.profile1, pp, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(c.profile1, 40, 40, 40);
 
                 // Load post image
-                loadImage(c.recentphoto1, image, "/com/starlight/images/missing.png");
-                scaleToFit(c.recentphoto1, 674, 485, 20);
+                ImageUtils.loadImage(c.recentphoto1, image, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(c.recentphoto1, 674, 485, 20);
 
                 postlist.getChildren().add(node);
             } catch (IOException e) {
@@ -288,95 +239,32 @@ public class CommunityController implements Initializable {
                     dailytitle1.setText(post.title);
                     starrating.setText(post.rating);
                     dailylikecounter.setText(post.likecount);
-                    loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto1, 280, 174, 30);
+                    ImageUtils.loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto1, 280, 174, 30);
                     break;
                 case 1:
                     dailytitle2.setText(post.title);
                     starrating2.setText(post.rating);
                     dailylikecounter2.setText(post.likecount);
-                    loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto2, 280, 174, 30);
+                    ImageUtils.loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto2, 280, 174, 30);
                     break;
                 case 2:
                     dailytitle3.setText(post.title);
                     starrating3.setText(post.rating);
                     dailylikecounter3.setText(post.likecount);
-                    loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto3, 280, 174, 30);
+                    ImageUtils.loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto3, 280, 174, 30);
                     break;
                 case 3:
                     dailytitle4.setText(post.title);
                     starrating4.setText(post.rating);
                     dailylikecounter4.setText(post.likecount);
-                    loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto4, 280, 174, 30);
+                    ImageUtils.loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto4, 280, 174, 30);
                     break;
             }
         }
-    }
-
-    /**
-     * Helper method to load an image from a given path into an ImageView.
-     * It handles both classpath-relative and absolute file paths.
-     *
-     * @param imageView the ImageView to load the image into
-     * @param path the path to the image (can be classpath-relative or absolute)
-     * @param fallbackPath the classpath-relative path to a fallback image
-     */
-    public void loadImage(ImageView imageView, String path, String fallbackPath) {
-        // Use FileSystemManager to resolve the image path
-        Path resolvedPath = com.starlight.util.FileSystemManager.resolveImagePath(path);
-        
-        Image imageToLoad = null;
-        if (resolvedPath != null) {
-            // Check if it's a special resource marker
-            if (resolvedPath.toString().startsWith("resource:")) {
-                String resourcePath = resolvedPath.toString().substring("resource:".length());
-                URL resource = getClass().getResource(resourcePath);
-                if (resource != null) {
-                    imageToLoad = new Image(resource.toExternalForm());
-                }
-            } else {
-                // Treat as a file path
-                File file = resolvedPath.toFile();
-                if (file.exists()) {
-                    imageToLoad = new Image(file.toURI().toString());
-                }
-            }
-        }
-
-        // If the image failed to load, try the fallback
-        if (imageToLoad == null && fallbackPath != null) {
-            Path resolvedFallbackPath = com.starlight.util.FileSystemManager.resolveImagePath(fallbackPath);
-            if (resolvedFallbackPath != null) {
-                if (resolvedFallbackPath.toString().startsWith("resource:")) {
-                    String resourcePath = resolvedFallbackPath.toString().substring("resource:".length());
-                    URL fallbackResource = getClass().getResource(resourcePath);
-                    if (fallbackResource != null) {
-                        imageToLoad = new Image(fallbackResource.toExternalForm());
-                    }
-                } else {
-                    File fallbackFile = resolvedFallbackPath.toFile();
-                    if (fallbackFile.exists()) {
-                        imageToLoad = new Image(fallbackFile.toURI().toString());
-                    }
-                }
-            }
-        }
-        
-        // Final fallback - try to use FileSystemManager's fallback system
-        if (imageToLoad == null) {
-            String defaultFallback = com.starlight.util.FileSystemManager.getFallbackImagePath("default");
-            if (defaultFallback != null) {
-                File defaultFile = new File(defaultFallback);
-                if (defaultFile.exists()) {
-                    imageToLoad = new Image(defaultFile.toURI().toString());
-                }
-            }
-        }
-        
-        imageView.setImage(imageToLoad);
     }
 
     /**

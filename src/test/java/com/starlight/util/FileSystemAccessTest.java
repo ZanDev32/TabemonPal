@@ -32,7 +32,7 @@ public class FileSystemAccessTest {
             Path testUserDir = Paths.get(FileSystemManager.getUserDataDirectory(), TEST_USERNAME);
             if (Files.exists(testUserDir)) {
                 Files.walk(testUserDir)
-                    .sorted((a, b) -> -a.compareTo(b)) // Delete files before directories
+                    .sorted(java.util.Comparator.reverseOrder()) // Delete files before directories
                     .forEach(path -> {
                         try {
                             Files.deleteIfExists(path);

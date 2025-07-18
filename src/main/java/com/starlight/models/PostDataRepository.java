@@ -125,7 +125,7 @@ public class PostDataRepository {
             }
             xstream.toXML(posts, fos);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save posts", e);
+            throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
         }
     }
 }

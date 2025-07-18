@@ -9,6 +9,7 @@ import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
 import com.starlight.models.User;
 import com.starlight.util.Session;
+import com.starlight.util.ImageUtils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXScrollPane;
@@ -80,13 +81,13 @@ public class ProfileController implements Initializable {
     
     private final PostDataRepository repository = new PostDataRepository();
     
-    // Use CommunityController for shared utility methods to reduce code redundancy
+    // Use CommunityController for getDisplayUsernameForUser method and ImageUtils for image operations
     private final CommunityController communityController = new CommunityController();
 
     public void setMainController(MainController main) {
         this.main = main;
         // Also set the main controller for the community controller if needed
-        communityController.setMainController(main);
+        // No need to set main controller for utility class
     }
     
     @FXML
@@ -106,10 +107,10 @@ public class ProfileController implements Initializable {
                 username.setText(displayName != null ? displayName : currentUser.username);
             }
             
-            // Load profile picture using CommunityController's image loading methods
+            // Load profile picture using ImageUtils
             if (profile != null) {
-                communityController.loadImage(profile, currentUser.profilepicture, "/com/starlight/images/missing.png");
-                communityController.scaleToFit(profile, 170, 170, 200); // Adjust size as needed
+                ImageUtils.loadImage(profile, currentUser.profilepicture, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(profile, 170, 170, 200); // Adjust size as needed
             }
             
             // Set followers and following counts (placeholder values since not in User model)
@@ -185,11 +186,11 @@ public class ProfileController implements Initializable {
                 // Set up callback to refresh the recipes when post is updated/deleted
                 controller.setOnPostUpdated(() -> loadUserRecipes());
 
-                // Load recipe image using CommunityController's image loading methods
+                // Load recipe image using ImageUtils
                 ImageView recipeImageView = controller.getImageView();
                 if (recipeImageView != null) {
-                    communityController.loadImage(recipeImageView, image, "/com/starlight/images/missing.png");
-                    communityController.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
+                    ImageUtils.loadImage(recipeImageView, image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
                 }
 
                 recipeContainer.getChildren().add(recipeNode);

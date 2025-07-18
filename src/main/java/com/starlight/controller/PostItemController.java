@@ -99,6 +99,8 @@ public class PostItemController {
             
         } catch (NumberFormatException e) {
             // Handle invalid like count
+            System.err.println("Invalid like count for post: " + (currentPost != null ? currentPost.uuid : "unknown"));
+            e.printStackTrace();
             currentPost.likecount = "0";
             currentPost.isLiked = "false";
             likecounter.setText("0");
