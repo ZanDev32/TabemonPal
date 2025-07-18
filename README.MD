@@ -1,7 +1,7 @@
 # TabemonPal: The Healthy Eating Gamification App
 
 
-[![Java](https://img.shields.io/badge/Java-11-red.svg)](https://openjdk.java.net/)
+[![Java](https://img.shields.io/badge/Java-17-red.svg)](https://openjdk.java.net/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-19-blue.svg)](https://openjfx.io/)
 [![MaterialFX](https://img.shields.io/badge/MaterialFX-11.13.5-purple.svg)](https://github.com/palexdev/MaterialFX)
 
@@ -92,6 +92,8 @@ An embedded HTTP server that handles user authentication, registration, and data
 
 ### Data Repositories
 XML-based repositories for storing and retrieving user accounts and community posts with support for CRUD operations.
+
+All user-generated data (XML files and uploaded images) is stored in a directory named `.tabemonpal` inside the current user's home folder. This keeps application data separate from the installation path and ensures it persists across updates.
 
 ### ChatGPT Integration
 The application leverages OpenAI's ChatGPT through the ChatGPT Java API to provide intelligent consultation and nutritional advice to users.

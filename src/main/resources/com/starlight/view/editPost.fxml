@@ -11,9 +11,9 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="515.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="515.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.EditPostController">
    <children>
-      <Label styleClass="Popup-post-title" text="Create New Recipe">
+      <Label styleClass="Popup-post-title" text="Edit Recipe">
          <VBox.margin>
             <Insets bottom="5.0" />
          </VBox.margin>
@@ -57,8 +57,7 @@
       <TextArea fx:id="ingredients" prefHeight="117.0" prefWidth="420.0" promptText="Tell us about your recipe" style="-fx-background-radius: 10;">
          <VBox.margin>
             <Insets bottom="5.0" />
-         </VBox.margin>
-      </TextArea>
+         </VBox.margin></TextArea>
       <Label styleClass="Popup-post-header" text="Directions">
          <VBox.margin>
             <Insets bottom="5.0" />
@@ -72,8 +71,7 @@
       <Label prefWidth="155.0" styleClass="Popup-post-header" text="Image">
          <VBox.margin>
             <Insets bottom="5.0" />
-         </VBox.margin>
-      </Label>
+         </VBox.margin></Label>
       <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="Popup-image">
          <children>
             <Label fx:id="pickerstatus" prefHeight="18.0" text="Drag and Drop or upload media">
