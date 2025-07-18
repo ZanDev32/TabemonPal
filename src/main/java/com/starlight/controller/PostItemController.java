@@ -7,7 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
+import com.starlight.repository.PostDataRepository;
+
 import java.util.List;
 
 /**

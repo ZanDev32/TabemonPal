@@ -154,7 +154,7 @@ public class EditProfileController implements Initializable {
             }
             
             // Update the UserData XML file
-            com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+            com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
             java.util.List<com.starlight.models.User> users = repo.loadUsers();
             for (com.starlight.models.User u : users) {
                 if (u.username.equals(currentSessionUser.username)) {
@@ -231,7 +231,7 @@ public class EditProfileController implements Initializable {
             System.err.println("All fields are required.");
             return;
         }
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+        com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
         java.util.List<com.starlight.models.User> users = repo.loadUsers();
         for (com.starlight.models.User u : users) {
             if (u.username.equals(currentUser.username)) {
@@ -254,7 +254,7 @@ public class EditProfileController implements Initializable {
     @FXML
     private void onDelete(javafx.event.ActionEvent event) {
         // Remove user from UserDataRepository using the new deleteUser method
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+        com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
         boolean userDeleted = repo.deleteUser(currentUser.username);
         
         if (!userDeleted) {

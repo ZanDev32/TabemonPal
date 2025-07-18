@@ -10,9 +10,9 @@ import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
 import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
 import com.starlight.models.User;
-import com.starlight.models.UserDataRepository;
+import com.starlight.repository.PostDataRepository;
+import com.starlight.repository.UserDataRepository;
 import com.starlight.util.ImageUtils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;

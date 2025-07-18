@@ -4,7 +4,8 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.fxml.FXML;
 import javafx.stage.Stage;
 import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
+import com.starlight.repository.PostDataRepository;
+
 import java.util.List;
 
 public class DeleteDialogController {

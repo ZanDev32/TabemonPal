@@ -205,7 +205,38 @@
     -fx-border-radius: 25 25 25 25;
         border-radius: 25 25 25 25;
 }
-    
+
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+
+.text-prompt {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #3F3F5B;
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-border-color: transparent;
+        border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+.button-topic {
+    -fx-background-radius: 10;
+    -fx-text-fill: #5b543f;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+}
 
 /* debugging only
 

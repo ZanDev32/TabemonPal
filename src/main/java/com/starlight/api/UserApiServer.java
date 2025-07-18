@@ -11,7 +11,7 @@ import java.util.Optional;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
-import com.starlight.models.UserDataRepository;
+import com.starlight.repository.UserDataRepository;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;

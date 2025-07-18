@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.starlight.models.Post;
 import com.starlight.util.FileSystemManager;
 
 /**

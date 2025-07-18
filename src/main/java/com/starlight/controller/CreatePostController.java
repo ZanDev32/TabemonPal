@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
+import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;

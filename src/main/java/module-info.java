@@ -10,6 +10,7 @@ module com.starlight {
     requires transitive MaterialFX;
     requires xstream;
     requires jdk.httpserver;
+    requires java.net.http;
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller;

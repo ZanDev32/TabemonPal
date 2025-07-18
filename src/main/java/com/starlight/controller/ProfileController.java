@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
 import com.starlight.models.User;
+import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 import com.starlight.util.ImageUtils;
 
