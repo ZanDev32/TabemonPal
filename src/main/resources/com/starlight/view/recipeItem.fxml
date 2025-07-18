@@ -32,7 +32,7 @@
       </ImageView>
       <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="44.0" prefWidth="130.0" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
          <children>
-            <MFXButton fx:id="editRecipe" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
+            <MFXButton fx:id="editPost" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
                <font>
                   <Font name="Comfortaa Medium" size="30.0" />
                </font>

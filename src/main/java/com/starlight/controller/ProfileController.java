@@ -176,8 +176,14 @@ public class ProfileController implements Initializable {
                 GridPane recipeNode = loader.load();
                 RecipeItemController controller = loader.getController();
 
-                // Set the recipe data using the new setter method
+                // Set the recipe data using the setter method
                 controller.setRecipeData(title, rating != null ? rating : "0.0", likes != null ? likes : "0");
+                
+                // Set the post data for edit/delete functionality
+                controller.setPost(post);
+                
+                // Set up callback to refresh the recipes when post is updated/deleted
+                controller.setOnPostUpdated(() -> loadUserRecipes());
 
                 // Load recipe image using CommunityController's image loading methods
                 ImageView recipeImageView = controller.getImageView();

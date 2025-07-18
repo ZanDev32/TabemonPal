@@ -258,6 +258,16 @@ public class CommunityController implements Initializable {
     }
 
     /**
+     * Public method to refresh the posts and daily posts - used when posts are updated externally
+     */
+    public void refreshPosts() {
+        if (postlist != null) {
+            loadPosts();
+        }
+        loadDailyPosts();
+    }
+
+    /**
      * Loads the top posts into the daily post slots with random selection
      */
     private void loadDailyPosts() {
