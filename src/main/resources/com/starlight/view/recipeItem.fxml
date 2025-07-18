@@ -18,11 +18,11 @@
     <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
   </columnConstraints>
   <rowConstraints>
-    <RowConstraints maxHeight="216.5" minHeight="10.0" prefHeight="173.5" valignment="TOP" vgrow="NEVER" />
-    <RowConstraints maxHeight="124.0" minHeight="10.0" prefHeight="81.5" vgrow="NEVER" />
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="173.5" valignment="TOP" vgrow="NEVER" />
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="81.5" valignment="TOP" vgrow="NEVER" />
   </rowConstraints>
    <children>
-      <ImageView fx:id="image" fitHeight="200.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fx:id="image" fitHeight="174.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
          <viewport>
             <Rectangle2D height="174.0" width="280.0" />
          </viewport>
@@ -64,7 +64,7 @@
             <Insets right="5.0" top="5.0" />
          </GridPane.margin>
       </HBox>
-      <VBox prefHeight="81.0" prefWidth="254.0" GridPane.rowIndex="1">
+      <VBox prefHeight="81.0" prefWidth="254.0" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.vgrow="NEVER">
          <children>
             <Label fx:id="title" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
                <font>

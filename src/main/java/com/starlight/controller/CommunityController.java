@@ -9,6 +9,7 @@ import java.util.ResourceBundle;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -228,6 +229,18 @@ public class CommunityController implements Initializable {
                 c.uploadtime.setText(formatRelativeTime(time));
                 c.description.setText(desc);
                 c.likecounter.setText(likes);
+                
+                // Set comment count (default to 0 if not set)
+                String commentCount = p.commentcount != null ? p.commentcount : "0";
+                c.commentcounter.setText(commentCount);
+                
+                // Set the post data for the controller
+                c.setPost(p);
+                
+                // Initialize isLiked field if not set
+                if (p.isLiked == null) {
+                    p.isLiked = "false";
+                }
 
                 // Load profile picture
                 loadImage(c.profile1, pp, "/com/starlight/images/missing.png");
@@ -245,7 +258,7 @@ public class CommunityController implements Initializable {
     }
 
     /**
-     * Loads the top posts into the daily post slots with relative time formatting
+     * Loads the top posts into the daily post slots with random selection
      */
     private void loadDailyPosts() {
         List<Post> posts = repository.loadPosts();
@@ -253,37 +266,41 @@ public class CommunityController implements Initializable {
             return;
         }
 
-        // Take up to 4 posts for daily posts
-        for (int i = 0; i < Math.min(4, posts.size()); i++) {
-            Post post = posts.get(i);
+        // Create a copy of the posts list and shuffle it randomly
+        List<Post> shuffledPosts = new java.util.ArrayList<>(posts);
+        Collections.shuffle(shuffledPosts);
+
+        // Take up to 4 posts for daily posts from the shuffled list
+        for (int i = 0; i < Math.min(4, shuffledPosts.size()); i++) {
+            Post post = shuffledPosts.get(i);
             switch (i) {
                 case 0:
                     dailytitle1.setText(post.title);
                     starrating.setText(post.rating);
                     dailylikecounter.setText(post.likecount);
                     loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto1, 280, 200, 30);
+                    scaleToFit(dailyphoto1, 280, 174, 30);
                     break;
                 case 1:
                     dailytitle2.setText(post.title);
                     starrating2.setText(post.rating);
                     dailylikecounter2.setText(post.likecount);
                     loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto2, 280, 200, 30);
+                    scaleToFit(dailyphoto2, 280, 174, 30);
                     break;
                 case 2:
                     dailytitle3.setText(post.title);
                     starrating3.setText(post.rating);
                     dailylikecounter3.setText(post.likecount);
                     loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto3, 280, 200, 30);
+                    scaleToFit(dailyphoto3, 280, 174, 30);
                     break;
                 case 3:
                     dailytitle4.setText(post.title);
                     starrating4.setText(post.rating);
                     dailylikecounter4.setText(post.likecount);
                     loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
-                    scaleToFit(dailyphoto4, 280, 200, 30);
+                    scaleToFit(dailyphoto4, 280, 174, 30);
                     break;
             }
         }

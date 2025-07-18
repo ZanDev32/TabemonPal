@@ -296,20 +296,11 @@ public class FileSystemManager {
      * @return path to a fallback image, or null if no fallback available
      */
     public static String getFallbackImagePath(String imageType) {
-        String[] fallbackPaths = {
-            "src/main/resources/com/starlight/images/dummy/profileman.jpg",
-            "src/main/resources/com/starlight/images/dummy/2.png",
-            "src/main/resources/com/starlight/images/dummy/recent_1.png",
-            "src/main/resources/com/starlight/images/dummy/image_2.jpg"
-        };
-        
-        for (String fallbackPath : fallbackPaths) {
-            Path resolvedPath = resolveImagePath(fallbackPath);
-            if (resolvedPath != null) {
-                return resolvedPath.toString();
-            }
+        String fallbackPath = "src/main/resources/com/starlight/images/missing.png";
+        Path resolvedPath = resolveImagePath(fallbackPath);
+        if (resolvedPath != null) {
+            return resolvedPath.toString();
         }
-        
         return null;
     }
 

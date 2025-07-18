@@ -183,7 +183,7 @@ public class ProfileController implements Initializable {
                 ImageView recipeImageView = controller.getImageView();
                 if (recipeImageView != null) {
                     communityController.loadImage(recipeImageView, image, "/com/starlight/images/missing.png");
-                    communityController.scaleToFit(recipeImageView, 280, 200, 20); // Adjust size for recipe item
+                    communityController.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
                 }
 
                 recipeContainer.getChildren().add(recipeNode);

@@ -72,7 +72,7 @@
         </HBox>
         <HBox prefHeight="31.0" prefWidth="425.0">
           <children>
-            <MFXButton fx:id="likecounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="15">
+            <MFXButton fx:id="likecounter" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleLikeClick" prefHeight="30.0" styleClass="interaction-button" text="0">
               <graphic>
                 <ImageView fx:id="likebutton" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                   <image>
@@ -84,7 +84,7 @@
                 <Insets right="4.0" />
               </HBox.margin>
             </MFXButton>
-            <MFXButton fx:id="commentcounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="2">
+            <MFXButton fx:id="commentcounter" maxHeight="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onAction="#handleCommentClick" prefHeight="30.0" styleClass="interaction-button" text="0">
               <graphic>
                 <ImageView fx:id="likebutton1" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                   <image>

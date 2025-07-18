@@ -72,7 +72,17 @@ public class PostDataRepository {
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
-                return (List<Post>) obj;
+                List<Post> posts = (List<Post>) obj;
+                // Initialize missing fields for existing posts
+                for (Post post : posts) {
+                    if (post.commentcount == null) {
+                        post.commentcount = "0";
+                    }
+                    if (post.isLiked == null) {
+                        post.isLiked = "false";
+                    }
+                }
+                return posts;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -104,6 +114,15 @@ public class PostDataRepository {
      */
     public void savePosts(List<Post> posts) {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
+            // Ensure all posts have the required fields before saving
+            for (Post post : posts) {
+                if (post.commentcount == null) {
+                    post.commentcount = "0";
+                }
+                if (post.isLiked == null) {
+                    post.isLiked = "false";
+                }
+            }
             xstream.toXML(posts, fos);
         } catch (Exception e) {
             throw new RuntimeException("Failed to save posts", e);

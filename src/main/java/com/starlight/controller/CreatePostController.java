@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.List;
+import java.util.UUID;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -119,11 +120,14 @@ public class CreatePostController implements Initializable {
 
             // Create a new Post object
             Post newPost = new Post();
+            newPost.uuid = UUID.randomUUID().toString();
             newPost.username = Session.getCurrentUser().username;
             newPost.profilepicture = "src/main/resources/com/starlight/images/dummy/2.png";
-            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             newPost.title = postTitle;
             newPost.description = postDescription;
+            newPost.ingredients = postIngredients;
+            newPost.directions = postDirections;
+            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
             try {
                 String storedPath = copyImageToUserDir(selectedImage);
                 newPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();

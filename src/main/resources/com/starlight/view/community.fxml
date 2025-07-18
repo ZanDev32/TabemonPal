@@ -287,7 +287,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -295,7 +295,10 @@
                                 <Insets left="7.0" />
                               </HBox.margin>
                             </Label>
-                            <Label prefHeight="21.0" prefWidth="36.0" text="Likes" />
+                            <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
+                                             <HBox.margin>
+                                                <Insets left="4.0" />
+                                             </HBox.margin></Label>
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -350,7 +353,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter2" prefHeight="23.0" prefWidth="13.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true" HBox.hgrow="ALWAYS">
+                            <Label fx:id="dailylikecounter2" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true" HBox.hgrow="ALWAYS">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -358,7 +361,10 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
+                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
+                                             <HBox.margin>
+                                                <Insets left="4.0" />
+                                             </HBox.margin></Label>
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -413,7 +419,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter3" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter3" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -421,7 +427,10 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
+                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
+                                             <HBox.margin>
+                                                <Insets left="4.0" />
+                                             </HBox.margin></Label>
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -476,7 +485,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter4" prefHeight="23.0" prefWidth="12.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter4" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -484,7 +493,10 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
+                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
+                                             <HBox.margin>
+                                                <Insets left="4.0" />
+                                             </HBox.margin></Label>
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
