@@ -16,6 +16,8 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -28,6 +30,30 @@ import javafx.concurrent.Task;
  * track of the active navigation button.
  */
 public class MainController implements Initializable {
+    @FXML
+    private ImageView homeIcon;
+
+    @FXML
+    private ImageView communityIcon;
+
+    @FXML
+    private ImageView wikiIcon;
+
+    @FXML
+    private ImageView consultIcon;
+
+    @FXML
+    private ImageView missionIcon;
+
+    @FXML
+    private ImageView gameIcon;
+
+    @FXML
+    private ImageView achievemntIcon;
+
+    @FXML
+    private ImageView appLogo;
+
     
     private NavbarController navbarController;
     
@@ -185,23 +211,90 @@ public class MainController implements Initializable {
         Integer row = GridPane.getRowIndex(button);
         if (row == null) row = 0;
         GridPane.setRowIndex(activeBar, row);
+        
+        activeBar.setTranslateX(2);
+        activeBar.getStyleClass().clear();
+        activeBar.getStyleClass().add("black");
+        
 
-        // Change button background
+        // Reset previous active button to inactive state
         if (currentActiveButton != null) {
             currentActiveButton.getStyleClass().remove("button-active");
-            if (!currentActiveButton.getStyleClass().contains("button")) {
-                currentActiveButton.getStyleClass().add("button");
-            }
+            currentActiveButton.getStyleClass().add("button-sidebar");
+            setButtonIcon(currentActiveButton, false); // Set to inactive icon
         }
+
+        // Set new active button state
+        button.getStyleClass().remove("button-sidebar");
         button.getStyleClass().add("button-active");
+        setButtonIcon(button, true); // Set to active icon
 
         // Track the current active button
         currentActiveButton = button;
     }
 
+    /**
+     * Sets the icon for a button based on its active state.
+     * @param button The button to update
+     * @param isActive Whether the button is active or not
+     */
+    private void setButtonIcon(MFXButton button, boolean isActive) {
+        ImageView iconView = null;
+        String iconName = null;
+
+        // Determine which icon to update based on button
+        if (button == home) {
+            iconView = homeIcon;
+            iconName = isActive ? "Home.png" : "Home_1.png";
+        } else if (button == community) {
+            iconView = communityIcon;
+            iconName = isActive ? "Community.png" : "Community_1.png";
+        } else if (button == wiki) {
+            iconView = wikiIcon;
+            iconName = isActive ? "Wiki.png" : "Wiki_1.png";
+        } else if (button == consult) {
+            iconView = consultIcon;
+            iconName = isActive ? "Consult.png" : "Consult_1.png";
+        } else if (button == mission) {
+            iconView = missionIcon;
+            iconName = isActive ? "Mission.png" : "Mission_1.png";
+        } else if (button == games) {
+            iconView = gameIcon;
+            iconName = isActive ? "Game.png" : "Game_1.png";
+        } else if (button == achievement) {
+            iconView = achievemntIcon;
+            iconName = isActive ? "Achievements.png" : "Achievements_1.png";
+        }
+
+        // Actually update the icon if we found a matching button
+        if (iconView != null && iconName != null) {
+            try {
+                String iconPath = "/com/starlight/icon/" + iconName;
+                Image newImage = new Image(getClass().getResourceAsStream(iconPath));
+                iconView.setImage(newImage);
+            } catch (Exception e) {
+                Logger.getLogger(MainController.class.getName()).log(Level.WARNING,
+                        "Failed to load icon: " + iconName, e);
+            }
+        }
+    }
+
     /** Initializes the controller by showing the home view. */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Initialize all buttons with inactive state and icons
+        initializeButtons();
+        
+        
+        // Load the bot icon for the app logo
+        try {
+            Image botIcon = new Image(getClass().getResourceAsStream("/com/starlight/images/botIcon.png"));
+            appLogo.setImage(botIcon);
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.WARNING,
+                    "Failed to load botIcon.png", e);
+        }
+        
         // Load navbar and set up controller communication
         try {
             FXMLLoader navbarLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/navbar.fxml"));
@@ -219,6 +312,27 @@ public class MainController implements Initializable {
         }
         
         loadPage("home");
-        selected(home);
+        selected(home); // This will set home as active and update its icon accordingly
+    }
+
+    /**
+     * Initializes all navigation buttons with their inactive state and icons.
+     */
+    private void initializeButtons() {
+        // Set all buttons to inactive style class
+        MFXButton[] buttons = {home, community, wiki, consult, mission, games, achievement};
+        for (MFXButton button : buttons) {
+            button.getStyleClass().remove("button-active");
+            button.getStyleClass().add("button-sidebar");
+        }
+
+        // Set all icons to inactive state
+        setButtonIcon(home, false);
+        setButtonIcon(community, false);
+        setButtonIcon(wiki, false);
+        setButtonIcon(consult, false);
+        setButtonIcon(mission, false);
+        setButtonIcon(games, false);
+        setButtonIcon(achievement, false);
     }
 }

@@ -153,9 +153,10 @@ public class ChatbotAPI {
         String systemMessage = "You are Kuro , a helpful nutrition assistant for the TabemonPal app. " +
                 "Provide accurate, helpful nutrition advice and food recommendations. " +
                 "Keep your responses concise but informative. " +
+                "you may use rich text formatting to enhance readability." +
                 "If you're unsure about medical advice, recommend consulting with a healthcare professional." +
-                "Avoid giving information on topics outside of nutrition, Health, or wellness.";
-        
+                "Avoid giving information on topics outside of nutrition, health, or wellness.";
+
         return sendMessage(question, systemMessage);
     }
     
@@ -165,7 +166,7 @@ public class ChatbotAPI {
     private String buildRequestBody(String userMessage, String systemMessage) {
         StringBuilder json = new StringBuilder();
         json.append("{");
-        json.append("\"model\": \"gpt-3.5-turbo\",");
+        json.append("\"model\": \"gpt-4o-mini\",");
         json.append("\"messages\": [");
         
         if (systemMessage != null && !systemMessage.trim().isEmpty()) {
@@ -180,7 +181,7 @@ public class ChatbotAPI {
         
         json.append("],");
         json.append("\"max_tokens\": 1000,");
-        json.append("\"temperature\": 0.7");
+        json.append("\"temperature\": 0.9");
         json.append("}");
         
         return json.toString();

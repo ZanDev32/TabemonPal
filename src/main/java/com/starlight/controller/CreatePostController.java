@@ -62,6 +62,26 @@ public class CreatePostController implements Initializable {
     private final PostDataRepository repository = new PostDataRepository();
 
     /**
+     * Formats text by replacing newlines with commas and cleaning up spacing.
+     * This ensures ingredients and directions are stored as comma-separated single lines.
+     *
+     * @param text the text to format
+     * @return formatted text with commas instead of newlines
+     */
+    private String formatTextAsCommaSeparated(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return "";
+        }
+        
+        // Replace newlines with commas, trim whitespace, and remove empty entries
+        return text.trim()
+                  .replaceAll("\\r?\\n", ", ")  // Replace newlines with ", "
+                  .replaceAll(",\\s*,", ",")    // Remove duplicate commas
+                  .replaceAll("^,\\s*|,\\s*$", "") // Remove leading/trailing commas
+                  .replaceAll("\\s{2,}", " ");  // Replace multiple spaces with single space
+    }
+
+    /**
      * Copies the selected image to the user's data directory.
      *
      * @param image the image file selected by the user
@@ -112,8 +132,8 @@ public class CreatePostController implements Initializable {
         submit.setOnAction(event -> {
             String postTitle = title.getText();
             String postDescription = description.getText();
-            String postIngredients = ingredients.getText();
-            String postDirections = directions.getText();
+            String postIngredients = formatTextAsCommaSeparated(ingredients.getText());
+            String postDirections = formatTextAsCommaSeparated(directions.getText());
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty() || selectedImage == null) {
                 logger.warning("Please complete all fields and select an image.");

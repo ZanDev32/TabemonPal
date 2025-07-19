@@ -15,7 +15,7 @@
 .sideBar{
     -fx-background-color: #EED8AF;
         background-color: #EED8AF;
-    -fx-background-radius: 0 50 50 0;
+    -fx-background-radius: 0 30 30 0;
 }
 
 .button-sidebar {  
@@ -59,10 +59,24 @@
 }
 
 .button-active-bar {
-    -fx-background-color: #3F3F5B;
-        background-color: #3F3F5B;
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
 }
 
+/* Ensure activeBar maintains its color regardless of position */
+.sideBar .button-active-bar {
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
+}
+
+.black {
+    -fx-background-color: #000000;
+        background-color: #000000;
+}
 .icon{
     -fx-padding: 0px 26px 0px 0px;
         padding: 0px 26px 0px 0px;
@@ -238,6 +252,74 @@
         font-size: 20;
 }
 
+.food-tag {
+    -fx-background-color: #EED8AF;
+        background-color: #EED8AF;
+    -fx-background-radius: 40;
+    -fx-text-fill: #000000;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+}
+
+.post-username {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-date {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 14;
+        font-size: 14;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-desc {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 28;
+        font-size: 28;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe-background {
+    -fx-background-color: #FBFAFA;
+        background-color: #FBFAFA;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.app-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 22;
+        font-size: 22;
+    -fx-text-fill: #3F3F5B;
+}
 /* debugging only
 
 .VBox {

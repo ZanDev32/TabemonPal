@@ -33,6 +33,9 @@ import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.TextFlow;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
 
 /**
  * Controller for the consult view with chatbot functionality.
@@ -61,6 +64,10 @@ public class ConsultController implements Initializable {
     // Properties for FXML binding
     private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
     private final BooleanProperty hasTextInput = new SimpleBooleanProperty(false);
+    
+    // Loading animation variables
+    private Timeline loadingAnimation;
+    private HBox loadingBubble;
     
     public ConsultController() {
         try {
@@ -105,20 +112,26 @@ public class ConsultController implements Initializable {
         prompt.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
 
         new Thread(() -> {
+            // Add loading animation
+            Platform.runLater(this::showLoadingBubble);
+            
             try {
                 String response = chatbotAPI.askNutritionQuestion(userInput);
                 Platform.runLater(() -> {
+                    hideLoadingBubble();
                     addBubble(response, false); // bot
                     isProcessing.set(false);
                 });
             } catch (ChatbotException e) {
                 Platform.runLater(() -> {
+                    hideLoadingBubble();
                     addBubble("Sorry, I'm having trouble connecting right now. Please try again later.", false);
                     isProcessing.set(false);
                 });
                 logger.log(Level.WARNING, "Chatbot error: " + e.getMessage(), e);
             } catch (Exception e) {
                 Platform.runLater(() -> {
+                    hideLoadingBubble();
                     addBubble("An unexpected error occurred. Please try again.", false);
                     isProcessing.set(false);
                 });
@@ -355,6 +368,113 @@ public class ConsultController implements Initializable {
             false);
     }
     
+    /**
+     * Shows a loading bubble with animated dots to indicate processing.
+     */
+    private void showLoadingBubble() {
+        if (loadingBubble != null) {
+            hideLoadingBubble(); // Remove any existing loading bubble
+        }
+        
+        // Create main container for the loading bubble row
+        loadingBubble = new HBox(18);
+        loadingBubble.setAlignment(Pos.TOP_LEFT);
+        loadingBubble.setPadding(new Insets(5, 10, 5, 10));
+
+        // Create and configure bot avatar
+        ImageView avatar = createAvatar(false);
+        
+        // Create text bubble for loading animation
+        TextFlow textBubble = new TextFlow();
+        textBubble.setMaxWidth(640);
+        textBubble.setPadding(new Insets(12, 15, 12, 15));
+        textBubble.setTextAlignment(TextAlignment.LEFT);
+        
+        // Create the processing text
+        Text processingText = new Text("Processing");
+        processingText.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
+        processingText.setFill(Color.rgb(51, 51, 51));
+        
+        Text dotsText = new Text("");
+        dotsText.setFont(Font.font("Segoe UI", FontWeight.NORMAL, 14));
+        dotsText.setFill(Color.rgb(51, 51, 51));
+        
+        textBubble.getChildren().addAll(processingText, dotsText);
+        
+        // Apply bot styling
+        textBubble.setStyle(
+            "-fx-background-color: #FFFFFF; " +
+            "-fx-background-radius: 5 18 18 18;"
+        );
+        
+        // Add drop shadow effect
+        DropShadow dropShadow = new DropShadow();
+        dropShadow.setColor(Color.rgb(0, 0, 0, 0.1));
+        dropShadow.setOffsetX(0);
+        dropShadow.setOffsetY(2);
+        dropShadow.setRadius(4);
+        textBubble.setEffect(dropShadow);
+
+        // Add components to the row
+        loadingBubble.getChildren().addAll(avatar, textBubble);
+
+        // Add to the chat container
+        bubblelist.getChildren().add(loadingBubble);
+
+        // Auto-scroll to bottom
+        Platform.runLater(() -> {
+            if (bubblelist.getParent() instanceof javafx.scene.control.ScrollPane) {
+                javafx.scene.control.ScrollPane scrollPane = (javafx.scene.control.ScrollPane) bubblelist.getParent();
+                scrollPane.setVvalue(1.0);
+            }
+        });
+        
+        // Start the animation
+        startLoadingAnimation(dotsText);
+    }
+    
+    /**
+     * Hides the loading bubble and stops the animation.
+     */
+    private void hideLoadingBubble() {
+        if (loadingAnimation != null) {
+            loadingAnimation.stop();
+            loadingAnimation = null;
+        }
+        
+        if (loadingBubble != null) {
+            bubblelist.getChildren().remove(loadingBubble);
+            loadingBubble = null;
+        }
+    }
+    
+    /**
+     * Starts the loading animation with cycling dots.
+     */
+    private void startLoadingAnimation(Text dotsText) {
+        if (loadingAnimation != null) {
+            loadingAnimation.stop();
+        }
+        
+        loadingAnimation = new Timeline(
+            new KeyFrame(Duration.millis(500), e -> dotsText.setText("")),
+            new KeyFrame(Duration.millis(1000), e -> dotsText.setText(".")),
+            new KeyFrame(Duration.millis(1500), e -> dotsText.setText("..")),
+            new KeyFrame(Duration.millis(2000), e -> dotsText.setText("..."))
+        );
+        
+        loadingAnimation.setCycleCount(Timeline.INDEFINITE);
+        loadingAnimation.play();
+    }
+    
+    /**
+     * Cleanup method to stop any running animations when the controller is destroyed.
+     * This should be called when switching views or closing the application.
+     */
+    public void cleanup() {
+        hideLoadingBubble();
+    }
+    
     // Getter methods for property access (useful for advanced bindings)
     public BooleanProperty isProcessingProperty() {
         return isProcessing;
@@ -364,4 +484,3 @@ public class ConsultController implements Initializable {
         return hasTextInput;
     }
 }
-    
