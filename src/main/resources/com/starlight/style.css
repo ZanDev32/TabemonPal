@@ -320,6 +320,31 @@
         font-size: 22;
     -fx-text-fill: #3F3F5B;
 }
+
+/* Recipe text formatting styles */
+.recipe-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 26;
+        font-size: 26;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.recipe-content {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+    -fx-line-spacing: 2px;
+}
+
 /* debugging only
 
 .VBox {

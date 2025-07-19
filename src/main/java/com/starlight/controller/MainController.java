@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import com.starlight.util.Session;
+import com.starlight.models.Post;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 
@@ -58,6 +59,8 @@ public class MainController implements Initializable {
     private NavbarController navbarController;
     
     private MFXButton currentActiveButton;
+    
+    private Post currentPost; // Current post for navigation to post view
     
     @FXML
     private BorderPane bp;
@@ -172,6 +175,11 @@ public class MainController implements Initializable {
                 }
                 if (controller instanceof ProfileController) {
                     ((ProfileController) controller).setMainController(MainController.this);
+                }
+                if (controller instanceof PostController) {
+                    PostController postController = (PostController) controller;
+                    postController.setPost(currentPost); 
+                    postController.setMainController(MainController.this);
                 }
                 
                 return root;
@@ -334,5 +342,21 @@ public class MainController implements Initializable {
         setButtonIcon(mission, false);
         setButtonIcon(games, false);
         setButtonIcon(achievement, false);
+    }
+    
+    /**
+     * Public method to navigate to community page with proper button selection
+     * Used by other controllers like PostController for navigation
+     */
+    public void navigateToCommunity() {
+        loadPage("community");
+        selected(community);
+    }
+    
+    /**
+     * Sets the current post for navigation to post view
+     */
+    public void setCurrentPost(Post post) {
+        this.currentPost = post;
     }
 }

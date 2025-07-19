@@ -229,20 +229,9 @@ public class FileSystemManager {
             return null;
         }
         
-        // Handle absolute paths (including user directory paths)
-        Path absolutePath = Paths.get(imagePath);
-        if (absolutePath.isAbsolute()) {
-            if (Files.exists(absolutePath)) {
-                return absolutePath;
-            } else {
-                LOGGER.warning("Could not resolve absolute path: " + imagePath);
-                return null;
-            }
-        }
-        
-        // Handle resource paths (paths starting with /)
-        if (imagePath.startsWith("/")) {
-            // Try to resolve as resource from classpath
+        // Handle resource paths (paths starting with /) - check this before absolute paths
+        if (imagePath.startsWith("/") && imagePath.contains("com/starlight")) {
+            // Try to resolve as resource from classpath first
             URL resource = FileSystemManager.class.getResource(imagePath);
             if (resource != null) {
                 try {
@@ -263,6 +252,17 @@ public class FileSystemManager {
             
             LOGGER.warning("Could not resolve resource path: " + imagePath);
             return null;
+        }
+        
+        // Handle absolute filesystem paths (but not resource paths)
+        Path absolutePath = Paths.get(imagePath);
+        if (absolutePath.isAbsolute()) {
+            if (Files.exists(absolutePath)) {
+                return absolutePath;
+            } else {
+                LOGGER.warning("Could not resolve absolute path: " + imagePath);
+                return null;
+            }
         }
         
         // Handle relative paths - try different base directories

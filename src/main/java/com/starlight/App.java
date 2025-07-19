@@ -42,6 +42,16 @@ public class App extends Application {
         }
     }
 
+    /**
+     * Maximizes the application window to fill the screen.
+     */
+    public static void maximizeStage() {
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setMaximized(true);
+        }
+    }
+
     /** Embedded HTTP server providing user API endpoints. */
     private UserApiServer apiServer;
     /** Thread running the API server. */
@@ -86,10 +96,11 @@ public class App extends Application {
      */
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
+
         
-        // Adjust window size based on the loaded FXML
+        // Maximize the stage based on the loaded FXML
         if ("main".equals(fxml)) {
-            resizeWindow(1920, 1080);
+            maximizeStage();
         } else if ("Authorization".equals(fxml)) {
             resizeWindow(1280, 720);
         }

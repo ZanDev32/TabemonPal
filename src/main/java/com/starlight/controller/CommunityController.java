@@ -106,6 +106,12 @@ public class CommunityController implements Initializable {
 
     public void setMainController(MainController main) {
         this.main = main;
+        
+        // If posts haven't been loaded yet because main was null, load them now
+        if (postlist != null && postlist.getChildren().isEmpty()) {
+            loadPosts();
+            loadDailyPosts();
+        }
     }
 
     @FXML
@@ -150,6 +156,11 @@ public class CommunityController implements Initializable {
      * added to the postlist container.
      */
     private void loadPosts() {
+        // Safety check - don't load posts if main controller isn't available
+        if (main == null) {
+            return;
+        }
+        
         postlist.getChildren().clear();
 
         List<Post> posts = repository.loadPosts();
@@ -187,6 +198,9 @@ public class CommunityController implements Initializable {
                 
                 // Set the post data for the controller
                 c.setPost(p);
+                
+                // Set main controller reference for navigation
+                c.setMainController(main);
                 
                 // Initialize isLiked field if not set
                 if (p.isLiked == null) {
@@ -273,14 +287,19 @@ public class CommunityController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
-        loadPosts();
-        loadDailyPosts();
+        
+        // Only load posts if main controller is available
+        // Otherwise, they'll be loaded when setMainController is called
+        if (main != null) {
+            loadPosts();
+            loadDailyPosts();
+        }
     }
 
     /**
      * Formats a timestamp string into a relative time format like "2h ago", "1d ago"
      */
-    private String formatRelativeTime(String timeString) {
+    public String formatRelativeTime(String timeString) {
         if (timeString == null || timeString.trim().isEmpty()) {
             return "unknown";
         }
@@ -306,8 +325,10 @@ public class CommunityController implements Initializable {
             }
             
             long hours = ChronoUnit.HOURS.between(postTime, LocalDateTime.now());
+            long minutes = ChronoUnit.MINUTES.between(postTime, LocalDateTime.now());
             
-            if (hours < 1) return "just now";
+            if (minutes < 1) return "just now";
+            if (minutes < 60) return minutes + "m ago";
             if (hours < 24) return hours + "h ago";
             
             long days = hours / 24;
