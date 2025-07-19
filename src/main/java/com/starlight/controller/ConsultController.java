@@ -13,8 +13,6 @@ import io.github.palexdev.materialfx.controls.MFXButton;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
@@ -28,7 +26,11 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.text.TextFlow;
 
 /**
  * Controller for the consult view with chatbot functionality.
@@ -54,7 +56,6 @@ public class ConsultController implements Initializable {
     
     // Properties for FXML binding
     private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
-    private final StringProperty attachmentStatus = new SimpleStringProperty("No attachment");
     private final BooleanProperty hasTextInput = new SimpleBooleanProperty(false);
     
     public ConsultController() {
@@ -142,8 +143,8 @@ public class ConsultController implements Initializable {
         // Create and configure avatar
         ImageView avatar = createAvatar(isUser);
         
-        // Create and configure text bubble
-        Label textBubble = createTextBubble(message, isUser);
+        // Create and configure text bubble using TextFlow
+        TextFlow textBubble = createTextBubble(message, isUser);
         
         // Add components to the row in correct order
         if (isUser) {
@@ -180,43 +181,39 @@ public class ConsultController implements Initializable {
         ImageUtils.loadImage(avatar, avatarPath, "src/main/resources/com/starlight/images/missing.png");
         
         // Apply scaling and styling
-        ImageUtils.scaleToFit(avatar, 32, 32, 16);
+        ImageUtils.scaleToFit(avatar, 32, 32, 40);
         
         return avatar;
     }
     
     /**
-     * Creates and configures a text bubble Label for the chat message.
+     * Creates and configures a text bubble TextFlow for the chat message.
      *
      * @param message The message text to display
      * @param isUser True if this is a user message, false for bot message
-     * @return Configured Label for the text bubble
+     * @return Configured TextFlow for the text bubble
      */
-    private Label createTextBubble(String message, boolean isUser) {
-        Label textBubble = new Label(message);
+    private TextFlow createTextBubble(String message, boolean isUser) {
+        TextFlow textBubble = new TextFlow();
         
-        // Basic text configuration
-        textBubble.setWrapText(true);
+        // Basic configuration
         textBubble.setMaxWidth(640);
         textBubble.setPadding(new Insets(12, 15, 12, 15));
         textBubble.setTextAlignment(TextAlignment.LEFT);
+        
+        // Parse and add formatted text
+        parseAndAddFormattedText(textBubble, message, isUser);
         
         // Apply styling based on sender
         if (isUser) {
             textBubble.setStyle(
                 "-fx-background-color: #B8145B; " +
-                "-fx-background-radius: 18 5 18 18; " +
-                "-fx-font-size: 14px; " +
-                "-fx-font-family: 'Poppins'; " +
-                "-fx-text-fill: #ffffffff;"
+                "-fx-background-radius: 18 5 18 18;"
             );
         } else {
             textBubble.setStyle(
                 "-fx-background-color: #FFFFFF; " +
-                "-fx-background-radius: 5 18 18 18; " +
-                "-fx-font-size: 14px; " +
-                "-fx-font-family: 'Poppins'; " +
-                "-fx-text-fill: #3F3F5B;"
+                "-fx-background-radius: 5 18 18 18;"
             );
         }
         
@@ -232,13 +229,54 @@ public class ConsultController implements Initializable {
     }
     
     /**
+     * Parses message text and adds formatted Text nodes to the TextFlow.
+     * Supports **bold** markdown formatting.
+     *
+     * @param textFlow The TextFlow to add Text nodes to
+     * @param message The message to parse
+     * @param isUser True if this is a user message, false for bot message
+     */
+    private void parseAndAddFormattedText(TextFlow textFlow, String message, boolean isUser) {
+        // Base text color
+        Color textColor = isUser ? Color.WHITE : Color.rgb(63, 63, 91);
+        Font baseFont = Font.font("Poppins", 14);
+        Font boldFont = Font.font("Poppins", FontWeight.BOLD, 14);
+        
+        String[] parts = message.split("\\*\\*");
+        
+        for (int i = 0; i < parts.length; i++) {
+            if (!parts[i].isEmpty()) {
+                Text text = new Text(parts[i]);
+                text.setFill(textColor);
+                
+                // Apply bold formatting to odd-indexed parts (text between **)
+                if (i % 2 == 1) {
+                    text.setFont(boldFont);
+                } else {
+                    text.setFont(baseFont);
+                }
+                
+                textFlow.getChildren().add(text);
+            }
+        }
+        
+        // If no text was added (empty message), add a space
+        if (textFlow.getChildren().isEmpty()) {
+            Text text = new Text(" ");
+            text.setFill(textColor);
+            text.setFont(baseFont);
+            textFlow.getChildren().add(text);
+        }
+    }
+    
+    /**
      * Gets the bot avatar path.
      *
      * @return Path to the bot avatar image
      */
     private String getBotAvatarPath() {
         // Return the same format as used in UserData.xml
-        return "src/main/resources/com/starlight/images/dummy/profilewoman.jpg";
+        return "src/main/resources/com/starlight/images/botIcon.png";
     }
     
     /**
@@ -260,8 +298,7 @@ public class ConsultController implements Initializable {
     @FXML
     private void handleAttachImage() {
         // TODO: Implement image attachment functionality
-        attachmentStatus.set("Image attachment not yet implemented");
-        attachmentnama.setText(attachmentStatus.get());
+        attachmentnama.setText("Image attachment not yet implemented");
     }
     
     /**
@@ -278,21 +315,6 @@ public class ConsultController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Initialize FXML bindings
-        setupBindings();
-        
-        // Make the TextArea transparent
-        prompt.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        
-        // Add welcome message
-        addBubble("Hello! I'm Fumo, your nutrition assistant. How can I help you today?", false);
-    }
-    
-    /**
-     * Sets up property bindings for reactive UI updates.
-     * This replaces manual event handler setup with declarative bindings.
-     */
-    private void setupBindings() {
         // Bind hasTextInput property to prompt text property
         hasTextInput.bind(prompt.textProperty().isNotEmpty());
         
@@ -302,33 +324,37 @@ public class ConsultController implements Initializable {
         // Bind attachment button disable property to processing state
         attachImage.disableProperty().bind(isProcessing);
         
-        // Bind attachment label text to attachment status property
-        attachmentnama.textProperty().bind(attachmentStatus);
+        // Set up event handlers
+        send.setOnAction(e -> handleUserMessage());
+        attachImage.setOnAction(e -> handleAttachImage());
+        prompt.setOnKeyPressed(this::handlePromptKeyPress);
         
-        // Note: For FXML binding, you would typically use these in the FXML file:
-        // <MFXButton fx:id="send" onAction="#handleUserMessage" />
-        // <MFXButton fx:id="attachImage" onAction="#handleAttachImage" />
-        // <TextArea fx:id="prompt" onKeyPressed="#handlePromptKeyPress" />
+        // Make the TextArea transparent
+        prompt.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
         
-        // Fallback programmatic bindings for compatibility
-        if (send.getOnAction() == null) {
-            send.setOnAction(e -> handleUserMessage());
-        }
-        if (attachImage.getOnAction() == null) {
-            attachImage.setOnAction(e -> handleAttachImage());
-        }
-        if (prompt.getOnKeyPressed() == null) {
-            prompt.setOnKeyPressed(this::handlePromptKeyPress);
-        }
+        // Add welcome message
+        addBubble("**Welcome Pal!** 🌱\n" + 
+                  "\n" + 
+                  "**I'm here to help you with:** \n" + 
+                  "🍏 Nutrition advice (meal planning, healthy eating) \n" + 
+                  "🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) \n" + 
+                  "💪 Healthy lifestyle habits (exercise, sleep, stress management) \n" + 
+                  "🔍 Tips & tricks (meal prep, portion control, eating out) \n" + 
+                  "🚀 Motivation & mindset (staying consistent, goal-setting) \n" + 
+                  "\n" + 
+                  "**Ask me anything!** Examples:  \n" + 
+                  "• \"What's a quick healthy breakfast?\" \n" + 
+                  "• \"How can I reduce sugar cravings?\" \n" + 
+                  "\n" + 
+                  "Let's make healthy living simple and fun! 😊\n" + 
+                  "\n" + 
+                  "**What's your question today?**", 
+            false);
     }
     
     // Getter methods for property access (useful for advanced bindings)
     public BooleanProperty isProcessingProperty() {
         return isProcessing;
-    }
-    
-    public StringProperty attachmentStatusProperty() {
-        return attachmentStatus;
     }
     
     public BooleanProperty hasTextInputProperty() {

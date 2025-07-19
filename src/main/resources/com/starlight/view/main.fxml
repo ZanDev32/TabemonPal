@@ -14,7 +14,7 @@
 
 <BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
-      <GridPane prefHeight="719.0" prefWidth="290.0" styleClass="sideBar" stylesheets="@../style.css">
+      <GridPane prefHeight="1080.0" prefWidth="299.0" styleClass="sideBar" stylesheets="@../style.css">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
@@ -81,7 +81,7 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton fx:id="consult" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#consult" prefHeight="0.0" prefWidth="0.0" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Consult with AI" GridPane.rowIndex="7">
+            <MFXButton fx:id="consult" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" onMouseClicked="#consult" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Consult with AI" GridPane.rowIndex="7">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
