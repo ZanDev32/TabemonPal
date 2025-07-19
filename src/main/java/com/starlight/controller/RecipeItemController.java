@@ -13,8 +13,11 @@ import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import java.io.IOException;
 import com.starlight.models.Post;
+import java.util.logging.Logger;
 
 public class RecipeItemController {
+    private static final Logger logger = Logger.getLogger(RecipeItemController.class.getName());
+
     @FXML
     private ImageView image;
 
@@ -84,7 +87,7 @@ public class RecipeItemController {
      */
     private void handleEditPost() {
         if (currentPost == null) {
-            System.err.println("No post data available for editing");
+            logger.warning("No post data available for editing");
             return;
         }
 
@@ -125,7 +128,7 @@ public class RecipeItemController {
             }
 
         } catch (IOException e) {
-            System.err.println("Failed to load edit post dialog: " + e.getMessage());
+            logger.warning("Failed to load edit post dialog: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -135,7 +138,7 @@ public class RecipeItemController {
      */
     private void handleDeletePost() {
         if (currentPost == null) {
-            System.err.println("No post data available for deletion");
+            logger.warning("No post data available for deletion");
             return;
         }
 
@@ -163,7 +166,7 @@ public class RecipeItemController {
             }
 
         } catch (IOException e) {
-            System.err.println("Failed to load delete dialog: " + e.getMessage());
+            logger.warning("Failed to load delete dialog: " + e.getMessage());
             e.printStackTrace();
         }
     }

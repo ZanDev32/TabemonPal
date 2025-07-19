@@ -15,6 +15,8 @@ import java.util.List;
  * Simple controller used for dynamically loaded post items.
  */
 public class PostItemController {
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PostItemController.class.getName());
+
     @FXML
     private VBox postTemplate;
 
@@ -100,7 +102,7 @@ public class PostItemController {
             
         } catch (NumberFormatException e) {
             // Handle invalid like count
-            System.err.println("Invalid like count for post: " + (currentPost != null ? currentPost.uuid : "unknown"));
+            logger.warning("Invalid like count for post: " + (currentPost != null ? currentPost.uuid : "unknown"));
             e.printStackTrace();
             currentPost.likecount = "0";
             currentPost.isLiked = "false";

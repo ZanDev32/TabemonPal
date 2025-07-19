@@ -2,7 +2,7 @@ package com.starlight.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
+import java.util.logging.Logger;
 import com.starlight.App;
 import com.starlight.api.ApiClient;
 import com.starlight.api.ApiClient.ApiException;
@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
  * Controller handling user login and transition to the main application.
  */
 public class LoginViewController implements Initializable {
+    private static final Logger logger = Logger.getLogger(LoginViewController.class.getName());
     @FXML
     private VBox loginView;
 
@@ -97,12 +98,12 @@ public class LoginViewController implements Initializable {
         try {
             User logged = apiClient.login(em, pass);
             Session.setCurrentUser(logged);
-            System.out.println("Login success for user: " + logged.username);
+            logger.info("Login success for user: " + logged.username);
             
             // Ensure we redirect to main.fxml after successful login
             App.loadMainWithSplash();
         } catch (ApiException e) {
-            System.out.println("Login failed: " + e.getMessage());
+            logger.warning("Login failed: " + e.getMessage());
             
             // Show user-friendly error message
             if (e.getStatusCode() == 401) {

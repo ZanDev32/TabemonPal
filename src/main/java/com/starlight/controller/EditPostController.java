@@ -4,6 +4,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.starlight.models.Post;
 import com.starlight.repository.PostDataRepository;
@@ -24,6 +26,7 @@ import javafx.scene.Node;
  * Controller responsible for the "edit post" dialog.
  */
 public class EditPostController implements Initializable {
+    private static final Logger logger = Logger.getLogger(EditPostController.class.getName());
 
     @FXML
     private MFXTextField title;
@@ -90,8 +93,7 @@ public class EditPostController implements Initializable {
             String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
-            System.err.println("Failed to copy image to user directory: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
             return null;
         }
     }
@@ -132,7 +134,7 @@ public class EditPostController implements Initializable {
         // Submit button logic
         submit.setOnAction(event -> {
             if (currentPost == null) {
-                System.err.println("No post to edit");
+                logger.warning("No post to edit");
                 return;
             }
 
@@ -142,7 +144,7 @@ public class EditPostController implements Initializable {
             String postDirections = directions.getText();
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty()) {
-                System.err.println("Please complete all fields.");
+                logger.warning("Please complete all fields.");
                 return;
             }
 

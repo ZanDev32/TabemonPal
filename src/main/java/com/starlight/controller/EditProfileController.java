@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
@@ -33,6 +34,7 @@ import com.starlight.util.ImageUtils;
  * and scaling to maintain consistency and reduce code redundancy across the application.
  */
 public class EditProfileController implements Initializable {
+    private static final Logger logger = Logger.getLogger(EditProfileController.class.getName());
     @FXML
     private ImageView Image;
 
@@ -132,7 +134,7 @@ public class EditProfileController implements Initializable {
         try {
             User currentSessionUser = Session.getCurrentUser();
             if (currentSessionUser == null) {
-                System.err.println("No current session user found");
+                logger.warning("No current session user found");
                 return;
             }
             
@@ -141,7 +143,7 @@ public class EditProfileController implements Initializable {
                 selectedFile, currentSessionUser.username);
             
             if (copiedFilePath == null) {
-                System.err.println("Failed to copy image file to user directory");
+                logger.warning("Failed to copy image file to user directory");
                 return;
             }
             
@@ -167,9 +169,9 @@ public class EditProfileController implements Initializable {
             // Refresh the profile image display
             loadCurrentUserProfileImage();
             
-            System.out.println("Profile image updated successfully: " + copiedFilePath);
+            logger.info("Profile image updated successfully: " + copiedFilePath);
         } catch (Exception e) {
-            System.err.println("Failed to update profile image: " + e.getMessage());
+            logger.warning("Failed to update profile image: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -201,9 +203,9 @@ public class EditProfileController implements Initializable {
                     os.write(xml.getBytes(StandardCharsets.UTF_8));
                 }
                 if (conn.getResponseCode() == 200) {
-                    System.out.println("User updated");
+                    logger.info("User updated");
                 } else {
-                    System.out.println("Update failed: " + conn.getResponseCode());
+                    logger.info("Update failed: " + conn.getResponseCode());
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -228,7 +230,7 @@ public class EditProfileController implements Initializable {
         String password = passwordField.getText();
         java.time.LocalDate birthDay = birthDayPicker.getValue();
         if (email.isEmpty() || password.isEmpty()) {
-            System.err.println("All fields are required.");
+            logger.warning("All fields are required.");
             return;
         }
         com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
@@ -242,7 +244,7 @@ public class EditProfileController implements Initializable {
             }
         }
         repo.saveUsers(users);
-        System.out.println("User updated successfully");
+        logger.info("User updated successfully");
         currentUser.email = email;
         currentUser.password = password;
         currentUser.birthDay = birthDay != null ? birthDay.toString() : null;
@@ -258,7 +260,7 @@ public class EditProfileController implements Initializable {
         boolean userDeleted = repo.deleteUser(currentUser.username);
         
         if (!userDeleted) {
-            System.err.println("User could not be deleted.");
+            logger.warning("User could not be deleted.");
             return;
         }
         
@@ -285,10 +287,10 @@ public class EditProfileController implements Initializable {
             currentStage.show();
             
             // Display a confirmation message
-            System.out.println("User account deleted successfully");
+            logger.info("User account deleted successfully");
             
         } catch (IOException e) {
-            System.err.println("Failed to load authorization view: " + e.getMessage());
+            logger.warning("Failed to load authorization view: " + e.getMessage());
             e.printStackTrace();
             
             // Fallback to previous behavior if authorization view can't be loaded

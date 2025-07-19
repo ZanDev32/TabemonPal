@@ -7,6 +7,8 @@ import java.net.BindException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -21,6 +23,8 @@ import com.sun.net.httpserver.HttpServer;
  * {@link XStream} for XML serialization of {@link User} objects.
  */
 public class UserApiServer {
+    private static final Logger logger = Logger.getLogger(UserApiServer.class.getName());
+
     /** Underlying lightweight HTTP server. */
     private HttpServer server;
     /** Repository used to read and write user data. */
@@ -53,11 +57,11 @@ public class UserApiServer {
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
             try {
                 server = HttpServer.create(new InetSocketAddress(currentPort), 0);
-                System.out.println("Server created on port " + currentPort);
+                logger.info("Server created on port " + currentPort);
                 serverCreated = true;
                 break;
             } catch (BindException e) {
-                System.out.println("Port " + currentPort + " already in use, trying next port...");
+                logger.info("Port " + currentPort + " already in use, trying next port...");
                 currentPort++;
             }
         }
@@ -187,8 +191,7 @@ public class UserApiServer {
                 }
             } catch (Exception e) {
                 // Log the exception
-                System.err.println("Error handling user request: " + e.getMessage());
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Error handling user request: " + e.getMessage(), e);
                 sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
             }
         }

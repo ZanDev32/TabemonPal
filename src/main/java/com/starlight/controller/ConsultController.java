@@ -2,6 +2,8 @@ package com.starlight.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.starlight.api.ChatbotAPI;
 import com.starlight.api.ChatbotAPI.ChatbotException;
@@ -36,6 +38,8 @@ import javafx.scene.text.TextFlow;
  * Controller for the consult view with chatbot functionality.
  */
 public class ConsultController implements Initializable {
+    private static final Logger logger = Logger.getLogger(ConsultController.class.getName());
+
     @FXML
     private Label attachmentnama;
 
@@ -63,8 +67,7 @@ public class ConsultController implements Initializable {
             this.chatbotAPI = new ChatbotAPI();
             loadCurrentUser();
         } catch (Exception e) {
-            System.err.println("Failed to initialize chatbot: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to initialize chatbot: " + e.getMessage(), e);
         }
     }
     
@@ -76,10 +79,10 @@ public class ConsultController implements Initializable {
             // Get the current user from the session instead of loading from repository
             currentUser = Session.getCurrentUser();
             if (currentUser == null) {
-                System.err.println("No current user found in session");
+                logger.warning("No current user found in session");
             }
         } catch (Exception e) {
-            System.err.println("Failed to load current user: " + e.getMessage());
+            logger.log(Level.WARNING, "Failed to load current user: " + e.getMessage(), e);
         }
     }
 
@@ -113,13 +116,13 @@ public class ConsultController implements Initializable {
                     addBubble("Sorry, I'm having trouble connecting right now. Please try again later.", false);
                     isProcessing.set(false);
                 });
-                System.err.println("Chatbot error: " + e.getMessage());
+                logger.log(Level.WARNING, "Chatbot error: " + e.getMessage(), e);
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     addBubble("An unexpected error occurred. Please try again.", false);
                     isProcessing.set(false);
                 });
-                System.err.println("Unexpected error: " + e.getMessage());
+                logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage(), e);
             }
         }).start();
     }

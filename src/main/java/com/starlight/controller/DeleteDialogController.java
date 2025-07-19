@@ -9,6 +9,8 @@ import com.starlight.repository.PostDataRepository;
 import java.util.List;
 
 public class DeleteDialogController {
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DeleteDialogController.class.getName());
+
     @FXML
     private MFXButton delete;
 
@@ -38,7 +40,7 @@ public class DeleteDialogController {
         // Delete button logic
         delete.setOnAction(event -> {
             if (postToDelete == null) {
-                System.err.println("No post to delete");
+                logger.warning("No post to delete");
                 return;
             }
 

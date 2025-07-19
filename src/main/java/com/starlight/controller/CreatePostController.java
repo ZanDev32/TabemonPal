@@ -7,6 +7,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.starlight.models.Post;
 import com.starlight.repository.PostDataRepository;
@@ -27,6 +29,7 @@ import javafx.scene.Node;
  * Controller responsible for the "create post" dialog.
  */
 public class CreatePostController implements Initializable {
+    private static final Logger logger = Logger.getLogger(CreatePostController.class.getName());
 
     @FXML
     private MFXTextField title;
@@ -69,8 +72,7 @@ public class CreatePostController implements Initializable {
             String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
-            System.err.println("Failed to copy image to user directory: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
             return null;
         }
     }
@@ -114,7 +116,7 @@ public class CreatePostController implements Initializable {
             String postDirections = directions.getText();
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty() || selectedImage == null) {
-                System.err.println("Please complete all fields and select an image.");
+                logger.warning("Please complete all fields and select an image.");
                 return;
             }
 

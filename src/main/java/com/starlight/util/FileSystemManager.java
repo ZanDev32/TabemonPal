@@ -160,8 +160,7 @@ public class FileSystemManager {
             
             return copyFileToUserDirectory(sourceFile, username, uniqueFileName);
         } catch (SecurityException e) {
-            System.err.println("Failed to copy file with unique filename: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to copy file with unique filename: " + e.getMessage(), e);
             return null;
         }
     }
@@ -286,7 +285,7 @@ public class FileSystemManager {
             return projectResourcesPath;
         }
         
-        System.out.println("Warning: Could not resolve image path: " + imagePath);
+        LOGGER.warning("Could not resolve image path: " + imagePath);
         return null;
     }
 

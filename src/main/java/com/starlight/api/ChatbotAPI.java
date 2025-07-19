@@ -8,6 +8,8 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
@@ -17,6 +19,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Handles API key management and chat completions using HTTP client.
  */
 public class ChatbotAPI {
+    private static final Logger logger = Logger.getLogger(ChatbotAPI.class.getName());
     private static final String OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
     private String apiKey;
     private HttpClient httpClient;
@@ -50,8 +53,8 @@ public class ChatbotAPI {
         try {
             loadApiKey();
         } catch (Exception e) {
-            System.err.println("Warning: Could not load API key: " + e.getMessage());
-            System.err.println("Chatbot functionality will be disabled.");
+            logger.log(Level.WARNING, "Could not load API key: " + e.getMessage(), e);
+            logger.warning("Chatbot functionality will be disabled.");
         }
     }
     
@@ -67,14 +70,14 @@ public class ChatbotAPI {
             this.apiKey = config.getOpenaiKey();
             
             if (this.apiKey == null || this.apiKey.trim().isEmpty() || this.apiKey.equals("your-openai-api-key-here")) {
-                System.err.println("Warning: No valid API key found in SECRET_KEY.xml. Chatbot will work in demo mode.");
+                logger.warning("No valid API key found in SECRET_KEY.xml. Chatbot will work in demo mode.");
                 this.apiKey = null;
             }
         } catch (IOException e) {
-            System.err.println("Warning: Could not load API key from " + secretKeyPath + ": " + e.getMessage());
+            logger.log(Level.WARNING, "Could not load API key from " + secretKeyPath + ": " + e.getMessage(), e);
             this.apiKey = null;
         } catch (Exception e) {
-            System.err.println("Warning: Error parsing SECRET_KEY.xml: " + e.getMessage());
+            logger.log(Level.WARNING, "Error parsing SECRET_KEY.xml: " + e.getMessage(), e);
             this.apiKey = null;
         }
     }
@@ -126,7 +129,7 @@ public class ChatbotAPI {
             } else {
                 String errorMessage = "API request failed with status " + response.statusCode() + 
                                     ": " + response.body();
-                System.err.println("OpenAI API Error: " + errorMessage);
+                logger.severe("OpenAI API Error: " + errorMessage);
                 throw new ChatbotException(errorMessage);
             }
             
@@ -134,7 +137,7 @@ public class ChatbotAPI {
             throw e; // Re-throw our custom exceptions
         } catch (Exception e) {
             String errorMessage = "Failed to get response from ChatGPT: " + e.getMessage();
-            System.err.println("ChatGPT Request Error: " + errorMessage);
+            logger.log(Level.SEVERE, "ChatGPT Request Error: " + errorMessage, e);
             throw new ChatbotException(errorMessage, e);
         }
     }
