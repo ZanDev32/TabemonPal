@@ -8,6 +8,7 @@ import java.util.logging.Level;
 import com.starlight.api.ChatbotAPI;
 import com.starlight.api.ChatbotAPI.ChatbotException;
 import com.starlight.model.User;
+import com.starlight.util.ChatHistoryManager;
 import com.starlight.util.ImageUtils;
 import com.starlight.util.Session;
 
@@ -41,6 +42,15 @@ import javafx.util.Duration;
  * Controller for the consult view with chatbot functionality.
  */
 public class ConsultController implements Initializable {
+    @FXML
+    private MFXButton quickMessage1;
+
+    @FXML
+    private MFXButton quickMessage2;
+
+    @FXML
+    private MFXButton quickMessage3;
+
     private static final Logger logger = Logger.getLogger(ConsultController.class.getName());
 
     @FXML
@@ -60,6 +70,7 @@ public class ConsultController implements Initializable {
     
     private ChatbotAPI chatbotAPI;
     private User currentUser;
+    private ChatHistoryManager historyManager;
     
     // Properties for FXML binding
     private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
@@ -72,6 +83,7 @@ public class ConsultController implements Initializable {
     public ConsultController() {
         try {
             this.chatbotAPI = new ChatbotAPI();
+            this.historyManager = new ChatHistoryManager();
             loadCurrentUser();
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to initialize chatbot: " + e.getMessage(), e);
@@ -145,14 +157,33 @@ public class ConsultController implements Initializable {
     }
     
     /**
-     * Adds a chat bubble to the UI 
+     * Adds a chat bubble to the UI and saves the message to history
      *
      * @param message The message to display.
      * @param isUser  True if the message is from the user, false if from the assistant.
      */
     private void addBubble(String message, boolean isUser) {
+        addBubble(message, isUser, true);
+    }
+    
+    /**
+     * Adds a chat bubble to the UI with option to save to history
+     *
+     * @param message The message to display.
+     * @param isUser  True if the message is from the user, false if from the assistant.
+     * @param saveToHistory Whether to save this message to chat history
+     */
+    private void addBubble(String message, boolean isUser, boolean saveToHistory) {
         if (message == null || message.trim().isEmpty()) {
             return; // Don't add empty messages
+        }
+
+        // Save to chat history if enabled and not a welcome message
+        if (saveToHistory && historyManager != null && currentUser != null) {
+            // Skip saving welcome messages (messages that contain "Welcome Pal!")
+            if (!message.contains("Welcome Pal!")) {
+                historyManager.addMessage(message, isUser, currentUser.username);
+            }
         }
 
         // Create main container for the bubble row
@@ -337,6 +368,93 @@ public class ConsultController implements Initializable {
         }
     }
 
+    /**
+     * Array of predefined quick questions that rotate randomly
+     */
+    private static final String[] QUICK_QUESTIONS = {
+        "What is TabemonPal?",
+        "Why is healthy eating important?", 
+        "What are superfoods?",
+        "What are the top 5 Indonesian superfoods?",
+        "How can I start eating healthier?",
+        "What nutrients should I focus on daily?",
+        "How do I plan balanced meals?",
+        "What are some healthy Indonesian dishes?"
+    };
+    
+    /**
+     * Handles quick message button 1 click
+     */
+    @FXML
+    public void handleQuickMessage1(javafx.event.ActionEvent event) {
+        sendQuickMessage(quickMessage1.getText());
+    }
+    
+    /**
+     * Handles quick message button 2 click
+     */
+    @FXML
+    public void handleQuickMessage2(javafx.event.ActionEvent event) {
+        sendQuickMessage(quickMessage2.getText());
+    }
+    
+    /**
+     * Handles quick message button 3 click
+     */
+    @FXML
+    public void handleQuickMessage3(javafx.event.ActionEvent event) {
+        sendQuickMessage(quickMessage3.getText());
+    }
+    
+    /**
+     * Sends a predefined question to the AI chatbot
+     * @param question The question to send
+     */
+    private void sendQuickMessage(String question) {
+        if (question == null || question.trim().isEmpty()) return;
+        
+        // Disable processing if already in progress
+        if (isProcessing.get()) {
+            logger.info("Already processing a message, ignoring quick message");
+            return;
+        }
+        
+        // Set the question in the prompt area (optional, for user feedback)
+        prompt.setText(question);
+        
+        // Send the message using existing logic
+        handleUserMessage();
+        
+        // Update quick message buttons with new random questions after sending
+        Platform.runLater(this::updateQuickMessageButtons);
+    }
+    
+    /**
+     * Updates quick message buttons with random questions from the predefined list
+     */
+    private void updateQuickMessageButtons() {
+        java.util.Random random = new java.util.Random();
+        java.util.List<String> availableQuestions = new java.util.ArrayList<>(java.util.Arrays.asList(QUICK_QUESTIONS));
+        
+        // Remove current button texts to avoid duplicates
+        availableQuestions.remove(quickMessage1.getText());
+        availableQuestions.remove(quickMessage2.getText());
+        availableQuestions.remove(quickMessage3.getText());
+        
+        // If we have enough questions left, pick 3 random ones
+        if (availableQuestions.size() >= 3) {
+            quickMessage1.setText(availableQuestions.remove(random.nextInt(availableQuestions.size())));
+            quickMessage2.setText(availableQuestions.remove(random.nextInt(availableQuestions.size())));
+            quickMessage3.setText(availableQuestions.remove(random.nextInt(availableQuestions.size())));
+        } else {
+            // Fallback to shuffling all questions if we don't have enough unique ones left
+            java.util.Collections.shuffle(availableQuestions);
+            if (availableQuestions.size() > 0) quickMessage1.setText(availableQuestions.get(0));
+            if (availableQuestions.size() > 1) quickMessage2.setText(availableQuestions.get(1));
+            if (availableQuestions.size() > 2) quickMessage3.setText(availableQuestions.get(2));
+        }
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Bind hasTextInput property to prompt text property
@@ -356,7 +474,7 @@ public class ConsultController implements Initializable {
         // Make the TextArea transparent
         prompt.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
         
-        // Add welcome message
+        // Add welcome message (don't save to history)
         addBubble("**Welcome Pal!** 🌱\n" + 
                   "\n" + 
                   "**I'm here to help you with:** \n" + 
@@ -373,7 +491,18 @@ public class ConsultController implements Initializable {
                   "Let's make healthy living simple and fun! 😊\n" + 
                   "\n" + 
                   "**What's your question today?**", 
-            false);
+            false, false);
+            
+        // Initialize quick message buttons with random questions
+        updateQuickMessageButtons();
+        
+        // Start chat history session if user is available
+        if (currentUser != null && historyManager != null) {
+            historyManager.startSession(currentUser.username);
+        }
+        
+        // Load previous chat history if available
+        loadRecentChatHistory();
     }
     
     /**
@@ -476,11 +605,73 @@ public class ConsultController implements Initializable {
     }
     
     /**
-     * Cleanup method to stop any running animations when the controller is destroyed.
+     * Loads recent chat history and displays it in the chat view.
+     * This method loads the most recent chat session (excluding the current one)
+     * to show conversation continuity.
+     */
+    private void loadRecentChatHistory() {
+        if (currentUser == null || historyManager == null) {
+            return;
+        }
+        
+        try {
+            var histories = historyManager.loadUserHistory(currentUser.username);
+            
+            // Skip the first history if it's the current session
+            int startIndex = 0;
+            if (!histories.isEmpty() && historyManager.hasActiveSession()) {
+                var currentSession = historyManager.getCurrentSession();
+                if (currentSession != null && 
+                    histories.get(0).sessionId.equals(currentSession.sessionId)) {
+                    startIndex = 1;
+                }
+            }
+            
+            // Load messages from the most recent completed session (limit to avoid UI overload)
+            if (histories.size() > startIndex) {
+                var recentHistory = histories.get(startIndex);
+                if (recentHistory.messages != null && !recentHistory.messages.isEmpty()) {
+                    
+                    // Add a separator message to show this is from previous session
+                    addBubble("─── *Previous conversation from " + 
+                             recentHistory.sessionStart.substring(0, 10) + "* ───", 
+                             false, false);
+                    
+                    // Load up to 10 most recent messages to avoid overwhelming the UI
+                    var messages = recentHistory.messages;
+                    int startMessageIndex = Math.max(0, messages.size() - 10);
+                    
+                    for (int i = startMessageIndex; i < messages.size(); i++) {
+                        var msg = messages.get(i);
+                        if (msg != null && msg.content != null && !msg.content.trim().isEmpty()) {
+                            addBubble(msg.content, msg.isUser, false);
+                        }
+                    }
+                    
+                    // Add another separator to distinguish from new conversation
+                    addBubble("─── *New conversation* ───", false, false);
+                    
+                    logger.info("Loaded " + (messages.size() - startMessageIndex) + 
+                               " messages from previous session: " + recentHistory.sessionId);
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Failed to load recent chat history: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Cleanup method to stop any running animations and end chat session when the controller is destroyed.
      * This should be called when switching views or closing the application.
      */
     public void cleanup() {
         hideLoadingBubble();
+        
+        // End the current chat session
+        if (historyManager != null && historyManager.hasActiveSession()) {
+            historyManager.endSession();
+            logger.info("Chat session ended during cleanup");
+        }
     }
     
     // Getter methods for property access (useful for advanced bindings)
@@ -490,5 +681,68 @@ public class ConsultController implements Initializable {
     
     public BooleanProperty hasTextInputProperty() {
         return hasTextInput;
+    }
+    
+    /**
+     * Gets the chat history manager for external access.
+     * 
+     * @return The chat history manager instance
+     */
+    public ChatHistoryManager getHistoryManager() {
+        return historyManager;
+    }
+    
+    /**
+     * Manually ends the current chat session.
+     * This can be called from external controllers or when user explicitly wants to end session.
+     */
+    public void endCurrentSession() {
+        if (historyManager != null && historyManager.hasActiveSession()) {
+            historyManager.endSession();
+            logger.info("Chat session ended manually");
+        }
+    }
+    
+    /**
+     * Starts a new chat session, ending the current one if active.
+     */
+    public void startNewSession() {
+        if (currentUser != null && historyManager != null) {
+            historyManager.startSession(currentUser.username);
+            logger.info("New chat session started");
+        }
+    }
+    
+    /**
+     * Clears the current chat UI and optionally starts a new session.
+     * 
+     * @param startNewSession Whether to start a new chat session after clearing
+     */
+    public void clearChat(boolean startNewSession) {
+        // Clear the chat UI
+        bubblelist.getChildren().clear();
+        
+        // Add welcome message
+        addBubble("**Welcome Pal!** 🌱\n" + 
+                  "\n" + 
+                  "**I'm here to help you with:** \n" + 
+                  "🍏 Nutrition advice (meal planning, healthy eating) \n" + 
+                  "🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) \n" + 
+                  "💪 Healthy lifestyle habits (exercise, sleep, stress management) \n" + 
+                  "🔍 Tips & tricks (meal prep, portion control, eating out) \n" + 
+                  "🚀 Motivation & mindset (staying consistent, goal-setting) \n" + 
+                  "\n" + 
+                  "**Ask me anything!** Examples:  \n" + 
+                  "• \"What's a quick healthy breakfast?\" \n" + 
+                  "• \"How can I reduce sugar cravings?\" \n" + 
+                  "\n" + 
+                  "Let's make healthy living simple and fun! 😊\n" + 
+                  "\n" + 
+                  "**What's your question today?**", 
+            false, false);
+        
+        if (startNewSession) {
+            startNewSession();
+        }
     }
 }

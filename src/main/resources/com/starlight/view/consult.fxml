@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="986.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.ConsultController">
+<GridPane alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" prefWidth="986.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.ConsultController">
   <columnConstraints>
     <ColumnConstraints hgrow="SOMETIMES" />
   </columnConstraints>
@@ -23,7 +23,7 @@
     <RowConstraints maxHeight="1.7976931348623157E308" minHeight="193.0" prefHeight="193.0" vgrow="SOMETIMES" />
   </rowConstraints>
    <children>
-      <MFXScrollPane hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="568.0" prefWidth="1482.0" style="-fx-background-color: transparent;" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES">
+      <MFXScrollPane hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefHeight="568.0" prefWidth="1482.0" style="-fx-background-color: transparent;" GridPane.halignment="CENTER" GridPane.hgrow="SOMETIMES" GridPane.valignment="CENTER" GridPane.vgrow="SOMETIMES">
          <content>
             <VBox fx:id="bubblelist" prefHeight="690.0" prefWidth="970.0" />
          </content>
@@ -32,7 +32,7 @@
          <children>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
                <children>
-                  <MFXButton maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="45.0" prefWidth="404.0" text="Lorem ipsum dolor sit amet" HBox.hgrow="NEVER">
+                  <MFXButton fx:id="quickMessage1" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#handleQuickMessage1" prefHeight="45.0" prefWidth="404.0" text="What is TabemonPal?" HBox.hgrow="NEVER">
                      <styleClass>
                         <String fx:value="button-topic" />
                         <String fx:value="background-window" />
@@ -41,7 +41,7 @@
                         <Insets left="8.0" right="8.0" />
                      </HBox.margin>
                   </MFXButton>
-                  <MFXButton maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="45.0" prefWidth="404.0" text="Lorem ipsum dolor sit amet" HBox.hgrow="NEVER">
+                  <MFXButton fx:id="quickMessage2" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#handleQuickMessage2" prefHeight="45.0" prefWidth="404.0" text="Why is healthy eating important?" HBox.hgrow="NEVER">
                      <styleClass>
                         <String fx:value="button-topic" />
                         <String fx:value="background-window" />
@@ -50,7 +50,7 @@
                         <Insets />
                      </HBox.margin>
                   </MFXButton>
-                  <MFXButton maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="45.0" prefWidth="404.0" text="Lorem ipsum dolor sit amet" HBox.hgrow="NEVER">
+                  <MFXButton fx:id="quickMessage3" maxHeight="-Infinity" maxWidth="-Infinity" onAction="#handleQuickMessage3" prefHeight="45.0" prefWidth="404.0" text="What are superfoods?" HBox.hgrow="NEVER">
                      <styleClass>
                         <String fx:value="button-topic" />
                         <String fx:value="background-window" />
@@ -66,7 +66,7 @@
             </HBox>
             <VBox alignment="BOTTOM_RIGHT" styleClass="background-window" VBox.vgrow="SOMETIMES">
                <children>
-                  <TextArea fx:id="prompt" depthTest="DISABLE" onKeyPressed="#handlePromptKeyPress" prefHeight="100.0" prefWidth="1443.0" promptText="Type your message here..." styleClass="text-propmt" wrapText="true">
+                  <TextArea fx:id="prompt" depthTest="DISABLE" onKeyPressed="#handlePromptKeyPress" prefHeight="163.0" prefWidth="966.0" promptText="Type your message here..." styleClass="text-prompt" wrapText="true">
                      <VBox.margin>
                         <Insets left="10.0" right="10.0" top="10.0" />
                      </VBox.margin>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXPasswordField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="loginView" alignment="CENTER_LEFT" maxHeight="1.7976931348623157E308" maxWidth="-Infinity" prefHeight="380.0" prefWidth="919.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.SettingController">
+   <children>
+      <MFXButton fx:id="goBack" minWidth="-Infinity" onMouseClicked="#goBack" prefHeight="34.0" prefWidth="34.0" style="-fx-background-color: transparent;" text=" ">
+         <graphic>
+            <ImageView fitHeight="26.0" fitWidth="48.0" pickOnBounds="true" preserveRatio="true" translateX="-5.0">
+               <image>
+                  <Image url="@../icon/Arrow%20left.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <VBox.margin>
+            <Insets bottom="50.0" />
+         </VBox.margin>
+      </MFXButton>
+      <Label prefHeight="36.0" prefWidth="389.0" style="-fx-font-size: 20;" text="Input your ChatGPT's Secrect Key here" wrapText="true" />
+      <MFXPasswordField fx:id="secret_key" floatMode="ABOVE" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="839.0" promptText="SECRET_KEY" style="-fx-font-size: 18;">
+         <VBox.margin>
+            <Insets bottom="20.0" />
+         </VBox.margin>
+      </MFXPasswordField>
+      <MFXButton fx:id="saveButton" onAction="#saveApiKey" prefHeight="46.0" prefWidth="150.0" styleClass="button-community" text="Save" />
+   </children>
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+   </padding>
+</VBox>

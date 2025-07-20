@@ -260,6 +260,9 @@ public class MainController implements Initializable {
                     postController.setPost(currentPost); 
                     postController.setMainController(MainController.this);
                 }
+                if (controller instanceof SettingController) {
+                    ((SettingController) controller).setMainController(MainController.this);
+                }
                 
                 return root;
             }
