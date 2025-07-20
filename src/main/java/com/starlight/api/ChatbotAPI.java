@@ -182,7 +182,7 @@ public class ChatbotAPI {
         
         String prompt = "Do an prediction analysis from this recipe's ingredients for nutrition facts using USDA then send the result in xml called nutrition:\n\n" +
                 "format:\n" +
-                "<nutrition verdict=\"Healthy|Moderate|Unhealthy|Junk Food\">\n" +
+                "<nutrition verdict=\"Healthy|Moderate|Unhealthy|Junk Food|Unknown\">\n" +
                 "  <ingredient name=\"\" amount=\"\">\n" +
                 "    <calories unit=\"kcal\"></calories>\n" +
                 "    <protein unit=\"g\"></protein>\n" +
@@ -204,6 +204,7 @@ public class ChatbotAPI {
                 "- 'Moderate': Average nutritional balance " +
                 "- 'Unhealthy': High sugar/salt/fat, low nutrients " +
                 "- 'Junk Food': Very high sugar/fat/salt, minimal nutritional value " +
+                "- 'Unknown': When nutritional analysis cannot be determined " +
                 "Return only valid XML that matches the exact format requested.";
         
         try {
@@ -214,9 +215,39 @@ public class ChatbotAPI {
                 throw new ChatbotException("Received empty response from nutrition analysis API");
             }
             
-            if (!response.contains("<nutrition>") || !response.contains("</nutrition>")) {
-                throw new ChatbotException("API response does not contain valid nutrition XML format. Response: " + 
-                                         (response.length() > 200 ? response.substring(0, 200) + "..." : response));
+            // Log the response length for monitoring
+            logger.info("Nutrition analysis API response length: " + response.length() + " characters");
+            
+            // Check for nutrition XML tags with more detailed error reporting
+            boolean hasNutritionStart = response.contains("<nutrition");
+            boolean hasNutritionEnd = response.contains("</nutrition>");
+            
+            if (!hasNutritionStart && !hasNutritionEnd) {
+                throw new ChatbotException("API response does not contain nutrition XML tags. Response: " + response);
+            } else if (!hasNutritionStart) {
+                throw new ChatbotException("API response missing <nutrition> opening tag. Response: " + response);
+            } else if (!hasNutritionEnd) {
+                // Try to repair incomplete XML by adding closing tag
+                logger.warning("API response missing closing tag, attempting to repair XML");
+                String repairedResponse = response.trim();
+                if (!repairedResponse.endsWith("</nutrition>")) {
+                    // If the response looks like it was cut off, add the closing tag
+                    if (repairedResponse.contains("<ingredient") && !repairedResponse.endsWith(">")) {
+                        // Find the last complete ingredient and add closing tags
+                        int lastCompleteIngredient = repairedResponse.lastIndexOf("</ingredient>");
+                        if (lastCompleteIngredient > 0) {
+                            repairedResponse = repairedResponse.substring(0, lastCompleteIngredient + "</ingredient>".length()) + "\n</nutrition>";
+                            logger.info("Repaired XML response: " + repairedResponse);
+                            return repairedResponse;
+                        }
+                    }
+                    // Simple repair: just add the closing tag
+                    repairedResponse += "\n</nutrition>";
+                    logger.info("Repaired XML by adding closing tag: " + repairedResponse);
+                    return repairedResponse;
+                } else {
+                    throw new ChatbotException("API response missing </nutrition> closing tag. Response: " + response);
+                }
             }
             
             return response;
@@ -247,7 +278,7 @@ public class ChatbotAPI {
             .append("\"}");
         
         json.append("],");
-        json.append("\"max_tokens\": 1000,");
+        json.append("\"max_tokens\": 2000,");
         json.append("\"temperature\": 0.9");
         json.append("}");
         

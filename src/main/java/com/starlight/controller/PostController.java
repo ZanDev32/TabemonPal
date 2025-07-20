@@ -6,6 +6,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import com.starlight.util.DoughnutChart;
 import javafx.scene.text.TextFlow;
 import javafx.scene.text.Text;
 import javafx.scene.text.Font;
@@ -19,10 +20,26 @@ import com.starlight.models.Post;
 import com.starlight.models.Nutrition;
 import com.starlight.util.ImageUtils;
 import com.starlight.repository.UserDataRepository;
+import com.starlight.repository.PostDataRepository;
+import com.starlight.api.ChatbotAPI;
+import com.starlight.util.NutritionParser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.concurrent.Task;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 public class PostController implements Initializable {
+    @FXML
+    private MFXButton doAnalysis;
+
     @FXML
     private MFXButton goBack;
 
@@ -33,7 +50,7 @@ public class PostController implements Initializable {
     private VBox recipeContainer;
 
     @FXML
-    private PieChart nutritionFacts;
+    private DoughnutChart nutritionFacts;
 
     @FXML
     private VBox postTemplate;
@@ -59,8 +76,13 @@ public class PostController implements Initializable {
     
     private Post currentPost;
     private final UserDataRepository userRepository = new UserDataRepository();
+    private final PostDataRepository postRepository = new PostDataRepository();
     private final CommunityController communityController = new CommunityController();
+    private final ChatbotAPI chatbotAPI = new ChatbotAPI();
+    private final NutritionParser nutritionParser = new NutritionParser();
     private MainController mainController; // Reference to main controller for navigation
+    private static final Logger logger = Logger.getLogger(PostController.class.getName());
+    private static final int MAX_RETRIES = 3;
 
     @FXML
     private void initialize() {
@@ -76,6 +98,26 @@ public class PostController implements Initializable {
             // Navigate back to community view with proper button selection
             mainController.navigateToCommunity();
         }
+    }
+    
+    /**
+     * Handles the do analysis button click - performs nutrition analysis on current recipe
+     */
+    @FXML
+    private void doAnalysis() {
+        if (currentPost == null) {
+            logger.warning("Cannot perform analysis - no current post available");
+            return;
+        }
+        
+        if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
+            logger.warning("Cannot perform analysis - no ingredients available");
+            showAnalysisErrorDialog("No ingredients found in this recipe to analyze.");
+            return;
+        }
+        
+        // Show processing dialog and start analysis
+        showProcessingAndAnalyzeNutrition();
     }
     
     /**
@@ -120,7 +162,7 @@ public class PostController implements Initializable {
         // Update verdict button if available
         if (verdict != null && currentPost.nutrition != null) {
             String verdictText = currentPost.nutrition.verdict != null ? 
-                currentPost.nutrition.verdict : "Moderate";
+                currentPost.nutrition.verdict : "Unknown";
             verdict.setText(verdictText);
             
             // Apply different styling based on verdict
@@ -139,14 +181,37 @@ public class PostController implements Initializable {
                 case "Junk Food":
                     verdict.getStyleClass().add("verdict-junk");
                     break;
+                case "Unknown":
+                    verdict.getStyleClass().add("verdict-unknown");
+                    break;
                 default:
-                    verdict.getStyleClass().add("verdict-moderate");
+                    verdict.getStyleClass().add("verdict-unknown");
                     break;
             }
         } else if (verdict != null) {
-            verdict.setText("No Analysis");
+            verdict.setText("Unknown");
             verdict.getStyleClass().clear();
             verdict.getStyleClass().add("food-tag");
+            verdict.getStyleClass().add("verdict-unknown");
+        }
+        
+        // Update doAnalysis button state based on current nutrition status
+        if (doAnalysis != null) {
+            if (currentPost.nutrition != null && currentPost.nutrition.verdict != null && !currentPost.nutrition.verdict.equals("Unknown")) {
+                // Recipe has been analyzed - button can re-analyze
+                doAnalysis.setText("Re-analyze");
+                doAnalysis.setDisable(false);
+            } else {
+                // Recipe hasn't been analyzed - button can analyze
+                doAnalysis.setText("Analyze");
+                doAnalysis.setDisable(false);
+            }
+            
+            // Disable if no ingredients available
+            if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
+                doAnalysis.setText("No Ingredients");
+                doAnalysis.setDisable(true);
+            }
         }
         
         // Load profile picture
@@ -342,10 +407,25 @@ public class PostController implements Initializable {
     }
     
     /**
-     * Populates the nutrition facts PieChart with data from the current post.
+     * Populates the nutrition facts DoughnutChart with data from the current post.
      */
     private void populateNutritionFacts() {
-        if (nutritionFacts == null || currentPost == null || currentPost.nutrition == null) {
+        if (nutritionFacts == null || currentPost == null) {
+            return;
+        }
+        
+        // Show placeholder data when no nutrition analysis available
+        if (currentPost.nutrition == null) {
+            ObservableList<PieChart.Data> placeholderData = FXCollections.observableArrayList(
+                new PieChart.Data("No nutrition analysis available", 1)
+            );
+            nutritionFacts.setData(placeholderData);
+            nutritionFacts.setTitle("Nutrition Facts");
+            nutritionFacts.setLegendVisible(true);
+            nutritionFacts.getStyleClass().add("nutrition-chart");
+            
+            // Force layout update to ensure DoughnutChart inner circle is properly displayed
+            refreshDoughnutChart();
             return;
         }
         
@@ -409,6 +489,9 @@ public class PostController implements Initializable {
             // Apply custom styling if needed
             nutritionFacts.getStyleClass().add("nutrition-chart");
             
+            // Force layout update to ensure DoughnutChart inner circle is properly displayed
+            refreshDoughnutChart();
+            
         } catch (Exception e) {
             java.util.logging.Logger.getLogger(PostController.class.getName())
                     .warning("Failed to populate nutrition facts: " + e.getMessage());
@@ -419,6 +502,250 @@ public class PostController implements Initializable {
             );
             nutritionFacts.setData(fallbackData);
             nutritionFacts.setTitle("Nutrition Facts");
+            
+            // Force layout update to ensure DoughnutChart inner circle is properly displayed
+            refreshDoughnutChart();
+        }
+    }
+    
+    /**
+     * Forces a layout refresh on the DoughnutChart to ensure the inner circle is properly displayed.
+     * This is needed after data updates to maintain the doughnut appearance.
+     */
+    private void refreshDoughnutChart() {
+        if (nutritionFacts != null) {
+            // Use the DoughnutChart's built-in refresh method
+            nutritionFacts.refreshDoughnut();
+            
+            // Additional delayed refresh to ensure proper rendering
+            Platform.runLater(() -> {
+                nutritionFacts.refreshDoughnut();
+            });
+        }
+    }
+    
+    /**
+     * Shows processing dialog and performs nutrition analysis asynchronously.
+     * Based on CreatePostController implementation.
+     */
+    private void showProcessingAndAnalyzeNutrition() {
+        try {
+            // Load processing dialog
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/processingDialog.fxml"));
+            Parent parent = fxmlLoader.load();
+            ProcessingDialogController processingController = fxmlLoader.getController();
+            
+            // Create modal stage
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Analyzing Nutrition...");
+            dialogStage.setScene(new Scene(parent));
+            dialogStage.setResizable(false);
+            
+            // Set up the dialog controller
+            processingController.setDialogStage(dialogStage);
+            processingController.updateStatus("Starting nutrition analysis...");
+            
+            // Show dialog
+            dialogStage.show();
+            
+            // Create and configure the analysis task
+            Task<Nutrition> nutritionTask = createNutritionAnalysisTask(processingController);
+            
+            // Handle task completion
+            nutritionTask.setOnSucceeded(e -> {
+                Platform.runLater(() -> {
+                    dialogStage.close();
+                    
+                    Nutrition newNutrition = nutritionTask.getValue();
+                    if (newNutrition != null && !newNutrition.ingredient.isEmpty()) {
+                        // Update the current post's nutrition
+                        currentPost.nutrition = newNutrition;
+                        
+                        // Save the updated post to XML
+                        saveUpdatedPost();
+                        
+                        // Update UI to reflect new nutrition data
+                        updateUIFromPost();
+                        
+                        // Show success dialog
+                        showResultDialog(true, "Nutrition analysis completed successfully!");
+                        
+                        logger.info("Nutrition analysis completed and saved successfully");
+                    } else {
+                        showResultDialog(false, "Nutrition analysis failed. Please try again.");
+                        logger.warning("Nutrition analysis returned empty or invalid results");
+                    }
+                });
+            });
+            
+            nutritionTask.setOnFailed(e -> {
+                Platform.runLater(() -> {
+                    dialogStage.close();
+                    
+                    Throwable exception = nutritionTask.getException();
+                    String errorMessage = "Nutrition analysis failed";
+                    if (exception != null) {
+                        errorMessage += ": " + exception.getMessage();
+                    }
+                    
+                    showResultDialog(false, errorMessage);
+                    logger.log(Level.SEVERE, "Nutrition analysis task failed", exception);
+                });
+            });
+            
+            // Start the task in a background thread
+            Thread taskThread = new Thread(nutritionTask);
+            taskThread.setDaemon(true);
+            taskThread.start();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show processing dialog", e);
+            showAnalysisErrorDialog("Failed to start nutrition analysis: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Creates the nutrition analysis task.
+     * Based on CreatePostController implementation.
+     */
+    private Task<Nutrition> createNutritionAnalysisTask(ProcessingDialogController processingController) {
+        return new Task<Nutrition>() {
+            @Override
+            protected Nutrition call() throws Exception {
+                String ingredients = currentPost.ingredients;
+                Exception lastException = null;
+                
+                // Try analysis up to MAX_RETRIES times
+                for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+                    final int currentAttempt = attempt; // Make effectively final for lambda
+                    try {
+                        Platform.runLater(() -> 
+                            processingController.updateStatus("Analyzing nutrition... (Attempt " + currentAttempt + "/" + MAX_RETRIES + ")")
+                        );
+                        
+                        // Perform nutrition analysis using ChatGPT API
+                        String nutritionResponse = chatbotAPI.analyzeNutritionFacts(ingredients);
+                        
+                        // Parse the AI response into Nutrition object
+                        Nutrition nutrition = nutritionParser.parseNutritionFromResponse(nutritionResponse);
+                        
+                        if (nutrition != null && !nutrition.ingredient.isEmpty()) {
+                            logger.info("Nutrition analysis completed successfully on attempt " + currentAttempt);
+                            Platform.runLater(() -> 
+                                processingController.updateStatus("Analysis completed successfully!")
+                            );
+                            return nutrition;
+                        } else {
+                            throw new Exception("AI returned empty or invalid nutrition data");
+                        }
+                        
+                    } catch (Exception e) {
+                        lastException = e;
+                        logger.log(Level.WARNING, "Nutrition analysis attempt " + currentAttempt + " failed: " + e.getMessage(), e);
+                        
+                        if (currentAttempt < MAX_RETRIES) {
+                            Platform.runLater(() -> 
+                                processingController.updateStatus("Attempt " + currentAttempt + " failed, retrying...")
+                            );
+                            Thread.sleep(1000); // Brief pause between attempts
+                        }
+                    }
+                }
+                
+                // All attempts failed
+                Platform.runLater(() -> 
+                    processingController.updateStatus("Analysis failed after " + MAX_RETRIES + " attempts")
+                );
+                throw lastException != null ? lastException : new Exception("All nutrition analysis attempts failed");
+            }
+        };
+    }
+    
+    /**
+     * Saves the updated post with new nutrition data to XML.
+     */
+    private void saveUpdatedPost() {
+        try {
+            // Load all posts
+            List<Post> allPosts = postRepository.loadPosts();
+            
+            // Find and update the current post in the list
+            boolean updated = false;
+            for (int i = 0; i < allPosts.size(); i++) {
+                Post post = allPosts.get(i);
+                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                    // Update the post in the list
+                    allPosts.set(i, currentPost);
+                    updated = true;
+                    break;
+                }
+            }
+            
+            if (!updated) {
+                logger.warning("Could not find post to update in XML data");
+                return;
+            }
+            
+            // Save the updated posts list back to XML
+            postRepository.savePosts(allPosts);
+            logger.info("Post nutrition data updated and saved to XML successfully");
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to save updated post to XML", e);
+            throw new RuntimeException("Failed to save nutrition analysis results", e);
+        }
+    }
+    
+    /**
+     * Shows a result dialog with success or failure message.
+     * Based on CreatePostController pattern.
+     */
+    private void showResultDialog(boolean success, String message) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
+            Parent parent = fxmlLoader.load();
+            PopupDialogController controller = fxmlLoader.getController();
+            
+            // Set appropriate message
+            if (success) {
+                controller.setNutritionAnalysisSuccess();
+            } else {
+                controller.setMessage(message);
+            }
+            
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle(success ? "Analysis Complete" : "Analysis Failed");
+            dialogStage.setScene(new Scene(parent));
+            dialogStage.setResizable(false);
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show result dialog", e);
+        }
+    }
+    
+    /**
+     * Shows an error dialog for analysis issues.
+     */
+    private void showAnalysisErrorDialog(String errorMessage) {
+        try {
+            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
+            Parent parent = fxmlLoader.load();
+            PopupDialogController controller = fxmlLoader.getController();
+            
+            controller.setMessage("Analysis Error\n\n" + errorMessage);
+            
+            Stage dialogStage = new Stage();
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setTitle("Analysis Error");
+            dialogStage.setScene(new Scene(parent));
+            dialogStage.setResizable(false);
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show error dialog", e);
         }
     }
 }

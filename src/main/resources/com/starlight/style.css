@@ -290,6 +290,12 @@
     -fx-text-fill: white !important;
 }
 
+.verdict-unknown {
+    -fx-background-color: #9E9E9E !important;
+        background-color: #9E9E9E !important;
+    -fx-text-fill: white !important;
+}
+
 .post-username {
     -fx-font-family: Poppins;
         font-family: Poppins;

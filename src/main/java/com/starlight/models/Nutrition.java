@@ -8,8 +8,8 @@ import java.util.List;
  */
 public class Nutrition {
     public List<NutritionIngredient> ingredient = new ArrayList<>();
-    /** Recipe health verdict: Healthy, Moderate, Unhealthy, or Junk Food */
-    public String verdict = "Moderate";
+    /** Recipe health verdict: Healthy, Moderate, Unhealthy, Junk Food, or Unknown */
+    public String verdict = "Unknown";
     
     /**
      * Individual ingredient nutrition information.

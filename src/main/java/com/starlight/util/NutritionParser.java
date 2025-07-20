@@ -83,10 +83,10 @@ public class NutritionParser {
             String verdict = verdictMatcher.group(1).trim();
             // Validate verdict value
             if (verdict.equals("Healthy") || verdict.equals("Moderate") || 
-                verdict.equals("Unhealthy") || verdict.equals("Junk Food")) {
+                verdict.equals("Unhealthy") || verdict.equals("Junk Food") || verdict.equals("Unknown")) {
                 nutrition.verdict = verdict;
             } else {
-                nutrition.verdict = "Moderate"; // Default fallback
+                nutrition.verdict = "Unknown"; // Default fallback
             }
         }
         
@@ -277,7 +277,7 @@ public class NutritionParser {
      */
     private Nutrition createFallbackNutrition() {
         Nutrition nutrition = new Nutrition();
-        nutrition.verdict = "Moderate"; // Default verdict
+        nutrition.verdict = "Unknown"; // Default verdict for unanalyzed recipes
         
         Nutrition.NutritionIngredient fallback = new Nutrition.NutritionIngredient();
         fallback.name = "Recipe";

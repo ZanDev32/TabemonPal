@@ -95,6 +95,7 @@ public class NutritionParserTest {
         assertNotNull(nutrition.ingredient, "Should have fallback ingredient");
         assertEquals(1, nutrition.ingredient.size(), "Should have one fallback ingredient");
         assertEquals("Recipe", nutrition.ingredient.get(0).name);
+        assertEquals("Unknown", nutrition.verdict, "Should have Unknown verdict for fallback");
     }
 
     @Test
@@ -126,5 +127,29 @@ public class NutritionParserTest {
         Nutrition nutrition = parser.parseNutritionFromResponse(malformedResponse);
 
         assertNotNull(nutrition, "Should return fallback nutrition object on parsing error");
+    }
+
+    @Test
+    void testParseUnknownVerdict() {
+        String aiResponse = "Here's the nutrition analysis:\n\n" +
+                "<nutrition verdict=\"Unknown\">\n" +
+                "  <ingredient name=\"Mystery Ingredient\" amount=\"100g\">\n" +
+                "    <calories unit=\"kcal\">100</calories>\n" +
+                "    <protein unit=\"g\">5</protein>\n" +
+                "    <fat unit=\"g\">3</fat>\n" +
+                "    <carbohydrates unit=\"g\">15</carbohydrates>\n" +
+                "    <fiber unit=\"g\">2</fiber>\n" +
+                "    <sugar unit=\"g\">8</sugar>\n" +
+                "    <salt unit=\"mg\">100</salt>\n" +
+                "  </ingredient>\n" +
+                "</nutrition>\n\n" +
+                "Nutritional analysis could not be fully determined.";
+
+        Nutrition nutrition = parser.parseNutritionFromResponse(aiResponse);
+
+        assertNotNull(nutrition, "Nutrition object should not be null");
+        assertEquals("Unknown", nutrition.verdict, "Should have Unknown verdict");
+        assertEquals(1, nutrition.ingredient.size(), "Should have 1 ingredient");
+        assertEquals("Mystery Ingredient", nutrition.ingredient.get(0).name);
     }
 }
