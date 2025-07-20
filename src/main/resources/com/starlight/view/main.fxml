@@ -28,6 +28,7 @@
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -106,6 +107,19 @@
                   </HBox>
                </graphic>
             </MFXButton>
+            <MFXButton fx:id="admin" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#admin" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Admin Panel" GridPane.rowIndex="9">
+               <graphic>
+                  <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
+                     <children>
+                        <ImageView fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../icon/cog-outline.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </HBox>
+               </graphic>
+            </MFXButton>
             <HBox alignment="CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="72.0" prefWidth="253.0" style="-fx-background-radius: 10;" styleClass="background-window" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                <GridPane.margin>
                   <Insets bottom="10.0" left="23.0" right="23.0" top="20.0" />
@@ -129,7 +143,7 @@
                   <Insets bottom="11.0" top="11.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="301.0" GridPane.hgrow="NEVER" GridPane.rowIndex="9">
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="301.0" GridPane.hgrow="NEVER" GridPane.rowIndex="10">
                <GridPane.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" />
                </GridPane.margin>

@@ -138,4 +138,26 @@ public class PostDataRepository {
             throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * Deletes a post by UUID and saves the updated post list
+     * @param uuid the UUID of the post to delete
+     * @return true if post was found and deleted, false otherwise
+     */
+    public boolean deletePost(String uuid) {
+        List<Post> posts = loadPosts();
+        int initialSize = posts.size();
+        
+        // Remove the post with the specified UUID
+        posts.removeIf(post -> post.uuid != null && post.uuid.equals(uuid));
+        
+        // Check if any posts were removed
+        if (posts.size() < initialSize) {
+            // Save the updated list
+            savePosts(posts);
+            return true;
+        }
+        
+        return false;
+    }
 }

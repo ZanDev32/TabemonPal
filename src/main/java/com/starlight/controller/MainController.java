@@ -25,6 +25,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.concurrent.Task;
+import javafx.scene.control.Alert;
 
 /**
  * Controller for the main application shell which loads sub-pages and keeps
@@ -90,6 +91,8 @@ public class MainController implements Initializable {
     private MFXButton games;
     @FXML 
     private MFXButton achievement;
+    @FXML 
+    private MFXButton admin;
     
     /** Handles navigation to the home view. */
     @FXML
@@ -138,6 +141,35 @@ public class MainController implements Initializable {
     void wiki(MouseEvent event) {
         loadPage("wiki");
         selected(wiki);
+    }
+
+    /** Handles navigation to the admin view (only for logged in users). */
+    @FXML
+    void admin(MouseEvent event) {
+        // Only allow admin access if user is logged in
+        if (Session.getCurrentUser() != null) {
+            loadPage("admin");
+            selected(admin);
+        } else {
+            // Show login prompt or access denied message
+            showAccessDeniedDialog();
+        }
+    }
+    
+    /**
+     * Shows access denied dialog for admin panel
+     */
+    private void showAccessDeniedDialog() {
+        try {
+            // Create a simple alert dialog for access denied
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle("Access Denied");
+            alert.setHeaderText("Admin Access Required");
+            alert.setContentText("Please log in to access the admin panel.");
+            alert.showAndWait();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /**

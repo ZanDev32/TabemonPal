@@ -457,3 +457,90 @@
 .nutrition-chart .pie-slice[data-name^="Calories"] {
     -fx-pie-color: #FFEAA7;
 }
+
+/* Admin Panel Styles */
+.admin-header {
+    -fx-background-color: #2C3E50;
+    -fx-text-fill: white;
+}
+
+.admin-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+}
+
+.admin-subtitle {
+    -fx-text-fill: #BDC3C7;
+}
+
+.admin-controls {
+    -fx-background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 0 0 1 0;
+}
+
+.stats-label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+}
+
+.admin-table {
+    -fx-background-color: #FFFFFF;
+}
+
+.admin-table .table-view {
+    -fx-background-color: transparent;
+}
+
+.admin-table .table-view .column-header {
+    -fx-background-color: #34495E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.admin-table .table-view .column-header-background {
+    -fx-background-color: #34495E;
+}
+
+.admin-table .table-row-cell {
+    -fx-background-color: transparent;
+}
+
+.admin-table .table-row-cell:odd {
+    -fx-background-color: #F8F9FA;
+}
+
+.admin-table .table-row-cell:selected {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+.admin-table .table-cell {
+    -fx-border-color: #E1E8ED;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 8;
+}
+
+.mfx-button-primary {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+    -fx-font-weight: bold;
+}
+
+.mfx-button-primary:hover {
+    -fx-background-color: #2980B9;
+}
+
+.admin-footer {
+    -fx-background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+    -fx-border-width: 1 0 0 0;
+}
+
+.footer-text {
+    -fx-text-fill: #7F8C8D;
+    -fx-font-style: italic;
+}
