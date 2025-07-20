@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1178.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
+<BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
       <GridPane prefHeight="719.0" prefWidth="290.0" styleClass="sideBar" stylesheets="@../style.css">
         <columnConstraints>
@@ -137,13 +137,13 @@
       </GridPane>
    </left>
    <center>
-      <GridPane fx:id="gp" prefWidth="861.0" BorderPane.alignment="CENTER">
+      <GridPane fx:id="gp" alignment="CENTER" prefHeight="1081.0" prefWidth="1691.0" BorderPane.alignment="CENTER">
         <columnConstraints>
-          <ColumnConstraints hgrow="SOMETIMES" />
+          <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" prefWidth="1600.0" />
         </columnConstraints>
         <rowConstraints>
-          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="95.0" valignment="TOP" vgrow="NEVER" />
-          <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="625.0" vgrow="ALWAYS" />
+          <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="80.0" valignment="TOP" vgrow="NEVER" />
+          <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="1000.0" valignment="CENTER" vgrow="ALWAYS" />
         </rowConstraints>
         <children>
         </children>

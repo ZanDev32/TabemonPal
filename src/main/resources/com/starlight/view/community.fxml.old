@@ -14,43 +14,150 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
+<GridPane alignment="TOP_CENTER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1200.0" prefWidth="1820.0" style="-fx-background-color: #FEF7E7;" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CommunityController">
   <columnConstraints>
     <ColumnConstraints hgrow="NEVER" maxWidth="1.7976931348623157E308" minWidth="74.0" prefWidth="332.6666564941406" />
     <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="1482.0" prefWidth="1487.3333435058594" />
   </columnConstraints>
   <rowConstraints>
     <RowConstraints fillHeight="false" maxHeight="1.7976931348623157E308" minHeight="-Infinity" prefHeight="49.0" vgrow="NEVER" />
-    <RowConstraints maxHeight="1.7976931348623157E308" prefHeight="841.0" vgrow="SOMETIMES" />
+    <RowConstraints maxHeight="1.7976931348623157E308" minHeight="766.0" prefHeight="841.0" vgrow="SOMETIMES" />
   </rowConstraints>
   <children>
-    <MFXButton fx:id="toProfile" buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" onMouseClicked="#toProfile" styleClass="button-community" text="My Profile" GridPane.columnIndex="1" />
-    <MFXScrollPane hbarPolicy="NEVER" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="1148.0" prefWidth="960.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+    <MFXButton buttonType="RAISED" maxHeight="40.0" maxWidth="334.0" styleClass="button-community" text="My Recipes" GridPane.columnIndex="1" />
+    <MFXScrollPane hbarPolicy="NEVER" hmax="0.0" maxWidth="1.7976931348623157E308" prefHeight="1148.0" prefWidth="960.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
       <content>
-        <GridPane fx:id="manu" maxWidth="1.7976931348623157E308" prefWidth="1706.0">
+        <GridPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1938.0" prefWidth="1706.0">
           <columnConstraints>
             <ColumnConstraints hgrow="SOMETIMES" maxWidth="1.7976931348623157E308" minWidth="10.0" prefWidth="100.0" />
           </columnConstraints>
           <rowConstraints>
-            <RowConstraints prefHeight="77.0" vgrow="NEVER" />
-            <RowConstraints maxHeight="287.0" minHeight="-Infinity" prefHeight="287.0" vgrow="NEVER" />
-            <RowConstraints maxHeight="58.0" minHeight="-Infinity" prefHeight="46.0" vgrow="NEVER" />
-            <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="77.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="269.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="64.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
           </rowConstraints>
           <children>
-            <GridPane maxWidth="-Infinity" minWidth="-Infinity" prefWidth="1280.0" GridPane.rowIndex="3" GridPane.valignment="TOP" GridPane.vgrow="ALWAYS">
+            <GridPane maxHeight="1.7976931348623157E308" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="1548.0" prefWidth="1280.0" GridPane.rowIndex="3" GridPane.vgrow="NEVER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="676.0" minWidth="10.0" prefWidth="676.0" />
                 <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" maxWidth="948.0" minWidth="-Infinity" prefWidth="604.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
               <children>
-                <VBox fx:id="postlist" spacing="10.0" styleClass="post-list" GridPane.vgrow="ALWAYS">
-                  <padding>
-                    <Insets bottom="50.0" />
-                  </padding>
+                <VBox fx:id="postlist" maxHeight="1.7976931348623157E308" prefHeight="200.0" prefWidth="100.0">
+                  <children>
+                    <VBox fx:id="post" minHeight="-Infinity" minWidth="-Infinity" prefHeight="656.0" prefWidth="677.0" styleClass="background-window">
+                      <children>
+                        <VBox fx:id="post1" prefHeight="428.0" prefWidth="599.0">
+                          <children>
+                            <HBox prefHeight="36.0" prefWidth="425.0">
+                              <children>
+                                <ImageView fx:id="profile1" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                                  <HBox.margin>
+                                    <Insets />
+                                  </HBox.margin>
+                                  <image>
+                                    <Image url="@../images/missing.png" />
+                                  </image>
+                                  <viewport>
+                                    <Rectangle2D height="40.0" width="40.0" />
+                                  </viewport>
+                                </ImageView>
+                                <VBox maxWidth="1.7976931348623157E308">
+                                  <children>
+                                    <Label fx:id="username" maxWidth="1.7976931348623157E308" styleClass="label2" text="user">
+                                      <VBox.margin>
+                                        <Insets left="20.0" />
+                                      </VBox.margin>
+                                    </Label>
+                                    <Label fx:id="uploadtime" maxWidth="1.7976931348623157E308" styleClass="label-date-community" text="time">
+                                      <VBox.margin>
+                                        <Insets left="20.0" />
+                                      </VBox.margin>
+                                    </Label>
+                                  </children>
+                                </VBox>
+                              </children>
+                              <VBox.margin>
+                                <Insets bottom="12.0" />
+                              </VBox.margin>
+                            </HBox>
+                            <Label fx:id="title" maxWidth="1.7976931348623157E308" styleClass="label-title-community" text="Lorem Ipsum" />
+                            <Label fx:id="description" maxWidth="1.7976931348623157E308" prefHeight="26.0" prefWidth="638.0" styleClass="label2" text="Lorem Ipsum asdadasdafdadfadfadfasdasdasdasd fgdfgdfgf" wrapText="true" />
+                            <ImageView fx:id="recentphoto1" fitHeight="482.0" fitWidth="637.0" pickOnBounds="true" preserveRatio="true">
+                              <VBox.margin>
+                                <Insets top="25.0" />
+                              </VBox.margin>
+                              <viewport>
+                                <Rectangle2D height="540.0" width="766.0" />
+                              </viewport>
+                              <image>
+                                <Image url="@../images/missing.png" />
+                              </image>
+                            </ImageView>
+                          </children>
+                          <VBox.margin>
+                            <Insets left="20.0" right="20.0" top="20.0" />
+                          </VBox.margin>
+                        </VBox>
+                        <VBox prefHeight="66.0" prefWidth="677.0">
+                          <children>
+                            <HBox prefHeight="1.0" prefWidth="465.0" style="-fx-background-color: #C4C4C44D;">
+                              <VBox.margin>
+                                <Insets top="10.0" />
+                              </VBox.margin>
+                            </HBox>
+                            <HBox prefHeight="31.0" prefWidth="425.0">
+                              <children>
+                                <MFXButton fx:id="likecounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="15">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/like.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                  <HBox.margin>
+                                    <Insets right="4.0" />
+                                  </HBox.margin>
+                                </MFXButton>
+                                <MFXButton fx:id="commentcounter" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="54.0" styleClass="interaction-button" text="2">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton1" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/comment.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                  <HBox.margin>
+                                    <Insets right="4.0" />
+                                  </HBox.margin>
+                                </MFXButton>
+                                <MFXButton fx:id="sharebutton" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="74.0" styleClass="interaction-button" text="Share">
+                                  <graphic>
+                                    <ImageView fx:id="likebutton11" fitHeight="15.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                      <image>
+                                        <Image url="@../icon/Share.png" />
+                                      </image>
+                                    </ImageView>
+                                  </graphic>
+                                </MFXButton>
+                              </children>
+                              <VBox.margin>
+                                <Insets left="20.0" right="20.0" top="6.0" />
+                              </VBox.margin>
+                            </HBox>
+                          </children>
+                        </VBox>
+                      </children>
+                                 <VBox.margin>
+                                    <Insets bottom="25.0" />
+                                 </VBox.margin>
+                    </VBox>
+                  </children>
                 </VBox>
                 <VBox maxWidth="-Infinity" prefHeight="832.0" prefWidth="465.0" GridPane.columnIndex="1" GridPane.halignment="RIGHT" GridPane.hgrow="SOMETIMES" GridPane.vgrow="NEVER">
                   <children>
@@ -226,6 +333,7 @@
                                     <Insets bottom="15.0" />
                                  </VBox.margin>
                     </VBox>
+                              <MFXButton fx:id="createpost" onAction="#handleCreatePost" text="Create new post" />
                   </children>
                   <GridPane.margin>
                     <Insets left="35.0" />
@@ -243,7 +351,7 @@
               <content>
                 <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="255.0">
                   <children>
-                    <VBox fx:id="dailypost1" maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox maxWidth="255.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto1" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -287,7 +395,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -295,10 +403,7 @@
                                 <Insets left="7.0" />
                               </HBox.margin>
                             </Label>
-                            <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
-                                             <HBox.margin>
-                                                <Insets left="4.0" />
-                                             </HBox.margin></Label>
+                            <Label prefHeight="21.0" prefWidth="36.0" text="Likes" />
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -309,7 +414,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox fx:id="dailypost2" maxWidth="225.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox maxWidth="225.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto2" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -319,7 +424,7 @@
                             <Image url="@../images/missing.png" />
                           </image>
                         </ImageView>
-                        <Label fx:id="dailytitle2" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
+                        <Label fx:id="dailytitle2" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true">
                           <font>
                             <Font size="12.0" />
                           </font>
@@ -353,7 +458,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter2" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true" HBox.hgrow="ALWAYS">
+                            <Label fx:id="dailylikecounter2" prefHeight="23.0" prefWidth="13.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true" HBox.hgrow="ALWAYS">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -361,10 +466,7 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
-                                             <HBox.margin>
-                                                <Insets left="4.0" />
-                                             </HBox.margin></Label>
+                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -375,7 +477,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox fx:id="dailypost3" maxWidth="255.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox maxWidth="255.0" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto3" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -385,7 +487,7 @@
                             <Image url="@../images/missing.png" />
                           </image>
                         </ImageView>
-                        <Label fx:id="dailytitle3" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
+                        <Label fx:id="dailytitle3" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true">
                           <font>
                             <Font size="12.0" />
                           </font>
@@ -419,7 +521,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter3" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter3" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -427,10 +529,7 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
-                                             <HBox.margin>
-                                                <Insets left="4.0" />
-                                             </HBox.margin></Label>
+                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
@@ -441,7 +540,7 @@
                         <Insets right="30.0" />
                       </HBox.margin>
                     </VBox>
-                    <VBox fx:id="dailypost4" minWidth="-Infinity" prefHeight="200.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
+                    <VBox minWidth="-Infinity" prefHeight="200.0" prefWidth="280.0" styleClass="background-window" HBox.hgrow="ALWAYS">
                       <children>
                         <ImageView fx:id="dailyphoto4" fitHeight="174.0" fitWidth="334.0" pickOnBounds="true" preserveRatio="true">
                           <viewport>
@@ -485,7 +584,7 @@
                                 <Insets top="10.0" />
                               </HBox.margin>
                             </ImageView>
-                            <Label fx:id="dailylikecounter4" prefHeight="23.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                            <Label fx:id="dailylikecounter4" prefHeight="23.0" prefWidth="12.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
                               <font>
                                 <Font size="12.0" />
                               </font>
@@ -493,10 +592,7 @@
                                 <Insets left="5.0" />
                               </HBox.margin>
                             </Label>
-                                          <Label prefHeight="21.0" prefWidth="36.0" text="Likes">
-                                             <HBox.margin>
-                                                <Insets left="4.0" />
-                                             </HBox.margin></Label>
+                            <Label maxHeight="1.7976931348623157E308" text="Likes" />
                           </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />

@@ -2,11 +2,8 @@ package com.starlight.controller;
 
 import java.io.File;
 import java.net.URL;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ResourceBundle;
 import java.util.List;
-import java.util.UUID;
 
 import com.starlight.models.Post;
 import com.starlight.models.PostDataRepository;
@@ -24,9 +21,9 @@ import javafx.scene.Node;
 
 
 /**
- * Controller responsible for the "create post" dialog.
+ * Controller responsible for the "edit post" dialog.
  */
-public class CreatePostController implements Initializable {
+public class EditPostController implements Initializable {
 
     @FXML
     private MFXTextField title;
@@ -53,16 +50,40 @@ public class CreatePostController implements Initializable {
     private MFXButton cancel;
 
     private File selectedImage;
-
+    private Post currentPost;
     private boolean success;
 
     private final PostDataRepository repository = new PostDataRepository();
 
     /**
+     * Sets the post to edit and populates the form fields
+     */
+    public void setPost(Post post) {
+        this.currentPost = post;
+        populateFields();
+    }
+
+    /**
+     * Populates the form fields with the current post data
+     */
+    private void populateFields() {
+        if (currentPost == null) return;
+
+        title.setText(currentPost.title != null ? currentPost.title : "");
+        description.setText(currentPost.description != null ? currentPost.description : "");
+        ingredients.setText(currentPost.ingredients != null ? currentPost.ingredients : "");
+        directions.setText(currentPost.directions != null ? currentPost.directions : "");
+        
+        // Set image status
+        if (currentPost.image != null && !currentPost.image.isEmpty()) {
+            pickerstatus.setText("Current: " + new File(currentPost.image).getName());
+        } else {
+            pickerstatus.setText("No image selected");
+        }
+    }
+
+    /**
      * Copies the selected image to the user's data directory.
-     *
-     * @param image the image file selected by the user
-     * @return the copied image file path
      */
     private String copyImageToUserDir(File image) {
         try {
@@ -76,21 +97,17 @@ public class CreatePostController implements Initializable {
     }
 
     /**
-     * Indicates whether the user successfully created a post.
+     * Indicates whether the user successfully updated the post.
      */
     public boolean isSuccess() {
         return success;
     }
 
-    /**
-     * Initializes the controller by wiring up button actions and the image
-     * picker logic.
-     */
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL location, ResourceBundle resources) {
         pickerstatus.setText("No image selected");
 
-        // Image picker logic
+        // Image picker logic - reuse from CreatePostController
         imagepicker.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose an image");
@@ -103,44 +120,58 @@ public class CreatePostController implements Initializable {
                 selectedImage = file;
                 pickerstatus.setText("Selected: " + file.getName());
             } else {
-                pickerstatus.setText("No image selected");
+                // Reset to current image status if no new image selected
+                if (currentPost != null && currentPost.image != null && !currentPost.image.isEmpty()) {
+                    pickerstatus.setText("Current: " + new File(currentPost.image).getName());
+                } else {
+                    pickerstatus.setText("No image selected");
+                }
             }
         });
 
+        // Submit button logic
         submit.setOnAction(event -> {
+            if (currentPost == null) {
+                System.err.println("No post to edit");
+                return;
+            }
+
             String postTitle = title.getText();
             String postDescription = description.getText();
             String postIngredients = ingredients.getText();
             String postDirections = directions.getText();
 
-            if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty() || selectedImage == null) {
-                System.err.println("Please complete all fields and select an image.");
+            if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty()) {
+                System.err.println("Please complete all fields.");
                 return;
             }
 
-            // Create a new Post object
-            Post newPost = new Post();
-            newPost.uuid = UUID.randomUUID().toString();
-            newPost.username = Session.getCurrentUser().username;
-            newPost.profilepicture = "src/main/resources/com/starlight/images/dummy/2.png";
-            newPost.title = postTitle;
-            newPost.description = postDescription;
-            newPost.ingredients = postIngredients;
-            newPost.directions = postDirections;
-            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-            try {
-                String storedPath = copyImageToUserDir(selectedImage);
-                newPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
-            } catch (Exception e) {
-                e.printStackTrace();
-                newPost.image = selectedImage.getAbsolutePath();
-            }
-            newPost.likecount = "0";
-            newPost.rating = "0.0";
+            // Update the post object
+            currentPost.title = postTitle;
+            currentPost.description = postDescription;
+            currentPost.ingredients = postIngredients;
+            currentPost.directions = postDirections;
 
-            // Save the new post
+            // Handle image update if new image was selected
+            if (selectedImage != null) {
+                try {
+                    String storedPath = copyImageToUserDir(selectedImage);
+                    currentPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    currentPost.image = selectedImage.getAbsolutePath();
+                }
+            }
+
+            // Save the updated post
             List<Post> posts = repository.loadPosts();
-            posts.add(0, newPost);
+            for (int i = 0; i < posts.size(); i++) {
+                Post post = posts.get(i);
+                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                    posts.set(i, currentPost);
+                    break;
+                }
+            }
             repository.savePosts(posts);
 
             success = true;
@@ -150,6 +181,7 @@ public class CreatePostController implements Initializable {
             stage.close();
         });
 
+        // Cancel button logic
         cancel.setOnAction(event -> {
             // Close the dialog without saving
             Stage stage = (Stage) cancel.getScene().getWindow();

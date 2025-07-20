@@ -30,6 +30,8 @@ public class PostTest {
         assertNull(post.rating);
         assertNull(post.uploadtime);
         assertNull(post.likecount);
+        assertNull(post.commentcount);
+        assertNull(post.isLiked);
     }
 
     @Test
@@ -110,6 +112,20 @@ public class PostTest {
     }
 
     @Test
+    void testSetAndGetCommentCount() {
+        String testCommentCount = "15";
+        post.commentcount = testCommentCount;
+        assertEquals(testCommentCount, post.commentcount);
+    }
+
+    @Test
+    void testSetAndGetIsLiked() {
+        String testIsLiked = "true";
+        post.isLiked = testIsLiked;
+        assertEquals(testIsLiked, post.isLiked);
+    }
+
+    @Test
     void testPostWithAllFieldsSet() {
         post.uuid = "550e8400-e29b-41d4-a716-446655440000";
         post.username = "masterchef";
@@ -122,6 +138,8 @@ public class PostTest {
         post.rating = "4.8";
         post.uploadtime = "2025-07-07T15:45:30Z";
         post.likecount = "127";
+        post.commentcount = "23";
+        post.isLiked = "false";
 
         assertEquals("550e8400-e29b-41d4-a716-446655440000", post.uuid);
         assertEquals("masterchef", post.username);
@@ -134,6 +152,8 @@ public class PostTest {
         assertEquals("4.8", post.rating);
         assertEquals("2025-07-07T15:45:30Z", post.uploadtime);
         assertEquals("127", post.likecount);
+        assertEquals("23", post.commentcount);
+        assertEquals("false", post.isLiked);
     }
 
     @Test
@@ -155,6 +175,8 @@ public class PostTest {
         post.rating = null;
         post.uploadtime = null;
         post.likecount = null;
+        post.commentcount = null;
+        post.isLiked = null;
 
         assertNull(post.uuid);
         assertNull(post.username);
@@ -167,6 +189,8 @@ public class PostTest {
         assertNull(post.rating);
         assertNull(post.uploadtime);
         assertNull(post.likecount);
+        assertNull(post.commentcount);
+        assertNull(post.isLiked);
     }
 
     @Test
@@ -182,6 +206,8 @@ public class PostTest {
         post.rating = "";
         post.uploadtime = "";
         post.likecount = "";
+        post.commentcount = "";
+        post.isLiked = "";
 
         assertEquals("", post.uuid);
         assertEquals("", post.username);
@@ -194,6 +220,8 @@ public class PostTest {
         assertEquals("", post.rating);
         assertEquals("", post.uploadtime);
         assertEquals("", post.likecount);
+        assertEquals("", post.commentcount);
+        assertEquals("", post.isLiked);
     }
 
     @Test
@@ -204,6 +232,8 @@ public class PostTest {
         post.directions = "1. Brew coffee ☕ 2. Heat milk 🥛 3. Bake croissants @ 200°C";
         post.rating = "4.9";
         post.likecount = "1,234";
+        post.commentcount = "87";
+        post.isLiked = "true";
 
         assertEquals("Café au Lait & Croissants", post.title);
         assertEquals("A French breakfast with café au lait ☕ and buttery croissants 🥐", post.description);
@@ -211,5 +241,7 @@ public class PostTest {
         assertEquals("1. Brew coffee ☕ 2. Heat milk 🥛 3. Bake croissants @ 200°C", post.directions);
         assertEquals("4.9", post.rating);
         assertEquals("1,234", post.likecount);
+        assertEquals("87", post.commentcount);
+        assertEquals("true", post.isLiked);
     }
 }
