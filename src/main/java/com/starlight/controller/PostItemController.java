@@ -67,7 +67,7 @@ public class PostItemController {
      * FXML binding method for like button click
      */
     @FXML
-    public void handleLikeClick() {
+    public void handleLikeClick(javafx.event.ActionEvent event) {
         if (currentPost == null) return;
         
         try {
@@ -116,7 +116,7 @@ public class PostItemController {
      * FXML binding method for comment button click
      */
     @FXML
-    public void handleCommentClick() {
+    public void handleCommentClick(javafx.event.ActionEvent event) {
         if (currentPost == null) return;
         
         try {

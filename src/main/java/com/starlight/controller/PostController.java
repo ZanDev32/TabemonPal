@@ -93,7 +93,7 @@ public class PostController implements Initializable {
      * Handles the go back button click - navigates back to community view
      */
     @FXML
-    private void goBack() {
+    private void goBack(javafx.scene.input.MouseEvent event) {
         if (mainController != null) {
             // Navigate back to community view with proper button selection
             mainController.navigateToCommunity();
@@ -104,7 +104,7 @@ public class PostController implements Initializable {
      * Handles the do analysis button click - performs nutrition analysis on current recipe
      */
     @FXML
-    private void doAnalysis() {
+    private void doAnalysis(javafx.event.ActionEvent event) {
         if (currentPost == null) {
             logger.warning("Cannot perform analysis - no current post available");
             return;
