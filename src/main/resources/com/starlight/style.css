@@ -487,8 +487,46 @@
 
 .admin-table {
     -fx-background-color: #FFFFFF;
+    -fx-pref-height: 400;
+    -fx-min-height: 300;
 }
 
+/* MFXTableView specific styling */
+.admin-table .mfx-table-view {
+    -fx-background-color: #FFFFFF;
+    -fx-border-color: #E1E8ED;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.admin-table .mfx-table-column-header {
+    -fx-background-color: #34495E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 10;
+    -fx-font-size: 14;
+}
+
+.admin-table .mfx-table-row-cell {
+    -fx-padding: 8;
+    -fx-border-color: #E1E8ED;
+    -fx-border-width: 0 0 1 0;
+}
+
+.admin-table .mfx-table-row-cell:odd {
+    -fx-background-color: #F8F9FA;
+}
+
+.admin-table .mfx-table-row-cell:hover {
+    -fx-background-color: #E3F2FD;
+}
+
+.admin-table .mfx-table-row-cell:selected {
+    -fx-background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+/* Legacy TableView styling (keep for compatibility) */
 .admin-table .table-view {
     -fx-background-color: transparent;
 }

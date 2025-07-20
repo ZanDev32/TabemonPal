@@ -5,13 +5,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.beans.property.SimpleStringProperty;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
+import javafx.geometry.Pos;
 
 import com.starlight.models.Post;
 import com.starlight.models.User;
@@ -21,6 +18,9 @@ import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXComboBox;
+import io.github.palexdev.materialfx.controls.MFXTableView;
+import io.github.palexdev.materialfx.controls.MFXTableColumn;
+import io.github.palexdev.materialfx.controls.cell.MFXTableRowCell;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -38,25 +38,15 @@ import java.time.format.DateTimeParseException;
 public class AdminController implements Initializable {
 
     @FXML
-    private TableView<PostTableData> postsTable;
+    private MFXTableView<PostTableData> postsTable;
 
-    @FXML
-    private TableColumn<PostTableData, String> titleColumn;
-
-    @FXML
-    private TableColumn<PostTableData, String> usernameColumn;
-
-    @FXML
-    private TableColumn<PostTableData, String> ratingColumn;
-
-    @FXML
-    private TableColumn<PostTableData, String> likeCountColumn;
-
-    @FXML
-    private TableColumn<PostTableData, String> uploadTimeColumn;
-
-    @FXML
-    private TableColumn<PostTableData, Void> actionColumn;
+    // Create table columns programmatically instead of FXML injection
+    private MFXTableColumn<PostTableData> titleColumn;
+    private MFXTableColumn<PostTableData> usernameColumn;
+    private MFXTableColumn<PostTableData> ratingColumn;
+    private MFXTableColumn<PostTableData> likeCountColumn;
+    private MFXTableColumn<PostTableData> uploadTimeColumn;
+    private MFXTableColumn<PostTableData> actionColumn;
 
     @FXML
     private MFXComboBox<String> sortComboBox;
@@ -145,22 +135,30 @@ public class AdminController implements Initializable {
             return;
         }
         
+        System.out.println("DEBUG: Initializing AdminController...");
+        
         // Initialize repositories
         postRepository = new PostDataRepository();
         userRepository = new UserDataRepository();
         postDataList = FXCollections.observableArrayList();
 
-        // Setup table columns
+        // Setup table columns first
         setupTableColumns();
+        System.out.println("DEBUG: Table columns setup completed");
 
         // Setup sort combo box
         setupSortComboBox();
 
-        // Load initial data
+        // Add test data to verify table works
+        addTestData();
+
+        // Load actual data
         loadData();
 
         // Setup refresh button
         refreshButton.setOnAction(e -> loadData());
+        
+        System.out.println("DEBUG: AdminController initialization completed");
     }
     
     /**
@@ -199,96 +197,95 @@ public class AdminController implements Initializable {
      * Sets up table columns with appropriate cell factories and value factories
      */
     private void setupTableColumns() {
-        // Basic columns
-        titleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
-        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
-        ratingColumn.setCellValueFactory(new PropertyValueFactory<>("rating"));
-        likeCountColumn.setCellValueFactory(new PropertyValueFactory<>("likeCount"));
-        uploadTimeColumn.setCellValueFactory(new PropertyValueFactory<>("uploadTime"));
+        System.out.println("DEBUG: Setting up MFXTableView columns...");
+        
+        // Create table columns programmatically with simplified approach
+        titleColumn = new MFXTableColumn<>("Title");
+        usernameColumn = new MFXTableColumn<>("Author");
+        ratingColumn = new MFXTableColumn<>("Rating");
+        likeCountColumn = new MFXTableColumn<>("Likes");
+        uploadTimeColumn = new MFXTableColumn<>("Upload Date");
+        actionColumn = new MFXTableColumn<>("Actions");
 
-        // Make rating column editable with ComboBox
-        setupEditableRatingColumn();
+        // Set preferred widths - make them larger for better visibility
+        titleColumn.setPrefWidth(250.0);
+        usernameColumn.setPrefWidth(150.0);
+        ratingColumn.setPrefWidth(100.0);
+        likeCountColumn.setPrefWidth(100.0);
+        uploadTimeColumn.setPrefWidth(180.0);
+        actionColumn.setPrefWidth(120.0);
 
-        // Setup action column with delete button
-        setupActionColumn();
+        // Set minimum widths to prevent columns from being too small
+        titleColumn.setMinWidth(200.0);
+        usernameColumn.setMinWidth(120.0);
+        ratingColumn.setMinWidth(80.0);
+        likeCountColumn.setMinWidth(80.0);
+        uploadTimeColumn.setMinWidth(150.0);
+        actionColumn.setMinWidth(100.0);
 
-        // Bind data to table
-        postsTable.setItems(postDataList);
-
-        // Enable row selection
-        postsTable.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-    }
-
-    /**
-     * Sets up the rating column to be editable with a ComboBox
-     */
-    private void setupEditableRatingColumn() {
-        ObservableList<String> ratingOptions = FXCollections.observableArrayList(
-            "0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0"
-        );
-
-        ratingColumn.setCellFactory(ComboBoxTableCell.forTableColumn(
-            new StringConverter<String>() {
-                @Override
-                public String toString(String object) {
-                    return object != null ? object : "0.0";
-                }
-
-                @Override
-                public String fromString(String string) {
-                    return string;
-                }
-            },
-            ratingOptions
-        ));
-
-        ratingColumn.setOnEditCommit(event -> {
-            PostTableData data = event.getRowValue();
-            data.rating.set(event.getNewValue());
-            // Update the original post object
-            data.getOriginalPost().rating = event.getNewValue();
-            // Save changes to XML
-            savePostChanges(data.getOriginalPost());
+        // Setup cell factories using simple string extraction
+        titleColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getTitle));
+        usernameColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getUsername));
+        ratingColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getRating));
+        likeCountColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getLikeCount));
+        uploadTimeColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getUploadTime));
+        
+        // Setup action column
+        actionColumn.setRowCellFactory(item -> {
+            MFXTableRowCell<PostTableData, String> cell = new MFXTableRowCell<>(data -> "");
+            MFXButton deleteButton = new MFXButton("Delete");
+            deleteButton.getStyleClass().add("mfx-button");
+            deleteButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 12px;");
+            deleteButton.setOnAction(event -> showDeleteConfirmation(item));
+            cell.setGraphic(deleteButton);
+            cell.setAlignment(Pos.CENTER);
+            return cell;
         });
 
-        // Make the table editable
-        postsTable.setEditable(true);
+        // Add columns to table
+        postsTable.getTableColumns().clear();
+        postsTable.getTableColumns().addAll(titleColumn, usernameColumn, ratingColumn, likeCountColumn, uploadTimeColumn, actionColumn);
+
+        // Set the items
+        postsTable.setItems(postDataList);
+        
+        // Configure table sizing
+        postsTable.setPrefHeight(400.0);
+        postsTable.setMinHeight(300.0);
+        postsTable.setMaxHeight(Double.MAX_VALUE);
+        
+        System.out.println("DEBUG: MFXTableView columns setup completed, postDataList size: " + postDataList.size());
+        System.out.println("DEBUG: Table columns count: " + postsTable.getTableColumns().size());
+        System.out.println("DEBUG: Table items count: " + postsTable.getItems().size());
+        
+        // Force table update
+        Platform.runLater(() -> {
+            postsTable.update();
+            System.out.println("DEBUG: Platform.runLater update called");
+        });
     }
 
     /**
-     * Sets up the action column with delete button
+     * Shows detailed information about a post
      */
-    private void setupActionColumn() {
-        Callback<TableColumn<PostTableData, Void>, TableCell<PostTableData, Void>> cellFactory = 
-            new Callback<TableColumn<PostTableData, Void>, TableCell<PostTableData, Void>>() {
-                @Override
-                public TableCell<PostTableData, Void> call(TableColumn<PostTableData, Void> param) {
-                    return new TableCell<PostTableData, Void>() {
-                        private final MFXButton deleteButton = new MFXButton("Delete");
-
-                        {
-                            deleteButton.getStyleClass().add("mfx-button");
-                            deleteButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white;");
-                            deleteButton.setOnAction(event -> {
-                                PostTableData data = getTableView().getItems().get(getIndex());
-                                showDeleteConfirmation(data);
-                            });
-                        }
-
-                        @Override
-                        public void updateItem(Void item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (empty) {
-                                setGraphic(null);
-                            } else {
-                                setGraphic(deleteButton);
-                            }
-                        }
-                    };
-                }
-            };
+    private void showPostDetails(PostTableData data) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Post Details");
+        alert.setHeaderText(data.getTitle());
         
-        actionColumn.setCellFactory(cellFactory);
+        String details = String.format(
+            "Author: %s\nRating: %s\nLikes: %s\nUpload Time: %s\nDescription: %s",
+            data.getUsername(),
+            data.getRating(),
+            data.getLikeCount(),
+            data.getUploadTime(),
+            data.getDescription().length() > 100 ? 
+                data.getDescription().substring(0, 100) + "..." : 
+                data.getDescription()
+        );
+        
+        alert.setContentText(details);
+        alert.showAndWait();
     }
 
     /**
@@ -326,6 +323,8 @@ public class AdminController implements Initializable {
                 List<Post> posts = postRepository.loadPosts();
                 List<User> users = userRepository.loadUsers();
 
+                System.out.println("DEBUG: Loaded " + posts.size() + " posts from repository");
+
                 Platform.runLater(() -> {
                     // Clear existing data
                     postDataList.clear();
@@ -335,13 +334,49 @@ public class AdminController implements Initializable {
                         .map(PostTableData::new)
                         .collect(Collectors.toList());
 
+                    System.out.println("DEBUG: Converted " + tableData.size() + " posts to table data");
+                    
+                    // Debug: Print first few items
+                    for (int i = 0; i < Math.min(3, tableData.size()); i++) {
+                        PostTableData item = tableData.get(i);
+                        System.out.println("DEBUG: Item " + i + ": " + item.getTitle() + " by " + item.getUsername());
+                    }
+
                     postDataList.addAll(tableData);
+
+                    System.out.println("DEBUG: Added data to table, postDataList size: " + postDataList.size());
+                    
+                    // Force MFXTableView to recognize the new data - multiple approaches
+                    postsTable.setItems(null);  // Clear first
+                    postsTable.setItems(postDataList);  // Reset
+                    postsTable.update();  // Update
+                    
+                    // Try to manually trigger table update with delay
+                    Platform.runLater(() -> {
+                        postsTable.update();
+                        System.out.println("DEBUG: Manual table update after data load");
+                        
+                        // Additional force update
+                        Platform.runLater(() -> {
+                            postsTable.update();
+                            System.out.println("DEBUG: Second manual table update");
+                        });
+                    });
 
                     // Update statistics
                     totalPostsLabel.setText("Total Posts: " + posts.size());
                     totalUsersLabel.setText("Total Users: " + users.size());
 
+                    // Force table refresh for MFXTableView
+                    postsTable.update();
+                    
+                    // Additional debug
+                    System.out.println("DEBUG: After refresh - Table items: " + postsTable.getItems().size());
+                    System.out.println("DEBUG: After refresh - Table columns: " + postsTable.getTableColumns().size());
+
                     loadingIndicator.setVisible(false);
+                    
+                    System.out.println("DEBUG: Data loading completed successfully");
                 });
 
                 return null;
@@ -351,7 +386,9 @@ public class AdminController implements Initializable {
         loadTask.setOnFailed(e -> {
             Platform.runLater(() -> {
                 loadingIndicator.setVisible(false);
-                showErrorAlert("Error", "Failed to load data from XML files.");
+                System.err.println("DEBUG: Failed to load data: " + e.getSource().getException());
+                e.getSource().getException().printStackTrace();
+                showErrorAlert("Error", "Failed to load data from XML files: " + e.getSource().getException().getMessage());
             });
         });
 
@@ -521,5 +558,52 @@ public class AdminController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+    
+    /**
+     * Adds test data to verify the table is working
+     */
+    private void addTestData() {
+        System.out.println("DEBUG: Adding test data to verify table functionality...");
+        
+        // Create dummy posts for testing
+        Post testPost1 = new Post();
+        testPost1.uuid = "test-1";
+        testPost1.title = "Test Post 1";
+        testPost1.username = "TestUser1";
+        testPost1.rating = "4.5";
+        testPost1.likecount = "10";
+        testPost1.uploadtime = "2025-07-20T19:00:00";
+        testPost1.description = "This is a test post to verify table functionality";
+        
+        Post testPost2 = new Post();
+        testPost2.uuid = "test-2";
+        testPost2.title = "Test Post 2";
+        testPost2.username = "TestUser2";
+        testPost2.rating = "3.8";
+        testPost2.likecount = "5";
+        testPost2.uploadtime = "2025-07-20T18:30:00";
+        testPost2.description = "Another test post";
+        
+        // Convert to table data
+        PostTableData tableData1 = new PostTableData(testPost1);
+        PostTableData tableData2 = new PostTableData(testPost2);
+        
+        // Add to the list
+        postDataList.clear();
+        postDataList.add(tableData1);
+        postDataList.add(tableData2);
+        
+        System.out.println("DEBUG: Added " + postDataList.size() + " test items to table");
+        System.out.println("DEBUG: Test item 1: " + tableData1.getTitle() + " by " + tableData1.getUsername());
+        System.out.println("DEBUG: Test item 2: " + tableData2.getTitle() + " by " + tableData2.getUsername());
+        
+        // Force table update
+        postsTable.update();
+        
+        Platform.runLater(() -> {
+            postsTable.update();
+            System.out.println("DEBUG: Test data added and table updated");
+        });
     }
 }

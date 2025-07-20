@@ -2,11 +2,11 @@
 
 <?import io.github.palexdev.materialfx.controls.MFXButton?>
 <?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXTableView?>
+<?import io.github.palexdev.materialfx.controls.MFXTableColumn?>
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -52,19 +52,11 @@
       </HBox>
       
       <!-- Table Section -->
-      <TableView fx:id="postsTable" styleClass="admin-table">
-         <columns>
-            <TableColumn fx:id="titleColumn" prefWidth="200.0" text="Title" />
-            <TableColumn fx:id="usernameColumn" prefWidth="120.0" text="Author" />
-            <TableColumn fx:id="ratingColumn" prefWidth="80.0" text="Rating" />
-            <TableColumn fx:id="likeCountColumn" prefWidth="80.0" text="Likes" />
-            <TableColumn fx:id="uploadTimeColumn" prefWidth="150.0" text="Upload Date" />
-            <TableColumn fx:id="actionColumn" prefWidth="100.0" text="Actions" />
-         </columns>
+      <MFXTableView fx:id="postsTable" styleClass="admin-table" prefHeight="400.0" minHeight="300.0" maxHeight="600.0" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets bottom="20.0" left="20.0" right="20.0" />
          </VBox.margin>
-      </TableView>
+      </MFXTableView>
       
       <!-- Footer Section -->
       <HBox styleClass="admin-footer" alignment="CENTER" spacing="10.0">
