@@ -6,6 +6,10 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.layout.StackPane;
+import javafx.stage.Stage;
+import javafx.stage.Modality;
+import javafx.scene.Scene;
 import com.starlight.util.DoughnutChart;
 import javafx.scene.text.TextFlow;
 import javafx.scene.text.Text;
@@ -15,6 +19,8 @@ import javafx.scene.paint.Color;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
+import io.github.palexdev.materialfx.dialogs.MFXGenericDialog;
+import javafx.scene.Parent;
 
 import com.starlight.models.Post;
 import com.starlight.models.Nutrition;
@@ -27,11 +33,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
 import javafx.application.Platform;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import io.github.palexdev.materialfx.controls.MFXButton;
 import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
@@ -526,31 +528,150 @@ public class PostController implements Initializable {
     
     /**
      * Shows processing dialog and performs nutrition analysis asynchronously.
-     * Based on CreatePostController implementation.
+     * Uses MFXGenericDialog as embedded overlay within the current scene.
      */
     private void showProcessingAndAnalyzeNutrition() {
         try {
-            // Load processing dialog
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/processingDialog.fxml"));
-            Parent parent = fxmlLoader.load();
-            ProcessingDialogController processingController = fxmlLoader.getController();
+            // Create MaterialFX processing dialog
+            MFXGenericDialog processingDialog = createProcessingDialog();
+            Label statusLabel = (Label) processingDialog.lookup(".status-label");
             
-            // Create modal stage
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            // Find the main window's root container - look for BorderPane or StackPane
+            Parent sceneRoot = doAnalysis.getScene().getRoot();
+            javafx.scene.layout.Pane rootContainer = null;
+            
+            // Try to find a suitable parent container that can handle overlays
+            if (sceneRoot instanceof javafx.scene.layout.BorderPane) {
+                // For BorderPane, we'll add overlay to the center or create a StackPane wrapper
+                javafx.scene.layout.BorderPane borderPane = (javafx.scene.layout.BorderPane) sceneRoot;
+                javafx.scene.Node centerNode = borderPane.getCenter();
+                if (centerNode instanceof javafx.scene.layout.Pane) {
+                    rootContainer = (javafx.scene.layout.Pane) centerNode;
+                }
+            } else if (sceneRoot instanceof javafx.scene.layout.StackPane) {
+                rootContainer = (javafx.scene.layout.StackPane) sceneRoot;
+            } else if (sceneRoot instanceof javafx.scene.layout.Pane) {
+                rootContainer = (javafx.scene.layout.Pane) sceneRoot;
+            }
+            
+            if (rootContainer == null) {
+                // Fallback: create a temporary Stage-based dialog
+                showProcessingDialogFallback();
+                return;
+            }
+            
+            // Create semi-transparent background overlay
+            javafx.scene.layout.StackPane backgroundOverlay = new javafx.scene.layout.StackPane();
+            backgroundOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+            backgroundOverlay.setPrefSize(javafx.scene.layout.Region.USE_COMPUTED_SIZE, javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            backgroundOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            
+            // Center the dialog in the overlay
+            javafx.scene.layout.StackPane.setAlignment(processingDialog, javafx.geometry.Pos.CENTER);
+            backgroundOverlay.getChildren().add(processingDialog);
+            
+            // Add the overlay to the root container
+            rootContainer.getChildren().add(backgroundOverlay);
+            
+            // Update initial status
+            if (statusLabel != null) {
+                statusLabel.setText("Starting nutrition analysis...");
+            }
+            
+            // Make variables accessible to task handlers
+            final javafx.scene.layout.Pane finalRootContainer = rootContainer;
+            final javafx.scene.layout.StackPane finalBackgroundOverlay = backgroundOverlay;
+            
+            // Create and configure the analysis task
+            Task<Nutrition> nutritionTask = createNutritionAnalysisTask(statusLabel);
+            
+            // Handle task completion
+            nutritionTask.setOnSucceeded(e -> {
+                Platform.runLater(() -> {
+                    // Remove the dialog overlay from root container
+                    if (finalRootContainer != null && finalRootContainer.getChildren().contains(finalBackgroundOverlay)) {
+                        finalRootContainer.getChildren().remove(finalBackgroundOverlay);
+                    }
+                    
+                    Nutrition newNutrition = nutritionTask.getValue();
+                    if (newNutrition != null && !newNutrition.ingredient.isEmpty()) {
+                        // Update the current post's nutrition
+                        currentPost.nutrition = newNutrition;
+                        
+                        // Save the updated post to XML
+                        saveUpdatedPost();
+                        
+                        // Update UI to reflect new nutrition data
+                        updateUIFromPost();
+                        
+                        // Show success dialog
+                        showResultDialog(true, "Nutrition analysis completed successfully!");
+                        
+                        logger.info("Nutrition analysis completed and saved successfully");
+                    } else {
+                        showResultDialog(false, "Nutrition analysis failed. Please try again.");
+                        logger.warning("Nutrition analysis returned empty or invalid results");
+                    }
+                });
+            });
+            
+            nutritionTask.setOnFailed(e -> {
+                Platform.runLater(() -> {
+                    // Remove the dialog overlay from root container
+                    if (finalRootContainer != null && finalRootContainer.getChildren().contains(finalBackgroundOverlay)) {
+                        finalRootContainer.getChildren().remove(finalBackgroundOverlay);
+                    }
+                    
+                    Throwable exception = nutritionTask.getException();
+                    String errorMessage = "Nutrition analysis failed";
+                    if (exception != null) {
+                        errorMessage += ": " + exception.getMessage();
+                    }
+                    
+                    showResultDialog(false, errorMessage);
+                    logger.log(Level.SEVERE, "Nutrition analysis task failed", exception);
+                });
+            });
+            
+            // Start the task in a background thread
+            Thread taskThread = new Thread(nutritionTask);
+            taskThread.setDaemon(true);
+            taskThread.start();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show processing dialog", e);
+            showAnalysisErrorDialog("Failed to start nutrition analysis: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Fallback method to show processing dialog using traditional Stage approach
+     * when embedded overlay cannot be created safely.
+     */
+    private void showProcessingDialogFallback() {
+        try {
+            // Create MaterialFX processing dialog
+            MFXGenericDialog processingDialog = createProcessingDialog();
+            Label statusLabel = (Label) processingDialog.lookup(".status-label");
+            
+            // Create a new Stage for the dialog
+            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(doAnalysis.getScene().getWindow());
             dialogStage.setTitle("Analyzing Nutrition...");
-            dialogStage.setScene(new Scene(parent));
             dialogStage.setResizable(false);
+            dialogStage.setScene(new javafx.scene.Scene((Parent) processingDialog));
             
-            // Set up the dialog controller
-            processingController.setDialogStage(dialogStage);
-            processingController.updateStatus("Starting nutrition analysis...");
+            // Update initial status
+            if (statusLabel != null) {
+                statusLabel.setText("Starting nutrition analysis...");
+            }
             
             // Show dialog
             dialogStage.show();
             
             // Create and configure the analysis task
-            Task<Nutrition> nutritionTask = createNutritionAnalysisTask(processingController);
+            Task<Nutrition> nutritionTask = createNutritionAnalysisTask(statusLabel);
             
             // Handle task completion
             nutritionTask.setOnSucceeded(e -> {
@@ -600,16 +721,16 @@ public class PostController implements Initializable {
             taskThread.start();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show processing dialog", e);
+            logger.log(Level.SEVERE, "Failed to show fallback processing dialog", e);
             showAnalysisErrorDialog("Failed to start nutrition analysis: " + e.getMessage());
         }
     }
     
     /**
      * Creates the nutrition analysis task.
-     * Based on CreatePostController implementation.
+     * Updated to work with MaterialFX dialog Label instead of ProcessingDialogController.
      */
-    private Task<Nutrition> createNutritionAnalysisTask(ProcessingDialogController processingController) {
+    private Task<Nutrition> createNutritionAnalysisTask(Label statusLabel) {
         return new Task<Nutrition>() {
             @Override
             protected Nutrition call() throws Exception {
@@ -620,9 +741,11 @@ public class PostController implements Initializable {
                 for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
                     final int currentAttempt = attempt; // Make effectively final for lambda
                     try {
-                        Platform.runLater(() -> 
-                            processingController.updateStatus("Analyzing nutrition... (Attempt " + currentAttempt + "/" + MAX_RETRIES + ")")
-                        );
+                        Platform.runLater(() -> {
+                            if (statusLabel != null) {
+                                statusLabel.setText("Analyzing nutrition... (Attempt " + currentAttempt + "/" + MAX_RETRIES + ")");
+                            }
+                        });
                         
                         // Perform nutrition analysis using ChatGPT API
                         String nutritionResponse = chatbotAPI.analyzeNutritionFacts(ingredients);
@@ -632,9 +755,11 @@ public class PostController implements Initializable {
                         
                         if (nutrition != null && !nutrition.ingredient.isEmpty()) {
                             logger.info("Nutrition analysis completed successfully on attempt " + currentAttempt);
-                            Platform.runLater(() -> 
-                                processingController.updateStatus("Analysis completed successfully!")
-                            );
+                            Platform.runLater(() -> {
+                                if (statusLabel != null) {
+                                    statusLabel.setText("Analysis completed successfully!");
+                                }
+                            });
                             return nutrition;
                         } else {
                             throw new Exception("AI returned empty or invalid nutrition data");
@@ -645,18 +770,22 @@ public class PostController implements Initializable {
                         logger.log(Level.WARNING, "Nutrition analysis attempt " + currentAttempt + " failed: " + e.getMessage(), e);
                         
                         if (currentAttempt < MAX_RETRIES) {
-                            Platform.runLater(() -> 
-                                processingController.updateStatus("Attempt " + currentAttempt + " failed, retrying...")
-                            );
+                            Platform.runLater(() -> {
+                                if (statusLabel != null) {
+                                    statusLabel.setText("Attempt " + currentAttempt + " failed, retrying...");
+                                }
+                            });
                             Thread.sleep(1000); // Brief pause between attempts
                         }
                     }
                 }
                 
                 // All attempts failed
-                Platform.runLater(() -> 
-                    processingController.updateStatus("Analysis failed after " + MAX_RETRIES + " attempts")
-                );
+                Platform.runLater(() -> {
+                    if (statusLabel != null) {
+                        statusLabel.setText("Analysis failed after " + MAX_RETRIES + " attempts");
+                    }
+                });
                 throw lastException != null ? lastException : new Exception("All nutrition analysis attempts failed");
             }
         };
@@ -698,54 +827,213 @@ public class PostController implements Initializable {
     }
     
     /**
-     * Shows a result dialog with success or failure message.
-     * Based on CreatePostController pattern.
+     * Shows a result dialog with success or failure message using MaterialFX dialog as embedded overlay.
      */
     private void showResultDialog(boolean success, String message) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
-            Parent parent = fxmlLoader.load();
-            PopupDialogController controller = fxmlLoader.getController();
+            // Create MaterialFX result dialog
+            MFXGenericDialog resultDialog = new MFXGenericDialog();
+            resultDialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+            resultDialog.getStyleClass().add("background-window");
+            resultDialog.setPrefSize(400, 200);
             
-            // Set appropriate message
-            if (success) {
-                controller.setNutritionAnalysisSuccess();
-            } else {
-                controller.setMessage(message);
+            // Create message label
+            Label messageLabel = new Label(message);
+            messageLabel.getStyleClass().add("dialog-message");
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(350);
+            
+            // Create OK button
+            MFXButton okButton = new MFXButton("OK");
+            okButton.getStyleClass().add("food-tag");
+            
+            // Create container
+            VBox container = new VBox(20);
+            container.setAlignment(javafx.geometry.Pos.CENTER);
+            container.getChildren().addAll(messageLabel, okButton);
+            
+            resultDialog.setContent(container);
+            
+            // Find a suitable parent container
+            Parent sceneRoot = doAnalysis.getScene().getRoot();
+            javafx.scene.layout.Pane rootContainer = null;
+            
+            if (sceneRoot instanceof javafx.scene.layout.BorderPane) {
+                javafx.scene.layout.BorderPane borderPane = (javafx.scene.layout.BorderPane) sceneRoot;
+                javafx.scene.Node centerNode = borderPane.getCenter();
+                if (centerNode instanceof javafx.scene.layout.Pane) {
+                    rootContainer = (javafx.scene.layout.Pane) centerNode;
+                }
+            } else if (sceneRoot instanceof javafx.scene.layout.Pane) {
+                rootContainer = (javafx.scene.layout.Pane) sceneRoot;
             }
             
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setTitle(success ? "Analysis Complete" : "Analysis Failed");
-            dialogStage.setScene(new Scene(parent));
-            dialogStage.setResizable(false);
-            dialogStage.showAndWait();
+            if (rootContainer != null) {
+                // Create semi-transparent background overlay
+                javafx.scene.layout.StackPane backgroundOverlay = new javafx.scene.layout.StackPane();
+                backgroundOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+                backgroundOverlay.setPrefSize(javafx.scene.layout.Region.USE_COMPUTED_SIZE, javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+                backgroundOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+                
+                // Center the dialog in the overlay
+                javafx.scene.layout.StackPane.setAlignment(resultDialog, javafx.geometry.Pos.CENTER);
+                backgroundOverlay.getChildren().add(resultDialog);
+                
+                // Add the overlay to scene
+                rootContainer.getChildren().add(backgroundOverlay);
+                
+                // Make variables effectively final for lambda
+                final javafx.scene.layout.Pane finalRootContainer = rootContainer;
+                final javafx.scene.layout.StackPane finalBackgroundOverlay = backgroundOverlay;
+                
+                // Set up OK button to close dialog
+                okButton.setOnAction(e -> finalRootContainer.getChildren().remove(finalBackgroundOverlay));
+            } else {
+                // Fallback to Stage-based dialog
+                showResultDialogFallback(success, message);
+            }
             
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to show result dialog", e);
+            showResultDialogFallback(success, message);
         }
     }
     
     /**
-     * Shows an error dialog for analysis issues.
+     * Fallback method to show result dialog using traditional Stage approach.
+     */
+    private void showResultDialogFallback(boolean success, String message) {
+        try {
+            // Create MaterialFX result dialog
+            MFXGenericDialog resultDialog = new MFXGenericDialog();
+            resultDialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+            resultDialog.getStyleClass().add("background-window");
+            resultDialog.setPrefSize(400, 200);
+            
+            // Create message label
+            Label messageLabel = new Label(message);
+            messageLabel.getStyleClass().add("dialog-message");
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(350);
+            
+            // Create OK button
+            MFXButton okButton = new MFXButton("OK");
+            okButton.getStyleClass().add("food-tag");
+            
+            // Create container
+            VBox container = new VBox(20);
+            container.setAlignment(javafx.geometry.Pos.CENTER);
+            container.getChildren().addAll(messageLabel, okButton);
+            
+            resultDialog.setContent(container);
+            
+            // Create a new Stage for the dialog
+            javafx.stage.Stage dialogStage = new javafx.stage.Stage();
+            dialogStage.initModality(javafx.stage.Modality.APPLICATION_MODAL);
+            dialogStage.initOwner(doAnalysis.getScene().getWindow());
+            dialogStage.setTitle(success ? "Analysis Complete" : "Analysis Failed");
+            dialogStage.setResizable(false);
+            dialogStage.setScene(new javafx.scene.Scene((Parent) resultDialog));
+            
+            // Set up OK button to close dialog
+            okButton.setOnAction(e -> dialogStage.close());
+            
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show fallback result dialog", e);
+        }
+    }
+    
+    /**
+     * Shows an error dialog for analysis issues using MaterialFX dialog as embedded overlay.
      */
     private void showAnalysisErrorDialog(String errorMessage) {
         try {
-            FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
-            Parent parent = fxmlLoader.load();
-            PopupDialogController controller = fxmlLoader.getController();
+            // Create MaterialFX error dialog
+            MFXGenericDialog errorDialog = new MFXGenericDialog();
+            errorDialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+            errorDialog.getStyleClass().add("background-window");
+            errorDialog.setPrefSize(450, 250);
             
-            controller.setMessage("Analysis Error\n\n" + errorMessage);
+            // Create error message label
+            Label messageLabel = new Label("Analysis Error\n\n" + errorMessage);
+            messageLabel.getStyleClass().add("dialog-message");
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(400);
             
-            Stage dialogStage = new Stage();
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setTitle("Analysis Error");
-            dialogStage.setScene(new Scene(parent));
-            dialogStage.setResizable(false);
-            dialogStage.showAndWait();
+            // Create OK button
+            MFXButton okButton = new MFXButton("OK");
+            okButton.getStyleClass().add("food-tag");
+            
+            // Create container
+            VBox container = new VBox(20);
+            container.setAlignment(javafx.geometry.Pos.CENTER);
+            container.getChildren().addAll(messageLabel, okButton);
+            
+            errorDialog.setContent(container);
+            
+            // Find the scene root to add dialog overlay
+            Parent sceneRoot = doAnalysis.getScene().getRoot();
+            
+            // Get or create StackPane overlay
+            javafx.scene.layout.StackPane dialogOverlay;
+            if (sceneRoot instanceof javafx.scene.layout.StackPane) {
+                dialogOverlay = (javafx.scene.layout.StackPane) sceneRoot;
+            } else {
+                dialogOverlay = new javafx.scene.layout.StackPane();
+                dialogOverlay.getChildren().add(sceneRoot);
+                doAnalysis.getScene().setRoot(dialogOverlay);
+            }
+            
+            // Create semi-transparent background overlay
+            javafx.scene.layout.StackPane backgroundOverlay = new javafx.scene.layout.StackPane();
+            backgroundOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+            backgroundOverlay.setPrefSize(javafx.scene.layout.Region.USE_COMPUTED_SIZE, javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            backgroundOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            
+            // Center the dialog in the overlay
+            javafx.scene.layout.StackPane.setAlignment(errorDialog, javafx.geometry.Pos.CENTER);
+            backgroundOverlay.getChildren().add(errorDialog);
+            
+            // Add the overlay to scene
+            dialogOverlay.getChildren().add(backgroundOverlay);
+            
+            // Set up OK button to close dialog
+            okButton.setOnAction(e -> dialogOverlay.getChildren().remove(backgroundOverlay));
             
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to show error dialog", e);
         }
+    }
+    
+    /**
+     * Creates a MaterialFX processing dialog with status label and progress spinner.
+     */
+    private MFXGenericDialog createProcessingDialog() {
+        MFXGenericDialog dialog = new MFXGenericDialog();
+        dialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+        dialog.getStyleClass().add("background-window");
+        dialog.setPrefSize(400, 200);
+        
+        // Create status label
+        Label statusLabel = new Label("Processing...");
+        statusLabel.getStyleClass().addAll("status-label", "post-username");
+        statusLabel.setWrapText(true);
+        statusLabel.setPrefWidth(350);
+        
+        // Create progress spinner using MaterialFX
+        io.github.palexdev.materialfx.controls.MFXProgressSpinner spinner = 
+            new io.github.palexdev.materialfx.controls.MFXProgressSpinner();
+        spinner.setPrefSize(80, 80);
+        
+        // Create container
+        VBox container = new VBox(20);
+        container.setAlignment(javafx.geometry.Pos.CENTER);
+        container.getChildren().addAll(statusLabel, spinner);
+        container.setPadding(new javafx.geometry.Insets(40));
+        
+        dialog.setContent(container);
+        return dialog;
     }
 }

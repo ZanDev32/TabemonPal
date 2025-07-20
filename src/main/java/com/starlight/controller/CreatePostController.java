@@ -28,6 +28,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
 import javafx.stage.FileChooser;
 import javafx.scene.Node;
 import javafx.application.Platform;
@@ -190,30 +192,61 @@ public class CreatePostController implements Initializable {
 
     /**
      * Shows processing dialog and performs nutrition analysis asynchronously,
-     * as a modal popup dialog
+     * using MaterialFX dialog as embedded overlay within the current scene.
      */
     private void showProcessingAndAnalyzeNutrition(Post newPost, String ingredients) {
         try {
-            // Create and show processing dialog as a modal popup
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/processingDialog.fxml"));
-            Parent root = loader.load();
+            // Create MaterialFX processing dialog
+            io.github.palexdev.materialfx.dialogs.MFXGenericDialog processingDialog = 
+                new io.github.palexdev.materialfx.dialogs.MFXGenericDialog();
+            processingDialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+            processingDialog.getStyleClass().add("background-window");
+            processingDialog.setPrefSize(400, 200);
             
-            ProcessingDialogController processingController = loader.getController();
+            // Create status label
+            Label statusLabel = new Label("Creating your post...");
+            statusLabel.getStyleClass().add("post-username");
+            statusLabel.setWrapText(true);
+            statusLabel.setPrefWidth(350);
             
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Creating Post");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
+            // Create progress spinner
+            io.github.palexdev.materialfx.controls.MFXProgressSpinner spinner = 
+                new io.github.palexdev.materialfx.controls.MFXProgressSpinner();
+            spinner.setPrefSize(80, 80);
             
-            // Set the stage reference in the controller
-            processingController.setDialogStage(dialogStage);
+            // Create container
+            VBox container = new VBox(20);
+            container.setAlignment(javafx.geometry.Pos.CENTER);
+            container.getChildren().addAll(statusLabel, spinner);
+            container.setPadding(new javafx.geometry.Insets(40));
             
-            // Center the dialog
-            dialogStage.centerOnScreen();
+            processingDialog.setContent(container);
             
-            // Show the dialog (non-blocking)
-            dialogStage.show();
+            // Find the scene root to add dialog overlay
+            javafx.scene.Parent sceneRoot = submit.getScene().getRoot();
+            
+            // Get or create StackPane overlay
+            javafx.scene.layout.StackPane dialogOverlay;
+            if (sceneRoot instanceof javafx.scene.layout.StackPane) {
+                dialogOverlay = (javafx.scene.layout.StackPane) sceneRoot;
+            } else {
+                dialogOverlay = new javafx.scene.layout.StackPane();
+                dialogOverlay.getChildren().add(sceneRoot);
+                submit.getScene().setRoot(dialogOverlay);
+            }
+            
+            // Create semi-transparent background overlay
+            javafx.scene.layout.StackPane backgroundOverlay = new javafx.scene.layout.StackPane();
+            backgroundOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+            backgroundOverlay.setPrefSize(javafx.scene.layout.Region.USE_COMPUTED_SIZE, javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            backgroundOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            
+            // Center the dialog in the overlay
+            javafx.scene.layout.StackPane.setAlignment(processingDialog, javafx.geometry.Pos.CENTER);
+            backgroundOverlay.getChildren().add(processingDialog);
+            
+            // Add the overlay to scene
+            dialogOverlay.getChildren().add(backgroundOverlay);
             
             // Create background task for AI analysis
             Task<Void> analysisTask = new Task<Void>() {
@@ -236,9 +269,9 @@ public class CreatePostController implements Initializable {
                             Platform.runLater(() -> {
                                 try {
                                     if (currentAttempt == 1) {
-                                        processingController.updateStatus("Analyzing nutrition facts...");
+                                        statusLabel.setText("Analyzing nutrition facts...");
                                     } else {
-                                        processingController.updateStatus("Analyzing nutrition facts... (retry " + currentAttempt + "/" + MAX_RETRIES + ")");
+                                        statusLabel.setText("Analyzing nutrition facts... (retry " + currentAttempt + "/" + MAX_RETRIES + ")");
                                     }
                                 } catch (Exception e) {
                                     logger.log(Level.WARNING, "Failed to update processing status: " + e.getMessage());
@@ -254,7 +287,7 @@ public class CreatePostController implements Initializable {
                 
                 // Update status to show success  
                 Platform.runLater(() -> {
-                    processingController.updateStatus("Nutrition analysis completed successfully!");
+                    statusLabel.setText("Nutrition analysis completed successfully!");
                 });
                 
                 return null; // Success - exit the retry loop
@@ -282,7 +315,7 @@ public class CreatePostController implements Initializable {
                                 // Wait a bit before retrying (unless it's an API key issue)
                                 Platform.runLater(() -> {
                                     try {
-                                        processingController.updateStatus("Analysis failed, retrying... (" + (currentAttempt + 1) + "/" + MAX_RETRIES + ")");
+                                        statusLabel.setText("Analysis failed, retrying... (" + (currentAttempt + 1) + "/" + MAX_RETRIES + ")");
                                     } catch (Exception ex) {
                                         logger.log(Level.WARNING, "Failed to update retry status: " + ex.getMessage());
                                     }
@@ -307,16 +340,16 @@ public class CreatePostController implements Initializable {
                         try {
                             if (finalIsApiKeyIssue) {
                                 logger.log(Level.WARNING, "Skipping nutrition analysis - API key not configured");
-                                processingController.updateStatus("API key not configured. Using default values...");
+                                statusLabel.setText("API key not configured. Using default values...");
                                 showPopupDialog("apikey");
                             } else if (finalIsNetworkIssue) {
                                 logger.log(Level.WARNING, "Skipping nutrition analysis - network issues detected");
-                                processingController.updateStatus("Network issues detected. Using default values...");
+                                statusLabel.setText("Network issues detected. Using default values...");
                                 showPopupDialog("network");
                             } else {
                                 logger.log(Level.SEVERE, "All " + MAX_RETRIES + " nutrition analysis attempts failed. Last error: " + 
                                           (finalException != null ? finalException.getMessage() : "Unknown error"));
-                                processingController.updateStatus("Nutrition analysis failed. Using default values...");
+                                statusLabel.setText("Nutrition analysis failed. Using default values...");
                                 showPopupDialog("analysis_failed");
                             }
                         } catch (Exception e) {
@@ -335,7 +368,7 @@ public class CreatePostController implements Initializable {
                     Platform.runLater(() -> {
                         try {
                             // Update final status
-                            processingController.updateStatus("Saving post...");
+                            statusLabel.setText("Saving post...");
                             
                             // Save the new post
                             List<Post> posts = repository.loadPosts();
@@ -346,7 +379,7 @@ public class CreatePostController implements Initializable {
                             logger.info("Post created and saved successfully");
                             
                             // Close the processing dialog
-                            processingController.closeDialog();
+                            dialogOverlay.getChildren().remove(backgroundOverlay);
                             
                             // Show success popup
                             showResultDialog("post_created_success");
@@ -359,7 +392,7 @@ public class CreatePostController implements Initializable {
                             
                             // Close dialog and show failure message
                             try {
-                                processingController.closeDialog();
+                                dialogOverlay.getChildren().remove(backgroundOverlay);
                                 showResultDialog("post_creation_failed");
                                 App.setRoot("main");
                             } catch (Exception fallbackEx) {
@@ -376,7 +409,7 @@ public class CreatePostController implements Initializable {
                         
                         // Still try to save post without nutrition data
                         try {
-                            processingController.updateStatus("Saving post with default values...");
+                            statusLabel.setText("Saving post with default values...");
                             newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
                             List<Post> posts = repository.loadPosts();
                             posts.add(0, newPost);
@@ -384,7 +417,7 @@ public class CreatePostController implements Initializable {
                             success = true;
                             
                             // Close the processing dialog
-                            processingController.closeDialog();
+                            dialogOverlay.getChildren().remove(backgroundOverlay);
                             
                             // Show success popup (post was still created)
                             showResultDialog("post_created_success");
@@ -396,7 +429,7 @@ public class CreatePostController implements Initializable {
                             
                             // Close the processing dialog and show failure message
                             try {
-                                processingController.closeDialog();
+                                dialogOverlay.getChildren().remove(backgroundOverlay);
                                 showResultDialog("post_creation_failed");
                                 App.setRoot("main");
                             } catch (Exception ex) {
@@ -476,42 +509,80 @@ public class CreatePostController implements Initializable {
     }
     
     /**
-     * Shows a popup dialog with success or failure message
+     * Shows a popup dialog with success or failure message using MaterialFX dialog.
      */
     private void showResultDialog(String resultType) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
-            Parent root = loader.load();
+            // Create MaterialFX result dialog
+            io.github.palexdev.materialfx.dialogs.MFXGenericDialog resultDialog = 
+                new io.github.palexdev.materialfx.dialogs.MFXGenericDialog();
+            resultDialog.getStylesheets().add(getClass().getResource("/com/starlight/style.css").toExternalForm());
+            resultDialog.getStyleClass().add("background-window");
+            resultDialog.setPrefSize(400, 200);
             
-            PopupDialogController controller = loader.getController();
+            // Create message label
+            Label messageLabel = new Label();
+            messageLabel.getStyleClass().add("post-username");
+            messageLabel.setWrapText(true);
+            messageLabel.setPrefWidth(350);
             
             // Set appropriate message based on result type
             switch (resultType) {
                 case "post_created_success":
-                    controller.setPostCreatedSuccess();
+                    messageLabel.setText("Great! Your recipe has been posted successfully and is now live in the community feed!");
                     break;
                 case "post_creation_failed":
-                    controller.setPostCreationFailed();
+                    messageLabel.setText("Sorry, we couldn't create your post right now. Please check your inputs and try again.");
                     break;
                 case "nutrition_analysis_success":
-                    controller.setNutritionAnalysisSuccess();
+                    messageLabel.setText("Nutrition analysis completed successfully! Your recipe now has detailed nutritional information.");
                     break;
                 default:
-                    controller.setMessage("Operation completed.");
+                    messageLabel.setText("Operation completed.");
                     break;
             }
             
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle(resultType.contains("success") ? "Success" : "Error");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
+            // Create OK button
+            io.github.palexdev.materialfx.controls.MFXButton okButton = 
+                new io.github.palexdev.materialfx.controls.MFXButton("OK");
+            okButton.getStyleClass().add("food-tag");
             
-            // Center the dialog
-            dialogStage.centerOnScreen();
+            // Create container
+            VBox container = new VBox(20);
+            container.setAlignment(javafx.geometry.Pos.CENTER);
+            container.getChildren().addAll(messageLabel, okButton);
+            container.setPadding(new javafx.geometry.Insets(40));
             
-            // Show the dialog
-            dialogStage.showAndWait();
+            resultDialog.setContent(container);
+            
+            // Find the scene root to add dialog overlay
+            javafx.scene.Parent sceneRoot = submit.getScene().getRoot();
+            
+            // Get or create StackPane overlay
+            javafx.scene.layout.StackPane dialogOverlay;
+            if (sceneRoot instanceof javafx.scene.layout.StackPane) {
+                dialogOverlay = (javafx.scene.layout.StackPane) sceneRoot;
+            } else {
+                dialogOverlay = new javafx.scene.layout.StackPane();
+                dialogOverlay.getChildren().add(sceneRoot);
+                submit.getScene().setRoot(dialogOverlay);
+            }
+            
+            // Create semi-transparent background overlay
+            javafx.scene.layout.StackPane backgroundOverlay = new javafx.scene.layout.StackPane();
+            backgroundOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.3);");
+            backgroundOverlay.setPrefSize(javafx.scene.layout.Region.USE_COMPUTED_SIZE, javafx.scene.layout.Region.USE_COMPUTED_SIZE);
+            backgroundOverlay.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            
+            // Center the dialog in the overlay
+            javafx.scene.layout.StackPane.setAlignment(resultDialog, javafx.geometry.Pos.CENTER);
+            backgroundOverlay.getChildren().add(resultDialog);
+            
+            // Add the overlay to scene
+            dialogOverlay.getChildren().add(backgroundOverlay);
+            
+            // Set up OK button to close dialog
+            okButton.setOnAction(e -> dialogOverlay.getChildren().remove(backgroundOverlay));
             
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);

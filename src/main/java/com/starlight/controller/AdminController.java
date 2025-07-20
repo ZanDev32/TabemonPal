@@ -149,9 +149,6 @@ public class AdminController implements Initializable {
         // Setup sort combo box
         setupSortComboBox();
 
-        // Add test data to verify table works
-        addTestData();
-
         // Load actual data
         loadData();
 
@@ -213,7 +210,7 @@ public class AdminController implements Initializable {
         ratingColumn.setPrefWidth(100.0);
         likeCountColumn.setPrefWidth(100.0);
         uploadTimeColumn.setPrefWidth(180.0);
-        actionColumn.setPrefWidth(120.0);
+        actionColumn.setPrefWidth(140.0);
 
         // Set minimum widths to prevent columns from being too small
         titleColumn.setMinWidth(200.0);
@@ -221,7 +218,7 @@ public class AdminController implements Initializable {
         ratingColumn.setMinWidth(80.0);
         likeCountColumn.setMinWidth(80.0);
         uploadTimeColumn.setMinWidth(150.0);
-        actionColumn.setMinWidth(100.0);
+        actionColumn.setMinWidth(120.0);
 
         // Setup cell factories using simple string extraction
         titleColumn.setRowCellFactory(item -> new MFXTableRowCell<>(PostTableData::getTitle));
@@ -233,18 +230,37 @@ public class AdminController implements Initializable {
         // Setup action column
         actionColumn.setRowCellFactory(item -> {
             MFXTableRowCell<PostTableData, String> cell = new MFXTableRowCell<>(data -> "");
+            
+            // Create Edit button
+            MFXButton editButton = new MFXButton("Edit");
+            editButton.getStyleClass().add("mfx-button");
+            editButton.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 11px; -fx-pref-width: 50;");
+            editButton.setOnAction(event -> showEditPostDialog(item));
+            
+            // Create Delete button
             MFXButton deleteButton = new MFXButton("Delete");
             deleteButton.getStyleClass().add("mfx-button");
-            deleteButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 12px;");
+            deleteButton.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-size: 11px; -fx-pref-width: 50;");
             deleteButton.setOnAction(event -> showDeleteConfirmation(item));
-            cell.setGraphic(deleteButton);
+            
+            // Create HBox to hold both buttons
+            javafx.scene.layout.HBox buttonBox = new javafx.scene.layout.HBox(5);
+            buttonBox.setAlignment(Pos.CENTER);
+            buttonBox.getChildren().addAll(editButton, deleteButton);
+            
+            cell.setGraphic(buttonBox);
             cell.setAlignment(Pos.CENTER);
             return cell;
         });
 
         // Add columns to table
         postsTable.getTableColumns().clear();
-        postsTable.getTableColumns().addAll(titleColumn, usernameColumn, ratingColumn, likeCountColumn, uploadTimeColumn, actionColumn);
+        postsTable.getTableColumns().add(titleColumn);
+        postsTable.getTableColumns().add(usernameColumn);
+        postsTable.getTableColumns().add(ratingColumn);
+        postsTable.getTableColumns().add(likeCountColumn);
+        postsTable.getTableColumns().add(uploadTimeColumn);
+        postsTable.getTableColumns().add(actionColumn);
 
         // Set the items
         postsTable.setItems(postDataList);
@@ -605,5 +621,100 @@ public class AdminController implements Initializable {
             postsTable.update();
             System.out.println("DEBUG: Test data added and table updated");
         });
+    }
+    
+    /**
+     * Shows edit dialog for a post
+     */
+    private void showEditPostDialog(PostTableData data) {
+        Dialog<Void> dialog = new Dialog<>();
+        dialog.setTitle("Edit Post");
+        dialog.setHeaderText("Edit Post: " + data.getTitle());
+        
+        // Set the button types
+        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
+        
+        // Create form fields
+        javafx.scene.layout.GridPane grid = new javafx.scene.layout.GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new javafx.geometry.Insets(20, 150, 10, 10));
+        
+        TextField titleField = new TextField(data.getTitle());
+        TextField usernameField = new TextField(data.getUsername());
+        MFXComboBox<String> ratingComboBox = new MFXComboBox<>();
+        ratingComboBox.getItems().addAll("0.0", "0.5", "1.0", "1.5", "2.0", "2.5", "3.0", "3.5", "4.0", "4.5", "5.0");
+        ratingComboBox.setValue(data.getRating());
+        TextField likesField = new TextField(data.getLikeCount());
+        TextArea descriptionArea = new TextArea(data.getDescription());
+        descriptionArea.setPrefRowCount(4);
+        descriptionArea.setWrapText(true);
+        
+        // Add labels and fields to grid
+        grid.add(new Label("Title:"), 0, 0);
+        grid.add(titleField, 1, 0);
+        grid.add(new Label("Author:"), 0, 1);
+        grid.add(usernameField, 1, 1);
+        grid.add(new Label("Rating:"), 0, 2);
+        grid.add(ratingComboBox, 1, 2);
+        grid.add(new Label("Likes:"), 0, 3);
+        grid.add(likesField, 1, 3);
+        grid.add(new Label("Description:"), 0, 4);
+        grid.add(descriptionArea, 1, 4);
+        
+        dialog.getDialogPane().setContent(grid);
+        
+        // Enable/Disable save button depending on whether a title was entered
+        javafx.scene.Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
+        saveButton.setDisable(false);
+        
+        // Add validation
+        titleField.textProperty().addListener((observable, oldValue, newValue) -> {
+            saveButton.setDisable(newValue.trim().isEmpty());
+        });
+        
+        // Handle save action
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == saveButtonType) {
+                try {
+                    // Validate likes field is numeric
+                    Integer.parseInt(likesField.getText());
+                    
+                    // Update the data model
+                    data.title.set(titleField.getText());
+                    data.username.set(usernameField.getText());
+                    data.rating.set(ratingComboBox.getValue());
+                    data.likeCount.set(likesField.getText());
+                    data.description.set(descriptionArea.getText());
+                    
+                    // Update the original post
+                    Post originalPost = data.getOriginalPost();
+                    originalPost.title = titleField.getText();
+                    originalPost.username = usernameField.getText();
+                    originalPost.rating = ratingComboBox.getValue();
+                    originalPost.likecount = likesField.getText();
+                    originalPost.description = descriptionArea.getText();
+                    
+                    // Save changes to XML
+                    savePostChanges(originalPost);
+                    
+                    // Refresh table
+                    postsTable.update();
+                    
+                    showSuccessAlert("Success", "Post updated successfully!");
+                    
+                } catch (NumberFormatException e) {
+                    showErrorAlert("Error", "Likes must be a valid number.");
+                    return null; // Don't close dialog on error
+                } catch (Exception e) {
+                    showErrorAlert("Error", "Failed to update post: " + e.getMessage());
+                    return null; // Don't close dialog on error
+                }
+            }
+            return null;
+        });
+        
+        dialog.showAndWait();
     }
 }
