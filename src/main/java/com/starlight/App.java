@@ -15,7 +15,6 @@ import com.starlight.api.UserApiServer;
 import java.io.IOException;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
 /**
  * Main JavaFX application entry point. This class starts the embedded
  * {@link UserApiServer} and loads the initial FXML views.
@@ -190,17 +189,20 @@ public class App extends Application {
      * @param args command line arguments
      */
     public static void main(String[] args) {
-        // Initialize application data directory on startup
         FileSystemManager.initializeAppDataDirectory();
-        
-        // Set Linux-specific properties for better icon display
-        String os = System.getProperty("os.name").toLowerCase();
-        if (os.contains("linux")) {
-            System.setProperty("javafx.application.name", "TabemonPal");
-            System.setProperty("glass.gtk.uiScale", "1.0");
-        }
-        
         launch();
+
+        /*Login information 
+         * 
+         * Administrator:
+         * Username: admin
+         * Password: admin123
+         * 
+         * User:
+         * Username: user
+         * Password: user
+         *
+        */
     }
 
 }
