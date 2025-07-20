@@ -205,6 +205,67 @@
     -fx-border-radius: 25 25 25 25;
         border-radius: 25 25 25 25;
 }
+
+/* TabeStreak */
+
+.button-Mission {
+    -fx-background-color: #FEF7E7;
+        background-color: #FEF7E7;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.Card-Check {
+    -fx-background-color: #81C784;
+        background-color: #81C784;
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-color: #4CAF50;
+        border-color: #4CAF50;
+    -fx-border-radius: 20 20 20 20;
+        border-radius: 20 20 20 20;
+
+}
+
+.card-uncheck {
+    -fx-background-color: #FFFFFF;
+        background-color: #FFFFFF;
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-color: #dee0e3;
+        border-color: #dee0e3;
+    -fx-border-radius: 20 20 20 20;
+        border-radius: 20 20 20 20;
+}
+
+.card-current {
+    -fx-background-color: #4CAF50;
+        background-color: #4CAF50;
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-color: #E5E7EB;
+        border-color: #E5E7EB;
+    -fx-border-radius: 20 20 20 20;
+        border-radius: 20 20 20 20;
+}
+
+.cardReward-check {
+    -fx-background-color: #F7F7F7;
+        background-color: #F7F7F7;
+    -fx-background-radius: 20 20 20 20;
+    -fx-border-color: #FFD700;
+        border-color: #FFD700;
+    -fx-border-radius: 20 20 20 20;
+        border-radius: 20 20 20 20;
+}
+
+.cardReward-uncheck {
+    -fx-background-color: #F7F7F7;
+        background-color: #F7F7F7;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.card-Achieved {
+    -fx-background-color: #FEF7E7;
+        background-color: #FEF7E7;
+    -fx-background-radius: 20 20 20 20;
+}
     
 
 /* debugging only

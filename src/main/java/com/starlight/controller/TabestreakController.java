@@ -8,7 +8,7 @@ import javafx.fxml.Initializable;
 /**
  * Placeholder controller for the games view.
  */
-public class Tabestreak implements Initializable {
+public class TabestreakController implements Initializable {
 
     /**
      * Initializes the controller. Currently no-op.
