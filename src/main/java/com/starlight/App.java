@@ -13,12 +13,16 @@ import com.starlight.util.FileSystemManager;
 import com.starlight.api.UserApiServer;
 
 import java.io.IOException;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 /**
  * Main JavaFX application entry point. This class starts the embedded
  * {@link UserApiServer} and loads the initial FXML views.
  */
 public class App extends Application {
+
+    private static final Logger logger = Logger.getLogger(App.class.getName());
 
     /** Main application scene used to swap views. */
     private static Scene scene;
@@ -35,6 +39,16 @@ public class App extends Application {
             stage.setWidth(width);
             stage.setHeight(height);
             stage.centerOnScreen();
+        }
+    }
+
+    /**
+     * Maximizes the application window to fill the screen.
+     */
+    public static void maximizeStage() {
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setMaximized(true);
         }
     }
 
@@ -63,8 +77,7 @@ public class App extends Application {
             Image icon = new Image(getClass().getResourceAsStream("/com/starlight/images/AppLogo.png"));
             stage.getIcons().add(icon);
         } catch (Exception e) {
-            System.err.println("Could not load application icon: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Could not load application icon: " + e.getMessage(), e);
         }
         
         stage.setTitle("TabemonPal by Starlight Inc.");
@@ -83,10 +96,11 @@ public class App extends Application {
      */
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
+
         
-        // Adjust window size based on the loaded FXML
+        // Maximize the stage based on the loaded FXML
         if ("main".equals(fxml)) {
-            resizeWindow(1920, 1080);
+            maximizeStage();
         } else if ("Authorization".equals(fxml)) {
             resizeWindow(1280, 720);
         }
@@ -111,8 +125,7 @@ public class App extends Application {
         try {
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
-            System.err.println("Failed to load splash screen: " + ex.getMessage());
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to load splash screen: " + ex.getMessage(), ex);
             return;
         }
 
@@ -121,16 +134,14 @@ public class App extends Application {
             try {
                 setRoot("main");
             } catch (IOException ex) {
-                System.err.println("Failed to load main view: " + ex.getMessage());
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, "Failed to load main view: " + ex.getMessage(), ex);
                 
                 // Fallback - try to load main directly if there was an error
                 try {
-                    System.out.println("Attempting direct load of main view");
+                    logger.info("Attempting direct load of main view");
                     setRoot("main");
                 } catch (IOException fallbackEx) {
-                    System.err.println("Fallback failed too: " + fallbackEx.getMessage());
-                    fallbackEx.printStackTrace();
+                    logger.log(Level.SEVERE, "Fallback failed too: " + fallbackEx.getMessage(), fallbackEx);
                 }
             }
         });
@@ -148,10 +159,10 @@ public class App extends Application {
         
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(resourcePath));
         if (fxmlLoader.getLocation() == null) {
-            System.err.println("FXML resource not found: " + resourcePath);
+            logger.warning("FXML resource not found: " + resourcePath);
             // Try with leading slash
             resourcePath = "/com/starlight/view/" + fxml + ".fxml";
-            System.out.println("Trying alternative path: " + resourcePath);
+            logger.info("Trying alternative path: " + resourcePath);
             fxmlLoader = new FXMLLoader(App.class.getClassLoader().getResource(resourcePath));
             
             if (fxmlLoader.getLocation() == null) {

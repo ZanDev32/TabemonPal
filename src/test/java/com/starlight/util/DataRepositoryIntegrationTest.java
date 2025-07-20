@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.starlight.models.UserDataRepository;
-import com.starlight.models.PostDataRepository;
+import com.starlight.repository.PostDataRepository;
+import com.starlight.repository.UserDataRepository;
 
 /**
  * Integration test to verify that data repositories work correctly with the new file system.

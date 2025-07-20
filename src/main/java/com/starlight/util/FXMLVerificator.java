@@ -4,12 +4,14 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.List;
 import java.util.stream.Stream;
+import java.util.logging.Logger;
 
 /**
  * Utility class for verifying and adjusting FXML files before they are loaded
  * by JavaFX.
  */
 public class FXMLVerificator {
+    private static final Logger logger = Logger.getLogger(FXMLVerificator.class.getName());
 
     // You can customize these
     private static final String EXPECTED_NAMESPACE = "http://javafx.com/javafx/19";
@@ -60,7 +62,7 @@ public class FXMLVerificator {
             // Save changes only if content was modified
             if (!original.equals(content)) {
                 Files.writeString(fxmlPath, content);
-                System.out.println("Downgraded JavaFX version in: " + fxmlPath.getFileName());
+                logger.info("Downgraded JavaFX version in: " + fxmlPath.getFileName());
             }
 
         } catch (IOException e) {

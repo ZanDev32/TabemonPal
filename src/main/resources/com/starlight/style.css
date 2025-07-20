@@ -15,7 +15,7 @@
 .sideBar{
     -fx-background-color: #EED8AF;
         background-color: #EED8AF;
-    -fx-background-radius: 0 50 50 0;
+    -fx-background-radius: 0 30 30 0;
 }
 
 .button-sidebar {  
@@ -59,10 +59,24 @@
 }
 
 .button-active-bar {
-    -fx-background-color: #3F3F5B;
-        background-color: #3F3F5B;
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
 }
 
+/* Ensure activeBar maintains its color regardless of position */
+.sideBar .button-active-bar {
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
+}
+
+.black {
+    -fx-background-color: #000000;
+        background-color: #000000;
+}
 .icon{
     -fx-padding: 0px 26px 0px 0px;
         padding: 0px 26px 0px 0px;
@@ -205,7 +219,162 @@
     -fx-border-radius: 25 25 25 25;
         border-radius: 25 25 25 25;
 }
-    
+
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+
+.text-prompt {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #3F3F5B;
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-border-color: transparent;
+        border-color: transparent;
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
+}
+
+.button-topic {
+    -fx-background-radius: 10;
+    -fx-text-fill: #5b543f;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+}
+
+.food-tag {
+    -fx-background-color: #EED8AF;
+        background-color: #EED8AF;
+    -fx-background-radius: 40;
+    -fx-text-fill: #000000;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+}
+
+/* Verdict-specific styling */
+.verdict-healthy {
+    -fx-background-color: #4CAF50 !important;
+        background-color: #4CAF50 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-moderate {
+    -fx-background-color: #FF9800 !important;
+        background-color: #FF9800 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-unhealthy {
+    -fx-background-color: #F44336 !important;
+        background-color: #F44336 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-junk {
+    -fx-background-color: #9C27B0 !important;
+        background-color: #9C27B0 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-unknown {
+    -fx-background-color: #9E9E9E !important;
+        background-color: #9E9E9E !important;
+    -fx-text-fill: white !important;
+}
+
+.post-username {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-date {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 14;
+        font-size: 14;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-desc {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 28;
+        font-size: 28;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe-background {
+    -fx-background-color: #FBFAFA;
+        background-color: #FBFAFA;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.app-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 22;
+        font-size: 22;
+    -fx-text-fill: #3F3F5B;
+}
+
+/* Recipe text formatting styles */
+.recipe-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 26;
+        font-size: 26;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.recipe-content {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+    -fx-line-spacing: 2px;
+}
 
 /* debugging only
 
@@ -215,3 +384,76 @@
 }
 
 */
+
+/* Nutrition Facts Chart Styling */
+.nutrition-chart {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 20px;
+        padding: 20px;
+}
+
+.nutrition-chart .chart-title {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 24px;
+        font-size: 24px;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .chart-legend {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 10px;
+        padding: 10px;
+}
+
+.nutrition-chart .chart-legend .legend-item {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 14px;
+        font-size: 14px;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .pie-slice[data-name="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name^="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name^="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}
+
+.nutrition-chart .pie-slice[data-name^="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}

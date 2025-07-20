@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.starlight.models.Post;
 import com.starlight.util.FileSystemManager;
 
 /**
@@ -39,6 +40,15 @@ public class PostDataRepository {
         xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
         xstream.alias("posts", List.class);
         xstream.alias("post", Post.class);
+        xstream.alias("nutrition", com.starlight.models.Nutrition.class);
+        xstream.alias("ingredient", com.starlight.models.Nutrition.NutritionIngredient.class);
+        xstream.alias("calories", com.starlight.models.Nutrition.Calories.class);
+        xstream.alias("protein", com.starlight.models.Nutrition.Protein.class);
+        xstream.alias("fat", com.starlight.models.Nutrition.Fat.class);
+        xstream.alias("carbohydrates", com.starlight.models.Nutrition.Carbohydrates.class);
+        xstream.alias("fiber", com.starlight.models.Nutrition.Fiber.class);
+        xstream.alias("sugar", com.starlight.models.Nutrition.Sugar.class);
+        xstream.alias("salt", com.starlight.models.Nutrition.Salt.class);
     }
 
     /**

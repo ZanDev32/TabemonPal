@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXDatePicker;
@@ -15,10 +16,13 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
+import java.util.logging.Level;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.models.User;
@@ -33,6 +37,7 @@ import com.starlight.util.ImageUtils;
  * and scaling to maintain consistency and reduce code redundancy across the application.
  */
 public class EditProfileController implements Initializable {
+    private static final Logger logger = Logger.getLogger(EditProfileController.class.getName());
     @FXML
     private ImageView Image;
 
@@ -106,7 +111,7 @@ public class EditProfileController implements Initializable {
      * Handles the image picker button click to allow user to select a new profile image
      */
     @FXML
-    private void onImagePickerClick(javafx.event.ActionEvent event) {
+    public void onImagePickerClick(javafx.event.ActionEvent event) {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select Profile Image");
         
@@ -132,7 +137,7 @@ public class EditProfileController implements Initializable {
         try {
             User currentSessionUser = Session.getCurrentUser();
             if (currentSessionUser == null) {
-                System.err.println("No current session user found");
+                logger.warning("No current session user found");
                 return;
             }
             
@@ -141,7 +146,7 @@ public class EditProfileController implements Initializable {
                 selectedFile, currentSessionUser.username);
             
             if (copiedFilePath == null) {
-                System.err.println("Failed to copy image file to user directory");
+                logger.warning("Failed to copy image file to user directory");
                 return;
             }
             
@@ -154,7 +159,7 @@ public class EditProfileController implements Initializable {
             }
             
             // Update the UserData XML file
-            com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+            com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
             java.util.List<com.starlight.models.User> users = repo.loadUsers();
             for (com.starlight.models.User u : users) {
                 if (u.username.equals(currentSessionUser.username)) {
@@ -167,9 +172,9 @@ public class EditProfileController implements Initializable {
             // Refresh the profile image display
             loadCurrentUserProfileImage();
             
-            System.out.println("Profile image updated successfully: " + copiedFilePath);
+            logger.info("Profile image updated successfully: " + copiedFilePath);
         } catch (Exception e) {
-            System.err.println("Failed to update profile image: " + e.getMessage());
+            logger.warning("Failed to update profile image: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -201,12 +206,15 @@ public class EditProfileController implements Initializable {
                     os.write(xml.getBytes(StandardCharsets.UTF_8));
                 }
                 if (conn.getResponseCode() == 200) {
-                    System.out.println("User updated");
+                    logger.info("User updated successfully");
+                    showResultDialog("account_updated_success");
                 } else {
-                    System.out.println("Update failed: " + conn.getResponseCode());
+                    logger.info("Update failed: " + conn.getResponseCode());
+                    showResultDialog("account_update_failed");
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Failed to update user: " + e.getMessage(), e);
+                showResultDialog("account_update_failed");
             }
         });
 
@@ -228,10 +236,10 @@ public class EditProfileController implements Initializable {
         String password = passwordField.getText();
         java.time.LocalDate birthDay = birthDayPicker.getValue();
         if (email.isEmpty() || password.isEmpty()) {
-            System.err.println("All fields are required.");
+            logger.warning("All fields are required.");
             return;
         }
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
+        com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
         java.util.List<com.starlight.models.User> users = repo.loadUsers();
         for (com.starlight.models.User u : users) {
             if (u.username.equals(currentUser.username)) {
@@ -242,7 +250,7 @@ public class EditProfileController implements Initializable {
             }
         }
         repo.saveUsers(users);
-        System.out.println("User updated successfully");
+        logger.info("User updated successfully");
         currentUser.email = email;
         currentUser.password = password;
         currentUser.birthDay = birthDay != null ? birthDay.toString() : null;
@@ -252,25 +260,29 @@ public class EditProfileController implements Initializable {
     }
 
     @FXML
-    private void onDelete(javafx.event.ActionEvent event) {
-        // Remove user from UserDataRepository using the new deleteUser method
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-        boolean userDeleted = repo.deleteUser(currentUser.username);
-        
-        if (!userDeleted) {
-            System.err.println("User could not be deleted.");
-            return;
-        }
-        
-        // Clear current user session
-        com.starlight.util.Session.setCurrentUser(null);
-        
-        // Execute logout callback if provided
-        if (onLogout != null) {
-            onLogout.run();
-        }
-        
+    public void onDelete(javafx.event.ActionEvent event) {
         try {
+            // Remove user from UserDataRepository using the new deleteUser method
+            com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
+            boolean userDeleted = repo.deleteUser(currentUser.username);
+            
+            if (!userDeleted) {
+                logger.warning("User could not be deleted.");
+                showResultDialog("account_deletion_failed");
+                return;
+            }
+            
+            // Clear current user session
+            com.starlight.util.Session.setCurrentUser(null);
+            
+            // Execute logout callback if provided
+            if (onLogout != null) {
+                onLogout.run();
+            }
+            
+            // Show success message first
+            showResultDialog("account_deleted_success");
+            
             // Load the authorization view
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/Authorization.fxml"));
             Parent authView = loader.load();
@@ -285,11 +297,11 @@ public class EditProfileController implements Initializable {
             currentStage.show();
             
             // Display a confirmation message
-            System.out.println("User account deleted successfully");
+            logger.info("User account deleted successfully");
             
         } catch (IOException e) {
-            System.err.println("Failed to load authorization view: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.WARNING, "Failed to load authorization view: " + e.getMessage(), e);
+            showResultDialog("account_deletion_failed");
             
             // Fallback to previous behavior if authorization view can't be loaded
             Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
@@ -300,6 +312,55 @@ public class EditProfileController implements Initializable {
                 previousStage.toFront();
                 previousStage.requestFocus();
             }
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to delete account: " + e.getMessage(), e);
+            showResultDialog("account_deletion_failed");
+        }
+    }
+    
+    /**
+     * Shows a popup dialog with success or failure message
+     */
+    private void showResultDialog(String resultType) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
+            Parent root = loader.load();
+            
+            PopupDialogController controller = loader.getController();
+            
+            // Set appropriate message based on result type
+            switch (resultType) {
+                case "account_updated_success":
+                    controller.setAccountUpdatedSuccess();
+                    break;
+                case "account_update_failed":
+                    controller.setAccountUpdateFailed();
+                    break;
+                case "account_deleted_success":
+                    controller.setAccountDeletedSuccess();
+                    break;
+                case "account_deletion_failed":
+                    controller.setAccountDeletionFailed();
+                    break;
+                default:
+                    controller.setMessage("Operation completed.");
+                    break;
+            }
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(resultType.contains("success") ? "Success" : "Error");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+            
+            // Center the dialog
+            dialogStage.centerOnScreen();
+            
+            // Show the dialog
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
         }
     }
 

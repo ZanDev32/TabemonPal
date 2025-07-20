@@ -30,4 +30,6 @@ public class Post {
     public String commentcount;
     /** Whether the current user has liked this post. */
     public String isLiked;
+    /** Nutrition facts data from AI analysis. */
+    public Nutrition nutrition;
 }

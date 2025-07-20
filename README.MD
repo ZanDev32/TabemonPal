@@ -96,7 +96,7 @@ XML-based repositories for storing and retrieving user accounts and community po
 All user-generated data (XML files and uploaded images) is stored in a directory named `.tabemonpal` inside the current user's home folder. This keeps application data separate from the installation path and ensures it persists across updates.
 
 ### ChatGPT Integration
-The application leverages OpenAI's ChatGPT through the ChatGPT Java API to provide intelligent consultation and nutritional advice to users.
+The application leverages OpenAI's ChatGPT to provide intelligent consultation and nutritional advice to users.
 
 ### MVC Architecture
 The application follows the Model-View-Controller pattern with clear separation between data models, JavaFX views, and controller logic.
@@ -120,7 +120,6 @@ mvn test
 ### Required Libraries
 
 - MaterialFX: https://github.com/palexdev/MaterialFX
-- ChatGPT Java API: https://github.com/PlexPt/chatgpt-java
 - XStream: https://x-stream.github.io/
 
 ## 🙏 Acknowledgments

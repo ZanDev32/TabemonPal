@@ -13,8 +13,11 @@ import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import java.io.IOException;
 import com.starlight.models.Post;
+import java.util.logging.Logger;
 
 public class RecipeItemController {
+    private static final Logger logger = Logger.getLogger(RecipeItemController.class.getName());
+
     @FXML
     private ImageView image;
 
@@ -35,12 +38,15 @@ public class RecipeItemController {
 
     private Post currentPost;
     private Runnable onPostUpdated; // Callback to refresh the parent view
+    private MainController mainController; // Reference to main controller for navigation
 
     @FXML
     private void initialize() {
         // Connect edit and delete buttons
         editPost.setOnAction(event -> handleEditPost());
         deletePost.setOnAction(event -> handleDeletePost());
+        
+        // Click handling will be set up when main controller is set
     }
     
     /**
@@ -80,11 +86,20 @@ public class RecipeItemController {
     }
 
     /**
+     * Sets the main controller reference for navigation
+     */
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
+        // Now that we have the main controller, set up click handling
+        setupRecipeClickHandling();    
+    }
+    
+    /**
      * Handles the edit post button click
      */
     private void handleEditPost() {
         if (currentPost == null) {
-            System.err.println("No post data available for editing");
+            logger.warning("No post data available for editing");
             return;
         }
 
@@ -125,7 +140,7 @@ public class RecipeItemController {
             }
 
         } catch (IOException e) {
-            System.err.println("Failed to load edit post dialog: " + e.getMessage());
+            logger.warning("Failed to load edit post dialog: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -135,7 +150,7 @@ public class RecipeItemController {
      */
     private void handleDeletePost() {
         if (currentPost == null) {
-            System.err.println("No post data available for deletion");
+            logger.warning("No post data available for deletion");
             return;
         }
 
@@ -163,8 +178,85 @@ public class RecipeItemController {
             }
 
         } catch (IOException e) {
-            System.err.println("Failed to load delete dialog: " + e.getMessage());
+            logger.warning("Failed to load delete dialog: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Sets up click handling for the recipe item (excluding buttons)
+     */
+    private void setupRecipeClickHandling() {
+        // Get the root container (could be GridPane or other layout)
+        javafx.scene.Node rootContainer = null;
+        if (image != null && image.getParent() != null) {
+            rootContainer = image.getParent();
+        }
+        
+        // Make the root container clickable (but not the buttons)
+        if (rootContainer != null) {
+            rootContainer.setOnMouseClicked(event -> {
+                // Check if click target is a button or interactive element
+                javafx.scene.Node target = (javafx.scene.Node) event.getTarget();
+                
+                // Prevent clicks on edit/delete buttons from triggering navigation
+                if (isClickableButton(target)) {
+                    return;
+                }
+                
+                handleRecipeClick();
+            });
+            
+            // Set cursor to indicate clickable area
+            rootContainer.setStyle("-fx-cursor: hand;");
+        }
+        
+        // Also make the image and title explicitly clickable
+        if (image != null) {
+            image.setOnMouseClicked(event -> handleRecipeClick());
+            image.setStyle("-fx-cursor: hand;");
+        }
+        
+        if (title != null) {
+            title.setOnMouseClicked(event -> handleRecipeClick());
+            title.setStyle("-fx-cursor: hand;");
+        }
+        
+        if (rating != null) {
+            rating.setOnMouseClicked(event -> handleRecipeClick());
+            rating.setStyle("-fx-cursor: hand;");
+        }
+    }
+    
+    /**
+     * Checks if the clicked element is a button or interactive element
+     */
+    private boolean isClickableButton(javafx.scene.Node target) {
+        // Check if the target itself or any of its parents is a button
+        javafx.scene.Node current = target;
+        while (current != null) {
+            if (current == editPost || current == deletePost) {
+                return true;
+            }
+            current = current.getParent();
+        }
+        return false;
+    }
+    
+    /**
+     * Handles clicks on the recipe content to navigate to full post view
+     */
+    private void handleRecipeClick() {
+        if (currentPost != null && mainController != null) {
+            mainController.setCurrentPost(currentPost);
+            mainController.loadPage("Post");
+        } else {
+            if (currentPost == null) {
+                logger.warning("Cannot navigate: currentPost is null");
+            }
+            if (mainController == null) {
+                logger.warning("Cannot navigate: mainController is null");
+            }
         }
     }
 }
