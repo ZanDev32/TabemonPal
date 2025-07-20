@@ -7,7 +7,7 @@ import java.util.logging.Level;
 
 import com.starlight.api.ChatbotAPI;
 import com.starlight.api.ChatbotAPI.ChatbotException;
-import com.starlight.models.User;
+import com.starlight.model.User;
 import com.starlight.util.ImageUtils;
 import com.starlight.util.Session;
 

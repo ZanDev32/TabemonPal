@@ -14,7 +14,7 @@ module com.starlight {
 
     opens com.starlight to javafx.fxml;
     opens com.starlight.controller;
-    opens com.starlight.models;
+    opens com.starlight.model;
     opens com.starlight.util;
     opens com.starlight.api;
     
@@ -22,5 +22,5 @@ module com.starlight {
     exports com.starlight.controller;
     exports com.starlight.util;
     exports com.starlight.api;
-    exports com.starlight.models;
+    exports com.starlight.model;
 }

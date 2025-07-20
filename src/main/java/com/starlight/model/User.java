@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.model;
 
 /**
  * Data model representing a user account.

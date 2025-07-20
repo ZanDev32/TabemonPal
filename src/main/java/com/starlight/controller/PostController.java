@@ -16,12 +16,12 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 
-import com.starlight.models.Post;
-import com.starlight.models.Nutrition;
 import com.starlight.util.ImageUtils;
 import com.starlight.repository.UserDataRepository;
 import com.starlight.repository.PostDataRepository;
 import com.starlight.api.ChatbotAPI;
+import com.starlight.model.Nutrition;
+import com.starlight.model.Post;
 import com.starlight.util.NutritionParser;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

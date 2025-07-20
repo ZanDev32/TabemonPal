@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.starlight.api.ApiClient.ApiError;
 import com.starlight.api.ApiClient.ApiException;
-import com.starlight.models.User;
+import com.starlight.model.User;
 
 /**
  * Unit tests for {@link ApiClient}.

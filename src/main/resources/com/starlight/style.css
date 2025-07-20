@@ -461,12 +461,14 @@
 /* Admin Panel Styles */
 .admin-header {
     -fx-background-color: #2C3E50;
+    
     -fx-text-fill: white;
 }
 
 .admin-title {
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: bold;
+        font-weight: bold;
 }
 
 .admin-subtitle {
@@ -475,8 +477,11 @@
 
 .admin-controls {
     -fx-background-color: #ECF0F1;
+        background-color: #ECF0F1;
     -fx-border-color: #BDC3C7;
+        border-color: #BDC3C7;
     -fx-border-width: 0 0 1 0;
+        border-width: 0 0 1 0;
 }
 
 .stats-label {

@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.starlight.models.Nutrition;
+import com.starlight.model.Nutrition;
 
 /**
  * Unit tests for the NutritionParser utility class.

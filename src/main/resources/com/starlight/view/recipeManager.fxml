@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import io.github.palexdev.materialfx.controls.MFXComboBox?>
+<?import io.github.palexdev.materialfx.controls.MFXTableView?>
+<?import io.github.palexdev.materialfx.controls.MFXTableColumn?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.RecipeManagerController">
+   <children>
+      <!-- Header Section -->
+      <VBox styleClass="admin-header">
+         <children>
+            <Label text="Admin Panel - Post Management" styleClass="admin-title">
+               <font>
+                  <Font name="System Bold" size="24.0" />
+               </font>
+            </Label>
+            <Label text="Manage and monitor all user posts from XML data" styleClass="admin-subtitle">
+               <font>
+                  <Font size="14.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+      
+      <!-- Controls Section -->
+      <HBox styleClass="admin-controls" alignment="CENTER_LEFT" spacing="15.0">
+         <children>
+            <Label text="Sort by:" />
+            <MFXComboBox fx:id="sortComboBox" prefWidth="200.0" />
+            <MFXButton fx:id="refreshButton" text="Refresh Data" styleClass="mfx-button-primary" />
+            <VBox alignment="CENTER_LEFT">
+               <children>
+                  <Label fx:id="totalPostsLabel" text="Total Posts: -" styleClass="stats-label" />
+                  <Label fx:id="totalUsersLabel" text="Total Users: -" styleClass="stats-label" />
+               </children>
+            </VBox>
+            <ProgressIndicator fx:id="loadingIndicator" prefHeight="20.0" prefWidth="20.0" visible="false" />
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="15.0" />
+         </padding>
+      </HBox>
+      
+      <!-- Table Section -->
+      <MFXTableView fx:id="postsTable" styleClass="admin-table" prefHeight="400.0" minHeight="300.0" maxHeight="600.0" VBox.vgrow="ALWAYS">
+         <VBox.margin>
+            <Insets bottom="20.0" left="20.0" right="20.0" />
+         </VBox.margin>
+      </MFXTableView>
+      
+      <!-- Footer Section -->
+      <HBox styleClass="admin-footer" alignment="CENTER" spacing="10.0">
+         <children>
+            <Label text="📝 Click on Rating to edit • 🗑️ Use Delete button to remove posts • 🔄 Refresh to reload data" styleClass="footer-text">
+               <font>
+                  <Font size="12.0" />
+               </font>
+            </Label>
+         </children>
+         <padding>
+            <Insets bottom="15.0" left="20.0" right="20.0" top="10.0" />
+         </padding>
+      </HBox>
+   </children>
+</VBox>

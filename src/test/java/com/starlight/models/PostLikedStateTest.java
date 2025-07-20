@@ -2,6 +2,7 @@ package com.starlight.models;
 
 import org.junit.jupiter.api.Test;
 
+import com.starlight.model.Post;
 import com.starlight.repository.PostDataRepository;
 
 import org.junit.jupiter.api.BeforeEach;

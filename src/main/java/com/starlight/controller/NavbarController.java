@@ -1,6 +1,6 @@
 package com.starlight.controller;
 
-import com.starlight.models.User;
+import com.starlight.model.User;
 import com.starlight.util.ImageUtils;
 import com.starlight.util.Session;
 

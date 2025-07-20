@@ -12,8 +12,9 @@ import javafx.stage.Stage;
 import javafx.animation.ScaleTransition;
 import javafx.util.Duration;
 import java.io.IOException;
-import com.starlight.models.Post;
 import java.util.logging.Logger;
+
+import com.starlight.model.Post;
 
 public class RecipeItemController {
     private static final Logger logger = Logger.getLogger(RecipeItemController.class.getName());

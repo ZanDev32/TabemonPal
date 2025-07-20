@@ -1,9 +1,11 @@
 package com.starlight.util;
 
-import com.starlight.models.Nutrition;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
+
+import com.starlight.model.Nutrition;
+
 import java.util.regex.Matcher;
 
 /**

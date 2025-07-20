@@ -14,7 +14,7 @@
 
 <BorderPane fx:id="bp" maxHeight="1080.0" maxWidth="1920.0" minHeight="-Infinity" minWidth="-Infinity" prefHeight="1080.0" prefWidth="1920.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MainController">
    <left>
-      <GridPane prefHeight="1085.0" prefWidth="301.0" styleClass="sideBar" stylesheets="@../style.css">
+      <GridPane prefHeight="1081.0" prefWidth="315.0" styleClass="sideBar" stylesheets="@../style.css">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
         </columnConstraints>
@@ -29,6 +29,9 @@
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
             <RowConstraints maxHeight="60.0" minHeight="-Infinity" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
+            <RowConstraints maxHeight="60.0" minHeight="10.0" prefHeight="50.0" vgrow="SOMETIMES" />
           <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="BOTTOM" vgrow="SOMETIMES" />
         </rowConstraints>
          <children>
@@ -107,15 +110,11 @@
                   </HBox>
                </graphic>
             </MFXButton>
-            <MFXButton fx:id="admin" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#admin" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Admin Panel" GridPane.rowIndex="9">
+            <MFXButton fx:id="recipeManager" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#recipeManager" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="Recipe Manager" GridPane.rowIndex="11">
                <graphic>
                   <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
                      <children>
-                        <ImageView fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@../icon/cog-outline.png" />
-                           </image>
-                        </ImageView>
+                        <ImageView fx:id="recipeManagerIcon" fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true" />
                      </children>
                   </HBox>
                </graphic>
@@ -143,7 +142,7 @@
                   <Insets bottom="11.0" top="11.0" />
                </padding>
             </HBox>
-            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="301.0" GridPane.hgrow="NEVER" GridPane.rowIndex="10">
+            <HBox alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="60.0" prefWidth="301.0" GridPane.hgrow="NEVER" GridPane.rowIndex="13">
                <GridPane.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" />
                </GridPane.margin>
@@ -151,6 +150,16 @@
                   <Insets left="27.0" />
                </padding>
             </HBox>
+            <Label fx:id="adminMenu" alignment="BASELINE_LEFT" contentDisplay="CENTER" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" styleClass="button-sidebar" stylesheets="@../style.css" text="ADMIN DASHBOARD" textAlignment="CENTER" GridPane.rowIndex="10" />
+            <MFXButton fx:id="userManager" alignment="BASELINE_LEFT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" onMouseClicked="#userManager" rippleColor="#ab9b7e" styleClass="button-sidebar" stylesheets="@../style.css" text="User Manager" GridPane.rowIndex="12">
+               <graphic>
+                  <HBox prefHeight="21.0" prefWidth="53.0" styleClass="icon" stylesheets="@../style.css">
+                     <children>
+                        <ImageView fx:id="userManagerIcon" fitHeight="23.0" fitWidth="31.0" pickOnBounds="true" preserveRatio="true" />
+                     </children>
+                  </HBox>
+               </graphic>
+            </MFXButton>
          </children>
       </GridPane>
    </left>

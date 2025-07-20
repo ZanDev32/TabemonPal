@@ -5,8 +5,8 @@ import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import com.starlight.model.Post;
 import com.starlight.util.Session;
-import com.starlight.models.Post;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 
@@ -17,6 +17,7 @@ import javafx.fxml.Initializable;
 import javafx.geometry.HPos;
 import javafx.geometry.VPos;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -25,13 +26,27 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
 
 /**
  * Controller for the main application shell which loads sub-pages and keeps
  * track of the active navigation button.
  */
 public class MainController implements Initializable {
+    @FXML
+    private ImageView recipeManagerIcon;
+
+    @FXML
+    private ImageView userManagerIcon;
+
+    @FXML
+    private MFXButton recipeManager;
+
+    @FXML
+    private Label adminMenu;
+
+    @FXML
+    private MFXButton userManager;
+
     @FXML
     private ImageView homeIcon;
 
@@ -91,8 +106,6 @@ public class MainController implements Initializable {
     private MFXButton games;
     @FXML 
     private MFXButton achievement;
-    @FXML 
-    private MFXButton admin;
     
     /** Handles navigation to the home view. */
     @FXML
@@ -143,32 +156,66 @@ public class MainController implements Initializable {
         selected(wiki);
     }
 
-    /** Handles navigation to the admin view (only for logged in users). */
+    /** Handles navigation to the recipe manager view (only for admin users). */
     @FXML
-    void admin(MouseEvent event) {
-        // Only allow admin access if user is logged in
-        if (Session.getCurrentUser() != null) {
-            loadPage("admin");
-            selected(admin);
-        } else {
-            // Show login prompt or access denied message
-            showAccessDeniedDialog();
+    void recipeManager(MouseEvent event) {
+        // This should only be called if button is visible (admin user logged in)
+        loadPage("recipeManager");
+        selected(recipeManager);
+    }
+
+    /** Handles navigation to the user manager view (only for admin users). */
+    @FXML
+    void userManager(MouseEvent event) {
+        // This should only be called if button is visible (admin user logged in)
+        loadPage("userManager");
+        selected(userManager);
+    }
+    
+    /**
+     * Checks if the current user has admin privileges
+     */
+    private boolean isCurrentUserAdmin() {
+        if (Session.getCurrentUser() == null) {
+            return false;
+        }
+        
+        String username = Session.getCurrentUser().username;
+        return username != null && username.toLowerCase().equals("admin");
+    }
+    
+    /**
+     * Updates the visibility of navigation elements based on user permissions
+     */
+    public void updateNavigationForUser() {
+        boolean isAdmin = isCurrentUserAdmin();
+        adminMenu.setVisible(isAdmin);
+        adminMenu.setManaged(isAdmin); // This makes the label not take up space when hidden
+        recipeManager.setVisible(isAdmin);
+        recipeManager.setManaged(isAdmin); // This makes the button not take up space when hidden
+        userManager.setVisible(isAdmin);
+        userManager.setManaged(isAdmin); // This makes the button not take up space when hidden
+
+        // If recipe manager button was active and user is no longer admin, switch to home
+        if (!isAdmin && currentActiveButton == recipeManager) {
+            home(null);
+        }
+        // If user manager button was active and user is no longer admin, switch to home
+        if (!isAdmin && currentActiveButton == userManager) {
+            home(null);
         }
     }
     
     /**
-     * Shows access denied dialog for admin panel
+     * Public method to refresh navigation state - can be called by other controllers
+     * when user login state changes without a full application reload
      */
-    private void showAccessDeniedDialog() {
-        try {
-            // Create a simple alert dialog for access denied
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle("Access Denied");
-            alert.setHeaderText("Admin Access Required");
-            alert.setContentText("Please log in to access the admin panel.");
-            alert.showAndWait();
-        } catch (Exception e) {
-            e.printStackTrace();
+    public void refreshNavigationState() {
+        updateNavigationForUser();
+        
+        // Also refresh the navbar if needed
+        if (navbarController != null) {
+            // The navbar controller will handle its own user state updates
         }
     }
 
@@ -279,44 +326,81 @@ public class MainController implements Initializable {
      * @param isActive Whether the button is active or not
      */
     private void setButtonIcon(MFXButton button, boolean isActive) {
-        ImageView iconView = null;
-        String iconName = null;
+        String buttonId = getButtonIdentifier(button);
+        if (buttonId == null) return;
 
-        // Determine which icon to update based on button
-        if (button == home) {
-            iconView = homeIcon;
-            iconName = isActive ? "Home.png" : "Home_1.png";
-        } else if (button == community) {
-            iconView = communityIcon;
-            iconName = isActive ? "Community.png" : "Community_1.png";
-        } else if (button == wiki) {
-            iconView = wikiIcon;
-            iconName = isActive ? "Wiki.png" : "Wiki_1.png";
-        } else if (button == consult) {
-            iconView = consultIcon;
-            iconName = isActive ? "Consult.png" : "Consult_1.png";
-        } else if (button == mission) {
-            iconView = missionIcon;
-            iconName = isActive ? "Mission.png" : "Mission_1.png";
-        } else if (button == games) {
-            iconView = gameIcon;
-            iconName = isActive ? "Game.png" : "Game_1.png";
-        } else if (button == achievement) {
-            iconView = achievemntIcon;
-            iconName = isActive ? "Achievements.png" : "Achievements_1.png";
+        ImageView iconView;
+        String iconBaseName;
+
+        switch (buttonId) {
+            case "home":
+                iconView = homeIcon;
+                iconBaseName = "Home";
+                break;
+            case "community":
+                iconView = communityIcon;
+                iconBaseName = "Community";
+                break;
+            case "wiki":
+                iconView = wikiIcon;
+                iconBaseName = "Wiki";
+                break;
+            case "consult":
+                iconView = consultIcon;
+                iconBaseName = "Consult";
+                break;
+            case "mission":
+                iconView = missionIcon;
+                iconBaseName = "Mission";
+                break;
+            case "games":
+                iconView = gameIcon;
+                iconBaseName = "Game";
+                break;
+            case "achievement":
+                iconView = achievemntIcon;
+                iconBaseName = "Achievements";
+                break;
+            case "recipeManager":
+                iconView = recipeManagerIcon;
+                iconBaseName = "RecipeManager";
+                break;
+            case "userManager":
+                iconView = userManagerIcon;
+                iconBaseName = "UserManager";
+                break;
+            default:
+                return; // Unknown button, do nothing
         }
 
-        // Actually update the icon if we found a matching button
-        if (iconView != null && iconName != null) {
-            try {
-                String iconPath = "/com/starlight/icon/" + iconName;
-                Image newImage = new Image(getClass().getResourceAsStream(iconPath));
-                iconView.setImage(newImage);
-            } catch (Exception e) {
-                Logger.getLogger(MainController.class.getName()).log(Level.WARNING,
-                        "Failed to load icon: " + iconName, e);
-            }
+        // Update the icon
+        try {
+            String iconName = isActive ? iconBaseName + ".png" : iconBaseName + "_1.png";
+            String iconPath = "/com/starlight/icon/" + iconName;
+            Image newImage = new Image(getClass().getResourceAsStream(iconPath));
+            iconView.setImage(newImage);
+        } catch (Exception e) {
+            Logger.getLogger(MainController.class.getName()).log(Level.WARNING,
+                    "Failed to load icon for button: " + buttonId, e);
         }
+    }
+
+    /**
+     * Helper method to get a string identifier for a button
+     * @param button The button to identify
+     * @return String identifier for the button, or null if unknown
+     */
+    private String getButtonIdentifier(MFXButton button) {
+        if (button == home) return "home";
+        if (button == community) return "community";
+        if (button == wiki) return "wiki";
+        if (button == consult) return "consult";
+        if (button == mission) return "mission";
+        if (button == games) return "games";
+        if (button == achievement) return "achievement";
+        if (button == recipeManager) return "recipeManager";
+        if (button == userManager) return "userManager";
+        return null;
     }
 
     /** Initializes the controller by showing the home view. */
@@ -353,6 +437,9 @@ public class MainController implements Initializable {
         
         loadPage("home");
         selected(home); // This will set home as active and update its icon accordingly
+        
+        // Update navigation visibility based on current user
+        updateNavigationForUser();
     }
 
     /**
@@ -360,7 +447,7 @@ public class MainController implements Initializable {
      */
     private void initializeButtons() {
         // Set all buttons to inactive style class
-        MFXButton[] buttons = {home, community, wiki, consult, mission, games, achievement};
+        MFXButton[] buttons = {home, community, wiki, consult, mission, games, achievement, recipeManager, userManager};
         for (MFXButton button : buttons) {
             button.getStyleClass().remove("button-active");
             button.getStyleClass().add("button-sidebar");
@@ -374,6 +461,16 @@ public class MainController implements Initializable {
         setButtonIcon(mission, false);
         setButtonIcon(games, false);
         setButtonIcon(achievement, false);
+        setButtonIcon(recipeManager, false);
+        setButtonIcon(userManager, false);
+        
+        // Hide admin button initially - will be shown if admin user logs in
+        adminMenu.setVisible(false);
+        adminMenu.setManaged(false);
+        recipeManager.setVisible(false);
+        recipeManager.setManaged(false);
+        userManager.setVisible(false);
+        userManager.setManaged(false); 
     }
     
     /**
