@@ -16,8 +16,11 @@ import java.util.ResourceBundle;
 import javafx.fxml.Initializable;
 
 import com.starlight.models.Post;
+import com.starlight.models.Nutrition;
 import com.starlight.util.ImageUtils;
 import com.starlight.repository.UserDataRepository;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 public class PostController implements Initializable {
     @FXML
@@ -115,9 +118,35 @@ public class PostController implements Initializable {
         }
         
         // Update verdict button if available
-        if (verdict != null) {
-            // You can implement AI verdict logic here
-            verdict.setText("AI Approved");
+        if (verdict != null && currentPost.nutrition != null) {
+            String verdictText = currentPost.nutrition.verdict != null ? 
+                currentPost.nutrition.verdict : "Moderate";
+            verdict.setText(verdictText);
+            
+            // Apply different styling based on verdict
+            verdict.getStyleClass().clear();
+            verdict.getStyleClass().add("food-tag");
+            switch (verdictText) {
+                case "Healthy":
+                    verdict.getStyleClass().add("verdict-healthy");
+                    break;
+                case "Moderate":
+                    verdict.getStyleClass().add("verdict-moderate");
+                    break;
+                case "Unhealthy":
+                    verdict.getStyleClass().add("verdict-unhealthy");
+                    break;
+                case "Junk Food":
+                    verdict.getStyleClass().add("verdict-junk");
+                    break;
+                default:
+                    verdict.getStyleClass().add("verdict-moderate");
+                    break;
+            }
+        } else if (verdict != null) {
+            verdict.setText("No Analysis");
+            verdict.getStyleClass().clear();
+            verdict.getStyleClass().add("food-tag");
         }
         
         // Load profile picture
@@ -136,8 +165,8 @@ public class PostController implements Initializable {
         // Populate recipe container with formatted text
         populateRecipeContainer();
         
-        // TODO: Populate nutrition facts chart
-        // populateNutritionFacts();
+        // Populate nutrition facts chart
+        populateNutritionFacts();
     }
     
     /**
@@ -310,5 +339,86 @@ public class PostController implements Initializable {
      */
     private String formatRelativeTime(String timeString) {
         return communityController.formatRelativeTime(timeString);
+    }
+    
+    /**
+     * Populates the nutrition facts PieChart with data from the current post.
+     */
+    private void populateNutritionFacts() {
+        if (nutritionFacts == null || currentPost == null || currentPost.nutrition == null) {
+            return;
+        }
+        
+        try {
+            Nutrition nutrition = currentPost.nutrition;
+            ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+            
+            // Get total values for all nutrients
+            double totalProtein = nutrition.getTotalProtein();
+            double totalFat = nutrition.getTotalFat();
+            double totalCarbs = nutrition.getTotalCarbohydrates();
+            double totalFiber = nutrition.getTotalFiber();
+            double totalSugar = nutrition.getTotalSugar();
+            double totalSalt = nutrition.getTotalSalt();
+            
+            // Create pie chart data for macronutrients and key micronutrients
+            if (totalProtein > 0) {
+                pieChartData.add(new PieChart.Data("Protein (" + String.format("%.1f", totalProtein) + "g)", totalProtein));
+            }
+            
+            if (totalFat > 0) {
+                pieChartData.add(new PieChart.Data("Fat (" + String.format("%.1f", totalFat) + "g)", totalFat));
+            }
+            
+            if (totalCarbs > 0) {
+                pieChartData.add(new PieChart.Data("Carbohydrates (" + String.format("%.1f", totalCarbs) + "g)", totalCarbs));
+            }
+            
+            if (totalFiber > 0) {
+                pieChartData.add(new PieChart.Data("Fiber (" + String.format("%.1f", totalFiber) + "g)", totalFiber));
+            }
+            
+            if (totalSugar > 0) {
+                pieChartData.add(new PieChart.Data("Sugar (" + String.format("%.1f", totalSugar) + "g)", totalSugar));
+            }
+            
+            if (totalSalt > 0) {
+                // Convert mg to g for display consistency, or keep as mg if preferred
+                if (totalSalt >= 1000) {
+                    pieChartData.add(new PieChart.Data("Salt (" + String.format("%.1f", totalSalt/1000) + "g)", totalSalt/100)); // Scale down for chart
+                } else {
+                    pieChartData.add(new PieChart.Data("Salt (" + String.format("%.0f", totalSalt) + "mg)", totalSalt/100)); // Scale down for chart
+                }
+            }
+            
+            // If no macronutrient data, show calories breakdown
+            if (pieChartData.isEmpty()) {
+                double totalCalories = nutrition.getTotalCalories();
+                if (totalCalories > 0) {
+                    pieChartData.add(new PieChart.Data("Calories (" + String.format("%.0f", totalCalories) + " kcal)", totalCalories));
+                } else {
+                    // Fallback: show a placeholder
+                    pieChartData.add(new PieChart.Data("No nutrition data available", 1));
+                }
+            }
+            
+            nutritionFacts.setData(pieChartData);
+            nutritionFacts.setTitle("Nutrition Facts");
+            nutritionFacts.setLegendVisible(true);
+            
+            // Apply custom styling if needed
+            nutritionFacts.getStyleClass().add("nutrition-chart");
+            
+        } catch (Exception e) {
+            java.util.logging.Logger.getLogger(PostController.class.getName())
+                    .warning("Failed to populate nutrition facts: " + e.getMessage());
+            
+            // Show fallback data
+            ObservableList<PieChart.Data> fallbackData = FXCollections.observableArrayList(
+                new PieChart.Data("Nutrition data unavailable", 1)
+            );
+            nutritionFacts.setData(fallbackData);
+            nutritionFacts.setTitle("Nutrition Facts");
+        }
     }
 }

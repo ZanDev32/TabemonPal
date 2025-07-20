@@ -265,6 +265,31 @@
         font-size: 24;
 }
 
+/* Verdict-specific styling */
+.verdict-healthy {
+    -fx-background-color: #4CAF50 !important;
+        background-color: #4CAF50 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-moderate {
+    -fx-background-color: #FF9800 !important;
+        background-color: #FF9800 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-unhealthy {
+    -fx-background-color: #F44336 !important;
+        background-color: #F44336 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-junk {
+    -fx-background-color: #9C27B0 !important;
+        background-color: #9C27B0 !important;
+    -fx-text-fill: white !important;
+}
+
 .post-username {
     -fx-font-family: Poppins;
         font-family: Poppins;
@@ -353,3 +378,76 @@
 }
 
 */
+
+/* Nutrition Facts Chart Styling */
+.nutrition-chart {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 20px;
+        padding: 20px;
+}
+
+.nutrition-chart .chart-title {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 24px;
+        font-size: 24px;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .chart-legend {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 10px;
+        padding: 10px;
+}
+
+.nutrition-chart .chart-legend .legend-item {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 14px;
+        font-size: 14px;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .pie-slice[data-name="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name^="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name^="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}
+
+.nutrition-chart .pie-slice[data-name^="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}

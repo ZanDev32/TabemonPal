@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox alignment="CENTER" maxWidth="600.0" prefHeight="300.0" prefWidth="600.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.PopupDialogController">
+   <children>
+      <Label fx:id="message" alignment="CENTER" prefHeight="59.0" prefWidth="449.0" styleClass="post-username" text="warning message" textAlignment="CENTER" wrapText="true">
+         <VBox.margin>
+            <Insets bottom="30.0" />
+         </VBox.margin>
+      </Label>
+      <MFXButton fx:id="okButton" prefHeight="26.0" prefWidth="104.0" styleClass="button-community" text="OK" />
+   </children>
+   <padding>
+      <Insets bottom="40.0" left="40.0" right="40.0" top="40.0" />
+   </padding>
+</VBox>

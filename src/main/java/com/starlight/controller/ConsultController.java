@@ -98,7 +98,7 @@ public class ConsultController implements Initializable {
      * This method can be bound directly to FXML using onAction="#handleUserMessage"
      */
     @FXML
-    private void handleUserMessage() {
+    public void handleUserMessage() {
         String userInput = prompt.getText().trim();
         if (userInput.isEmpty()) return;
 
@@ -312,7 +312,7 @@ public class ConsultController implements Initializable {
      * This method can be bound directly to FXML using onAction="#handleAttachImage"
      */
     @FXML
-    private void handleAttachImage() {
+    public void handleAttachImage() {
         // TODO: Implement image attachment functionality
         attachmentnama.setText("Image attachment not yet implemented");
     }

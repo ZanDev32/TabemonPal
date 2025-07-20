@@ -161,6 +161,73 @@ public class ChatbotAPI {
     }
     
     /**
+     * Analyzes nutrition facts for given ingredients using ChatGPT.
+     *
+     * @param ingredients The ingredients string (vertical line separated)
+     * @return The nutrition facts in XML format
+     * @throws ChatbotException if the API call fails
+     */
+    public String analyzeNutritionFacts(String ingredients) throws ChatbotException {
+        // Check if we're in demo mode (no API key)
+        if (apiKey == null) {
+            logger.warning("Cannot perform nutrition analysis - no API key configured");
+            throw new ChatbotException("Nutrition analysis is not available. Please configure your OpenAI API key in ~/.tabemonpal/Database/.SECRET_KEY.xml to enable this feature.");
+        }
+        
+        if (ingredients == null || ingredients.trim().isEmpty()) {
+            throw new ChatbotException("Cannot analyze nutrition facts for empty ingredients list");
+        }
+        
+        String ingredientsList = ingredients.replace("|", "\n");
+        
+        String prompt = "Do an prediction analysis from this recipe's ingredients for nutrition facts using USDA then send the result in xml called nutrition:\n\n" +
+                "format:\n" +
+                "<nutrition verdict=\"Healthy|Moderate|Unhealthy|Junk Food\">\n" +
+                "  <ingredient name=\"\" amount=\"\">\n" +
+                "    <calories unit=\"kcal\"></calories>\n" +
+                "    <protein unit=\"g\"></protein>\n" +
+                "    <fat unit=\"g\"></fat>\n" +
+                "    <carbohydrates unit=\"g\"></carbohydrates>\n" +
+                "    <fiber unit=\"g\"></fiber>\n" +
+                "    <sugar unit=\"g\"></sugar>\n" +
+                "    <salt unit=\"mg\"></salt>\n" +
+                "  </ingredient>\n" +
+                "</nutrition>\n\n" +
+                "Ingredients: " + ingredientsList;
+        
+        String systemMessage = "You are a nutrition analysis assistant. " +
+                "Provide ONLY the XML nutrition data as requested, without any additional text or formatting. " +
+                "Use USDA nutritional database for accurate values. " +
+                "If exact amounts are not specified in ingredients, estimate reasonable serving sizes. " +
+                "For the verdict attribute, analyze overall nutrition and classify as: " +
+                "- 'Healthy': Low sugar/salt, high fiber/protein, balanced macros " +
+                "- 'Moderate': Average nutritional balance " +
+                "- 'Unhealthy': High sugar/salt/fat, low nutrients " +
+                "- 'Junk Food': Very high sugar/fat/salt, minimal nutritional value " +
+                "Return only valid XML that matches the exact format requested.";
+        
+        try {
+            String response = sendMessage(prompt, systemMessage);
+            
+            // Basic validation that we got something that looks like XML
+            if (response == null || response.trim().isEmpty()) {
+                throw new ChatbotException("Received empty response from nutrition analysis API");
+            }
+            
+            if (!response.contains("<nutrition>") || !response.contains("</nutrition>")) {
+                throw new ChatbotException("API response does not contain valid nutrition XML format. Response: " + 
+                                         (response.length() > 200 ? response.substring(0, 200) + "..." : response));
+            }
+            
+            return response;
+            
+        } catch (ChatbotException e) {
+            // Add more context to the error
+            throw new ChatbotException("Nutrition analysis failed: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
      * Builds the JSON request body for the OpenAI API.
      */
     private String buildRequestBody(String userMessage, String systemMessage) {
