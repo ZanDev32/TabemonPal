@@ -8,12 +8,13 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
+import com.starlight.util.FileSystemManager;
 
 /**
  * Repository for persisting {@link User} objects to an XML file.
  */
 public class UserDataRepository {
-    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/UserData.xml";
+    private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "UserData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/UserDataDummy.xml";
 
     private final String xmlPath;
@@ -31,6 +32,10 @@ public class UserDataRepository {
      */
     public UserDataRepository(String xmlPath) {
         this.xmlPath = xmlPath;
+        File parent = new File(xmlPath).getParentFile();
+        if (parent != null) {
+            parent.mkdirs();
+        }
         xstream = new XStream(new DomDriver());
         xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
         xstream.alias("users", List.class);
@@ -119,8 +124,17 @@ public class UserDataRepository {
      * Saves the provided list of users.
      */
     public void saveUsers(List<User> users) {
+        // Prevent duplicate users before saving
+        List<User> distinctUsers = users.stream()
+                .distinct()
+                .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
+
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
-            xstream.toXML(users, fos);
+            if (distinctUsers.isEmpty()) {
+                fos.write("<users></users>".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            } else {
+                xstream.toXML(distinctUsers, fos);
+            }
         } catch (Exception e) {
             throw new RuntimeException("Failed to save users", e);
         }

@@ -42,6 +42,8 @@ public class PostDataRepositoryTest {
         p.rating = "5";
         p.uploadtime = "now";
         p.likecount = "0";
+        p.commentcount = "0";
+        p.isLiked = "false";
         posts.add(p);
 
         repository.savePosts(posts);
@@ -58,5 +60,7 @@ public class PostDataRepositoryTest {
         assertEquals(p.rating, lp.rating);
         assertEquals(p.uploadtime, lp.uploadtime);
         assertEquals(p.likecount, lp.likecount);
+        assertEquals(p.commentcount, lp.commentcount);
+        assertEquals(p.isLiked, lp.isLiked);
     }
 }

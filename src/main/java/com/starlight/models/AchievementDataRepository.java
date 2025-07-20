@@ -7,13 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.util.FileSystemManager;
 
-/**
- * Repository for loading and saving {@link Post} objects to an XML file.
- */
-public class PostDataRepository {
-    private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "PostData.xml";
+public class AchievementDataRepository {
+    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
 
     private final String xmlPath;
@@ -22,19 +18,15 @@ public class PostDataRepository {
     /**
      * Creates a repository using the default XML file location.
      */
-    public PostDataRepository() {
+    public AchievementDataRepository() {
         this(DEFAULT_XML_PATH);
     }
 
     /**
      * Creates a repository storing data at the specified path.
      */
-    public PostDataRepository(String xmlPath) {
+    public AchievementDataRepository(String xmlPath) {
         this.xmlPath = xmlPath;
-        File parent = new File(xmlPath).getParentFile();
-        if (parent != null) {
-            parent.mkdirs();
-        }
         xstream = new XStream(new DomDriver());
         xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
         xstream.alias("posts", List.class);
@@ -72,17 +64,7 @@ public class PostDataRepository {
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
-                List<Post> posts = (List<Post>) obj;
-                // Initialize missing fields for existing posts
-                for (Post post : posts) {
-                    if (post.commentcount == null) {
-                        post.commentcount = "0";
-                    }
-                    if (post.isLiked == null) {
-                        post.isLiked = "false";
-                    }
-                }
-                return posts;
+                return (List<Post>) obj;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -114,18 +96,9 @@ public class PostDataRepository {
      */
     public void savePosts(List<Post> posts) {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
-            // Ensure all posts have the required fields before saving
-            for (Post post : posts) {
-                if (post.commentcount == null) {
-                    post.commentcount = "0";
-                }
-                if (post.isLiked == null) {
-                    post.isLiked = "false";
-                }
-            }
             xstream.toXML(posts, fos);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
+            throw new RuntimeException("Failed to save posts", e);
         }
     }
 }

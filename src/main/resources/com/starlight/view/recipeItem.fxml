@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXButton?>
+<?import javafx.geometry.Insets?>
+<?import javafx.geometry.Rectangle2D?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<GridPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="255.0" prefWidth="280.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.RecipeItemController">
+  <columnConstraints>
+    <ColumnConstraints halignment="RIGHT" hgrow="NEVER" minWidth="10.0" />
+  </columnConstraints>
+  <rowConstraints>
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="173.5" valignment="TOP" vgrow="NEVER" />
+    <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="81.5" valignment="TOP" vgrow="NEVER" />
+  </rowConstraints>
+   <children>
+      <ImageView fx:id="image" fitHeight="174.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true" GridPane.hgrow="NEVER" GridPane.vgrow="NEVER">
+         <viewport>
+            <Rectangle2D height="174.0" width="280.0" />
+         </viewport>
+         <image>
+            <Image url="@../images/missing.png" />
+         </image>
+      </ImageView>
+      <HBox alignment="CENTER_RIGHT" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="44.0" prefWidth="130.0" GridPane.halignment="RIGHT" GridPane.hgrow="NEVER" GridPane.valignment="TOP" GridPane.vgrow="NEVER">
+         <children>
+            <MFXButton fx:id="editPost" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
+               <font>
+                  <Font name="Comfortaa Medium" size="30.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true" translateX="-12.0">
+                     <image>
+                        <Image url="@../icon/edit.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+            </MFXButton>
+            <MFXButton fx:id="deletePost" buttonType="RAISED" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: white; -fx-background-radius: 90; rippleRadius: 10.0;" textOverrun="CLIP">
+               <font>
+                  <Font name="Comfortaa Medium" size="30.0" />
+               </font>
+               <graphic>
+                  <ImageView fitHeight="23.0" fitWidth="26.0" pickOnBounds="true" preserveRatio="true" translateX="-11.0">
+                     <image>
+                        <Image url="@../icon/delete.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="5.0" />
+               </HBox.margin>
+            </MFXButton>
+         </children>
+         <GridPane.margin>
+            <Insets right="5.0" top="5.0" />
+         </GridPane.margin>
+      </HBox>
+      <VBox prefHeight="81.0" prefWidth="254.0" GridPane.hgrow="NEVER" GridPane.rowIndex="1" GridPane.vgrow="NEVER">
+         <children>
+            <Label fx:id="title" maxWidth="1.7976931348623157E308" prefHeight="21.0" prefWidth="178.0" styleClass="label2" stylesheets="@../style.css" text="Lorem Ipsum" wrapText="true" VBox.vgrow="ALWAYS">
+               <font>
+                  <Font size="12.0" />
+               </font>
+               <VBox.margin>
+                  <Insets left="18.0" right="18.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <ImageView fitHeight="20.0" fitWidth="23.0" pickOnBounds="true" preserveRatio="true">
+                     <viewport>
+                        <Rectangle2D minX="10.0" minY="10.0" />
+                     </viewport>
+                     <image>
+                        <Image url="@../icon/star.png" />
+                     </image>
+                  </ImageView>
+                  <Label fx:id="rating" prefHeight="21.0" prefWidth="30.0" styleClass="label2" stylesheets="@../style.css" text="0.0" wrapText="true">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Label>
+                  <ImageView fitHeight="5.0" fitWidth="6.0" pickOnBounds="true" preserveRatio="true">
+                     <viewport>
+                        <Rectangle2D />
+                     </viewport>
+                     <image>
+                        <Image url="@../icon/dot.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <Label fx:id="likecount" prefHeight="23.0" prefWidth="14.0" styleClass="label2" stylesheets="@../style.css" text="0" wrapText="true">
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                     <HBox.margin>
+                        <Insets left="7.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Label prefHeight="21.0" prefWidth="36.0" text="Likes" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="20.0" left="18.0" right="18.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+</GridPane>

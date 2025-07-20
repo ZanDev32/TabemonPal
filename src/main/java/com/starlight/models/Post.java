@@ -26,4 +26,8 @@ public class Post {
     public String uploadtime;
     /** Like count. */
     public String likecount;
+    /** Comment count. */
+    public String commentcount;
+    /** Whether the current user has liked this post. */
+    public String isLiked;
 }
