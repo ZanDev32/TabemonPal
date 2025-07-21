@@ -497,7 +497,7 @@
                                              <HBox.margin>
                                                 <Insets left="4.0" />
                                              </HBox.margin></Label>
-                          </children>
+                         </children>
                           <VBox.margin>
                             <Insets bottom="20.0" left="18.0" right="18.0" />
                           </VBox.margin>

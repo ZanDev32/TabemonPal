@@ -15,7 +15,6 @@ import com.starlight.util.Session;
 import com.starlight.api.ChatbotAPI;
 import com.starlight.model.Post;
 import com.starlight.util.NutritionParser;
-import com.starlight.App;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -72,40 +71,13 @@ public class CreatePostController implements Initializable {
     private final ChatbotAPI chatbotAPI = new ChatbotAPI();
     private final NutritionParser nutritionParser = new NutritionParser();
 
-    /**
-     * Formats text by replacing newlines with vertical lines and cleaning up spacing.
-     * This ensures ingredients and directions are stored as vertical line-separated single lines.
-     *
-     * @param text the text to format
-     * @return formatted text with vertical lines instead of newlines
-     */
-    private String formatTextAsVerticalLineSeparated(String text) {
-        if (text == null || text.trim().isEmpty()) {
-            return "";
-        }
-        
-        // Replace newlines with vertical lines, trim whitespace, and remove empty entries
-        return text.trim()
-                  .replaceAll("\\r?\\n", "| ")  // Replace newlines with "| "
-                  .replaceAll("\\|\\s*\\|", "|")    // Remove duplicate vertical lines
-                  .replaceAll("^\\|\\s*|\\|\\s*$", "") // Remove leading/trailing vertical lines
-                  .replaceAll("\\s{2,}", " ");  // Replace multiple spaces with single space
-    }
+    private MainController mainController;
 
     /**
-     * Copies the selected image to the user's data directory.
-     *
-     * @param image the image file selected by the user
-     * @return the copied image file path
+     * Sets the main controller for navigation.
      */
-    private String copyImageToUserDir(File image) {
-        try {
-            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
-            return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
-        } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
-            return null;
-        }
+    public void setMainController(MainController mainController) {
+        this.mainController = mainController;
     }
 
     /**
@@ -186,6 +158,42 @@ public class CreatePostController implements Initializable {
             Stage stage = (Stage) cancel.getScene().getWindow();
             stage.close();
         });
+    }
+
+    /**
+     * Formats text by replacing newlines with vertical lines and cleaning up spacing.
+     * This ensures ingredients and directions are stored as vertical line-separated single lines.
+     *
+     * @param text the text to format
+     * @return formatted text with vertical lines instead of newlines
+     */
+    private String formatTextAsVerticalLineSeparated(String text) {
+        if (text == null || text.trim().isEmpty()) {
+            return "";
+        }
+        
+        // Replace newlines with vertical lines, trim whitespace, and remove empty entries
+        return text.trim()
+                  .replaceAll("\\r?\\n", "| ")  // Replace newlines with "| "
+                  .replaceAll("\\|\\s*\\|", "|")    // Remove duplicate vertical lines
+                  .replaceAll("^\\|\\s*|\\|\\s*$", "") // Remove leading/trailing vertical lines
+                  .replaceAll("\\s{2,}", " ");  // Replace multiple spaces with single space
+    }
+
+    /**
+     * Copies the selected image to the user's data directory.
+     *
+     * @param image the image file selected by the user
+     * @return the copied image file path
+     */
+    private String copyImageToUserDir(File image) {
+        try {
+            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
+            return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -351,17 +359,21 @@ public class CreatePostController implements Initializable {
                             // Show success popup
                             showResultDialog("post_created_success");
                             
-                            // Navigate back to main view
-                            App.setRoot("main");
+                            // Refresh the community page instead of navigating away
+                            if (mainController != null) {
+                                mainController.refreshCommunityPage();
+                            }
                             
                         } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Failed to save post or navigate to main: " + e.getMessage(), e);
+                            logger.log(Level.SEVERE, "Failed to save post or refresh community page: " + e.getMessage(), e);
                             
                             // Close dialog and show failure message
                             try {
                                 processingController.closeDialog();
                                 showResultDialog("post_creation_failed");
-                                App.setRoot("main");
+                                if (mainController != null) {
+                                    mainController.refreshCommunityPage();
+                                }
                             } catch (Exception fallbackEx) {
                                 logger.log(Level.SEVERE, "Fallback navigation failed: " + fallbackEx.getMessage(), fallbackEx);
                             }
@@ -389,8 +401,10 @@ public class CreatePostController implements Initializable {
                             // Show success popup (post was still created)
                             showResultDialog("post_created_success");
                             
-                            // Navigate back to main view
-                            App.setRoot("main");
+                            // Refresh the community page
+                            if (mainController != null) {
+                                mainController.refreshCommunityPage();
+                            }
                         } catch (Exception e) {
                             logger.log(Level.SEVERE, "Failed to save post: " + e.getMessage(), e);
                             
@@ -398,9 +412,11 @@ public class CreatePostController implements Initializable {
                             try {
                                 processingController.closeDialog();
                                 showResultDialog("post_creation_failed");
-                                App.setRoot("main");
+                                if (mainController != null) {
+                                    mainController.refreshCommunityPage();
+                                }
                             } catch (Exception ex) {
-                                logger.log(Level.SEVERE, "Failed to close dialog or navigate to main view: " + ex.getMessage(), ex);
+                                logger.log(Level.SEVERE, "Failed to close dialog or refresh community page: " + ex.getMessage(), ex);
                             }
                         }
                     });
@@ -422,13 +438,14 @@ public class CreatePostController implements Initializable {
                 posts.add(0, newPost);
                 repository.savePosts(posts);
                 success = true;
-                App.setRoot("main");
+                if (mainController != null) {
+                    mainController.refreshCommunityPage();
+                }
             } catch (Exception fallbackEx) {
                 logger.log(Level.SEVERE, "Fallback save and navigation failed: " + fallbackEx.getMessage(), fallbackEx);
             }
         }
     }
-    
     
     /**
      * Shows a popup dialog for nutrition analysis issues

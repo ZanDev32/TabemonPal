@@ -41,7 +41,7 @@
                       <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="X" textAlignment="CENTER" GridPane.halignment="CENTER">
+                        <Text fx:id="badgecounter" strokeType="OUTSIDE" strokeWidth="0.0" text="X" textAlignment="CENTER" GridPane.halignment="CENTER">
                            <font>
                               <Font size="18.0" />
                            </font>
@@ -66,7 +66,7 @@
                         <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                      </rowConstraints>
                      <children>
-                        <Text strokeType="OUTSIDE" strokeWidth="0.0" text="x%" GridPane.halignment="CENTER">
+                        <Text fx:id="badgecompletion" strokeType="OUTSIDE" strokeWidth="0.0" text="x%" GridPane.halignment="CENTER">
                            <font>
                               <Font size="18.0" />
                            </font>

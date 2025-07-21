@@ -115,7 +115,7 @@ public class CommunityController implements Initializable {
     }
 
     @FXML
-    void toProfile(MouseEvent event) {
+    public void toProfile(MouseEvent event) {
         main.loadPage("profile");
     }
     

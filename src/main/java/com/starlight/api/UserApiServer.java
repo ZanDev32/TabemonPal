@@ -7,6 +7,7 @@ import java.net.BindException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -324,5 +325,9 @@ public class UserApiServer {
         try (OutputStream os = exchange.getResponseBody()) {
             os.write(bytes);
         }
+    }
+
+    public BooleanSupplier isServerRunning() {
+        return () -> started;
     }
 }

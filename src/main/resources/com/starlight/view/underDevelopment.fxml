@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import io.github.palexdev.materialfx.controls.MFXScrollPane?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.VBox?>
+
+<MFXScrollPane fitToWidth="true" prefWidth="1402.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.UnderDevelopmentController">
+   <content>
+      <VBox alignment="TOP_CENTER" prefWidth="2078.0">
+         <children>
+            <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" stylesheets="@../style.css" VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox prefHeight="118.0" prefWidth="1372.0" VBox.vgrow="NEVER" />
+                  <VBox fx:id="container" alignment="CENTER" maxHeight="-Infinity" prefHeight="573.0" prefWidth="1372.0" styleClass="background-window" VBox.vgrow="ALWAYS">
+                     <children>
+                        <ImageView fitHeight="273.0" fitWidth="358.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../images/Underdevelopment.png" />
+                           </image>
+                        </ImageView>
+                        <Label style="-fx-font-size: 40;" text="The Food still in the Kitchen !" />
+                        <Label style="-fx-font-size: 25; -fx-text-fill: #8a8f95;" text="To make thing right we need some time to develop" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="45.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+            </VBox>
+         </children>
+      </VBox>
+   </content>
+</MFXScrollPane>

@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2079.0" prefWidth="990.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MissionController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="2079.0" prefWidth="990.0" styleClass="background" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.MissionController">
    <children>
       <GridPane layoutY="14.0" prefHeight="2204.0" prefWidth="990.0">
          <columnConstraints>
@@ -312,7 +312,7 @@
                                                 <Font size="24.0" />
                                              </font>
                                           </Text>
-                                          <GridPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                          <GridPane fx:id="tabestreakcounter" GridPane.columnIndex="1" GridPane.rowIndex="1">
                                             <columnConstraints>
                                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="133.39999389648438" minWidth="10.0" prefWidth="60.600006103515625" />
                                               <ColumnConstraints hgrow="SOMETIMES" maxWidth="217.39999389648438" minWidth="10.0" prefWidth="217.39999389648438" />

@@ -16,10 +16,23 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  * Handles XML serialization/deserialization and error handling.
  */
 public class ApiClient {
-    private static final String BASE_URL = "http://localhost:8000";
+    private final String baseUrl;
     private final XStream xstream;
     
+    /**
+     * Default constructor for production use.
+     * Connects to the standard server URL.
+     */
     public ApiClient() {
+        this("http://localhost:8000");
+    }
+
+    /**
+     * Constructor for testing or custom server URLs.
+     * @param baseUrl The base URL of the User API Server.
+     */
+    public ApiClient(String baseUrl) {
+        this.baseUrl = baseUrl;
         this.xstream = new XStream(new DomDriver());
         this.xstream.allowTypesByWildcard(new String[]{"com.starlight.model.*"});
         this.xstream.alias("user", User.class);
@@ -33,7 +46,7 @@ public class ApiClient {
      */
     public User login(String emailOrUsername, String password) throws ApiException {
         try {
-            URL url = new URL(BASE_URL + "/login");
+            URL url = new URL(baseUrl + "/login");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/xml");
@@ -70,7 +83,7 @@ public class ApiClient {
      */
     public User register(String username, String email, String password) throws ApiException {
         try {
-            URL url = new URL(BASE_URL + "/register");
+            URL url = new URL(baseUrl + "/register");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/xml");

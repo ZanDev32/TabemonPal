@@ -161,6 +161,9 @@
                </graphic>
             </MFXButton>
          </children>
+         <BorderPane.margin>
+            <Insets right="10.0" />
+         </BorderPane.margin>
       </GridPane>
    </left>
    <center>

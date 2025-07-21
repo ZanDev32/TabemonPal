@@ -117,7 +117,7 @@ public class MainController implements Initializable {
     /** Handles navigation to the achievement view. */
     @FXML
     void achievement(MouseEvent event) {
-        loadPage("achievement");
+        loadPage("underDevelopment");
         selected(achievement);
     }
 
@@ -138,21 +138,21 @@ public class MainController implements Initializable {
     /** Handles navigation to the games view. */
     @FXML
     void games(MouseEvent event) {
-        loadPage("games");
+        loadPage("underDevelopment");
         selected(games);
     }
 
     /** Handles navigation to the mission view. */
     @FXML
     void mission(MouseEvent event) {
-        loadPage("mission");
+        loadPage("underDevelopment");
         selected(mission);
     }
 
     /** Handles navigation to the wiki view. */
     @FXML
     void wiki(MouseEvent event) {
-        loadPage("wiki");
+        loadPage("underDevelopment");
         selected(wiki);
     }
 
@@ -220,6 +220,18 @@ public class MainController implements Initializable {
     }
 
     /**
+     * Refreshes the community page to show new posts.
+     */
+    public void refreshCommunityPage() {
+        if (bp.getCenter() != null) {
+            Object controller = bp.getCenter().getProperties().get("controller");
+            if (controller instanceof CommunityController) {
+                ((CommunityController) controller).refreshPosts();
+            }
+        }
+    }
+
+    /**
      * Loads the given FXML page into the grid pane container.
     */
     void loadPage(String page) {
@@ -270,6 +282,7 @@ public class MainController implements Initializable {
 
             task.setOnSucceeded(ev -> {
                 Parent root = task.getValue();
+                root.getProperties().put("controller", task.getValue().getProperties().get("controller"));
                 gp.getChildren().remove(loadingRoot);
                 gp.getChildren().removeIf(node ->
                     GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
