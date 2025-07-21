@@ -1,204 +1,301 @@
 package com.starlight.controller;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
+
+import com.starlight.model.Post;
+import com.starlight.model.User;
+import com.starlight.repository.PostDataRepository;
+import com.starlight.util.Session;
+import com.starlight.util.ImageUtils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
-import io.github.palexdev.materialfx.controls.MFXDatePicker;
-import io.github.palexdev.materialfx.controls.MFXTextField;
+import io.github.palexdev.materialfx.controls.MFXScrollPane;
+import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.User;
-import com.starlight.util.Session;
+import javafx.util.Duration;
 
 /**
- * Controller for the user settings dialog where profile information can be
- * edited.
+ * Controller backing the profile page. It displays user profile information and user's recipes/posts.
+ * 
+ * Architecture: This controller uses dependency injection pattern by utilizing CommunityController's
+ * public utility methods to reduce code redundancy and maintain consistency across the application.
+ * Instead of duplicating image loading, scaling, and user data retrieval logic, we delegate these
+ * operations to the CommunityController which serves as a shared utility provider.
  */
 public class ProfileController implements Initializable {
-    @FXML
-    private ImageView profileimage;
-
-    @FXML
-    private MFXButton imagepicker;
-
-    @FXML
-    private Label welcomeLabel;
-
-    @FXML
-    private MFXTextField emailField;
+    private static final Logger logger = Logger.getLogger(ProfileController.class.getName());
     
-    @FXML 
-    private MFXTextField passwordField;
+    @FXML
+    private MFXButton editBio;
+
+    @FXML
+    private MFXButton addRecipe;
+
+    @FXML
+    private VBox badge;
+
+    @FXML
+    private ImageView badgeICon;
+
+    @FXML
+    private Label badgeTitle;
+
+    @FXML
+    private MFXButton swapToCommunity;
+
+    @FXML
+    private MFXScrollPane myrepiceList;
     
-    @FXML 
-    private MFXDatePicker birthDayPicker;
-
     @FXML
-    private MFXButton savebutton;
-
+    private ImageView profile;
+    
     @FXML
-    private MFXButton deleteaccbutton;
+    private Label username;
+    
+    @FXML
+    private Label bio;
+    
+    @FXML
+    private Label recipes;
+    
+    @FXML
+    private Label followers;
+    
+    @FXML
+    private Label following;
+    
+    private MainController main;
+    
+    private final PostDataRepository repository = new PostDataRepository();
+    
+    // Use CommunityController for getDisplayUsernameForUser method and ImageUtils for image operations
+    private final CommunityController communityController = new CommunityController();
 
-    private User currentUser;
-    private Runnable onLogout;
-    private Stage previousStage;
+    public void setMainController(MainController main) {
+        this.main = main;
+        // Also set the main controller for the community controller if needed
+        // No need to set main controller for utility class
+        
+        // Update any existing RecipeItemControllers with the MainController reference
+        updateRecipeItemControllersMainController();
+    }
+    
+    /**
+     * Updates all existing RecipeItemControllers with MainController reference
+     * This handles the timing issue where recipes are loaded before MainController is set
+     */
+    private void updateRecipeItemControllersMainController() {
+        if (main == null || myrepiceList == null) {
+            return;
+        }
+        
+        // Since we can't easily access individual controllers after they're created,
+        // the best approach is to reload recipes if they were loaded before MainController was set
+        javafx.scene.Node content = myrepiceList.getContent();
+        if (content != null && content instanceof javafx.scene.Parent) {
+            javafx.scene.Parent parentContent = (javafx.scene.Parent) content;
+            if (parentContent.getChildrenUnmodifiable().size() > 0) {
+                logger.info("Reloading recipes with MainController reference");
+                loadUserRecipes();
+            }
+        }
+    }
+    
+    @FXML
+    void swapToCommunity(MouseEvent event) {
+        main.loadPage("community");
+    }
 
-    public void setUser(User user) {
-        this.currentUser = user;
-        if (welcomeLabel != null) welcomeLabel.setText("Hello, " + user.username);
-        if (emailField != null) emailField.setText(user.email);
-        if (passwordField != null) passwordField.setText(user.password);
-        if (birthDayPicker != null && user.birthDay != null && !user.birthDay.isEmpty()) {
-            birthDayPicker.setValue(java.time.LocalDate.parse(user.birthDay));
+    /**
+     * Loads the current user's profile information using CommunityController's methods
+     */
+    private void loadUserProfile() {
+        User currentUser = Session.getCurrentUser();
+        if (currentUser != null) {
+            // Set username using display name logic from CommunityController
+            if (username != null) {
+                String displayName = communityController.getDisplayUsernameForUser(currentUser.username);
+                username.setText(displayName != null ? displayName : currentUser.username);
+            }
+            
+            // Load profile picture using ImageUtils
+            if (profile != null) {
+                ImageUtils.loadImage(profile, currentUser.profilepicture, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(profile, 170, 170, 200); // Adjust size as needed
+            }
+            
+            // Set followers and following counts (placeholder values since not in User model)
+            if (followers != null) {
+                followers.setText("125"); // Placeholder - could be calculated from user relationships
+            }
+            
+            if (following != null) {
+                following.setText("89"); // Placeholder - could be calculated from user relationships
+            }
+            
+            // Set bio if available (though not in current User model, prepare for future)
+            if (bio != null) {
+                bio.setText("Food enthusiast and recipe creator"); // Placeholder bio
+            }
+        }
+    }
+    
+    /**
+     * Loads and displays the current user's recipes/posts using CommunityController's approach
+     */
+    private void loadUserRecipes() {
+        if (myrepiceList == null) return;
+        
+        User currentUser = Session.getCurrentUser();
+        if (currentUser == null) return;
+        
+        List<Post> allPosts = repository.loadPosts();
+        if (allPosts == null || allPosts.isEmpty()) {
+            // Clear the container if no posts
+            myrepiceList.setContent(new HBox());
+            if (recipes != null) {
+                recipes.setText("0");
+            }
+            return;
+        }
+        
+        // Filter posts by current user
+        List<Post> userPosts = allPosts.stream()
+            .filter(post -> currentUser.username.equals(post.username))
+            .toList();
+            
+        if (userPosts.isEmpty()) {
+            // Clear the container if no posts
+            myrepiceList.setContent(new HBox());
+            if (recipes != null) {
+                recipes.setText("0");
+            }
+            return;
+        }
+        
+        // Create horizontal layout for recipes
+        HBox recipeContainer = new HBox();
+        recipeContainer.setSpacing(20);
+        
+        for (Post post : userPosts) {
+            String title = post.title;
+            String image = post.image;
+            String likes = post.likecount;
+            String rating = post.rating;
+
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/recipeItem.fxml"));
+                GridPane recipeNode = loader.load();
+                RecipeItemController controller = loader.getController();
+
+                // Set the recipe data using the setter method
+                controller.setRecipeData(title, rating != null ? rating : "0.0", likes != null ? likes : "0");
+                
+                // Set the post data for edit/delete functionality
+                controller.setPost(post);
+                
+                // Set the main controller reference for navigation (check if available)
+                if (main != null) {
+                    controller.setMainController(main);
+                } else {
+                    // Log warning if main controller not available yet
+                    logger.warning("MainController not available for RecipeItemController - navigation will not work");
+                }
+                
+                // Set up callback to refresh the recipes when post is updated/deleted
+                controller.setOnPostUpdated(() -> loadUserRecipes());
+
+                // Load recipe image using ImageUtils
+                ImageView recipeImageView = controller.getImageView();
+                if (recipeImageView != null) {
+                    ImageUtils.loadImage(recipeImageView, image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
+                }
+
+                recipeContainer.getChildren().add(recipeNode);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+        myrepiceList.setContent(recipeContainer);
+        
+        // Update recipe count
+        if (recipes != null) {
+            recipes.setText(String.valueOf(userPosts.size()));
         }
     }
 
-    public void setOnLogout(Runnable onLogout) {
-        this.onLogout = onLogout;
-    }
-    
     /**
-     * Sets the stage to return to when the "Back to previous menu" button is clicked.
-     *
-     * @param stage the stage to return to
-     */
-    public void setPreviousStage(Stage stage) {
-        this.previousStage = stage;
-    }
-
-    /**
-     * Wires up the save and cancel buttons for the dialog.
+     * Initializes the controller by ensuring dummy data and loading profile and recipes.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        savebutton.setOnAction(event -> {
-            String newEmail = emailField.getText();
-            String newPass = passwordField.getText();
-            String birth = birthDayPicker.getValue() != null ? birthDayPicker.getValue().toString() : null;
-            try {
-                URL endpoint = new URL("http://localhost:8000/users/" + currentUser.username);
-                HttpURLConnection conn = (HttpURLConnection) endpoint.openConnection();
-                conn.setRequestMethod("PUT");
-                conn.setRequestProperty("Content-Type", "application/xml");
-                conn.setDoOutput(true);
-                User u = new User();
-                u.email = newEmail;
-                u.password = newPass;
-                u.birthDay = birth;
-                XStream xs = new XStream(new DomDriver());
-                xs.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
-                xs.alias("user", User.class);
-                String xml = xs.toXML(u);
-                try (OutputStream os = conn.getOutputStream()) {
-                    os.write(xml.getBytes(StandardCharsets.UTF_8));
-                }
-                if (conn.getResponseCode() == 200) {
-                    System.out.println("User updated");
-                } else {
-                    System.out.println("Update failed: " + conn.getResponseCode());
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-        // Add delete account button handler
-        deleteaccbutton.setOnAction(event -> onDelete(event));
-
-        User currentSessionUser = Session.getCurrentUser();
-        if (currentSessionUser != null && welcomeLabel != null) {
-            welcomeLabel.setText("Hello, " + currentSessionUser.username);
+        repository.ensureDummyData();
+        loadUserProfile();
+        loadUserRecipes();
+        
+        // Connect addRecipe button to handleCreatePost method
+        if (addRecipe != null) {
+            addRecipe.setOnAction(e -> handleCreatePost());
         }
     }
-
+    
     @FXML
-    private void onUpdate(javafx.event.ActionEvent event) {
-        String email = emailField.getText();
-        String password = passwordField.getText();
-        java.time.LocalDate birthDay = birthDayPicker.getValue();
-        if (email.isEmpty() || password.isEmpty()) {
-            System.err.println("All fields are required.");
-            return;
-        }
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-        java.util.List<com.starlight.models.User> users = repo.loadUsers();
-        for (com.starlight.models.User u : users) {
-            if (u.username.equals(currentUser.username)) {
-                u.email = email;
-                u.password = password;
-                u.birthDay = birthDay != null ? birthDay.toString() : null;
-                break;
-            }
-        }
-        repo.saveUsers(users);
-        System.out.println("User updated successfully");
-        currentUser.email = email;
-        currentUser.password = password;
-        currentUser.birthDay = birthDay != null ? birthDay.toString() : null;
+    private void handleCreatePost() {
+        showCreatePostPopup();
     }
 
-    @FXML
-    private void onDelete(javafx.event.ActionEvent event) {
-        // Remove user from UserDataRepository using the new deleteUser method
-        com.starlight.models.UserDataRepository repo = new com.starlight.models.UserDataRepository();
-        boolean userDeleted = repo.deleteUser(currentUser.username);
-        
-        if (!userDeleted) {
-            System.err.println("User could not be deleted.");
-            return;
-        }
-        
-        // Clear current user session
-        com.starlight.util.Session.setCurrentUser(null);
-        
-        // Execute logout callback if provided
-        if (onLogout != null) {
-            onLogout.run();
-        }
-        
+    /**
+     * Displays a modal dialog that allows the user to create a new post.
+     */
+    private void showCreatePostPopup() {
         try {
-            // Load the authorization view
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/Authorization.fxml"));
-            Parent authView = loader.load();
-            
-            // Get the current stage
-            Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
-            
-            // Set the authorization view in the current stage
-            javafx.scene.Scene scene = new javafx.scene.Scene(authView);
-            currentStage.setScene(scene);
-            currentStage.setTitle("Login/Register");
-            currentStage.show();
-            
-            // Display a confirmation message
-            System.out.println("User account deleted successfully");
-            
-        } catch (IOException e) {
-            System.err.println("Failed to load authorization view: " + e.getMessage());
-            e.printStackTrace();
-            
-            // Fallback to previous behavior if authorization view can't be loaded
-            Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
-            currentStage.hide();
-            
-            if (previousStage != null) {
-                previousStage.show();
-                previousStage.toFront();
-                previousStage.requestFocus();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));
+            Parent popupRoot = loader.load();
+            CreatePostController controller = loader.getController();
+
+            popupRoot.setScaleX(0.7);
+            popupRoot.setScaleY(0.7);
+
+            Scene popupScene = new Scene(popupRoot);
+            Stage popupStage = new Stage();
+            popupStage.initModality(Modality.APPLICATION_MODAL);
+            popupStage.setScene(popupScene);
+            popupStage.setTitle("Create Post");
+            popupStage.setResizable(false);
+
+            popupStage.setOnShown(e -> {
+                ScaleTransition st = new ScaleTransition(Duration.millis(220), popupRoot);
+                st.setFromX(0.7);
+                st.setFromY(0.7);
+                st.setToX(1.0);
+                st.setToY(1.0);
+                st.play();
+            });
+
+            popupStage.showAndWait();
+            if (controller.isSuccess()) {
+                loadUserRecipes(); // Reload user recipes after creating new post
             }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-
 }

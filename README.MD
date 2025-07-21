@@ -1,7 +1,7 @@
 # TabemonPal: The Healthy Eating Gamification App
 
 
-[![Java](https://img.shields.io/badge/Java-11-red.svg)](https://openjdk.java.net/)
+[![Java](https://img.shields.io/badge/Java-17-red.svg)](https://openjdk.java.net/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-19-blue.svg)](https://openjfx.io/)
 [![MaterialFX](https://img.shields.io/badge/MaterialFX-11.13.5-purple.svg)](https://github.com/palexdev/MaterialFX)
 
@@ -26,7 +26,7 @@
 ### Prerequisites
 
 Ensure you have the following installed on your system:
-- Java Development Kit (JDK) 11 or higher
+- Java Development Kit (JDK) 17 or higher
 - Maven for dependency management
 
 ### Installation
@@ -40,7 +40,7 @@ Follow these steps to set up the project locally:
 
 2. **Build the project with Maven**:
    ```bash
-   mvn install
+   mvn -B clean install
    ```
 
 3. **Run the application**:
@@ -60,7 +60,9 @@ TabemonPal/
     │   │           ├── App.java                  # Main application entry point
     │   │           ├── api/
     │   │           ├── controller/
-    │   │           ├── models/
+    │   │           ├── data/    
+    │   │           ├── model/
+    │   │           ├── repository/    
     │   │           └── util/
     │   └── resources/
     │       └── com/
@@ -72,7 +74,9 @@ TabemonPal/
         └── java/
             └── com/
                 └── starlight/
-                    ├── models/
+                    ├── api/
+                    ├── controller/
+                    ├── model/
                     └── util/
 ```
 
@@ -93,8 +97,10 @@ An embedded HTTP server that handles user authentication, registration, and data
 ### Data Repositories
 XML-based repositories for storing and retrieving user accounts and community posts with support for CRUD operations.
 
+All user-generated data (XML files and uploaded images) is stored in a directory named `.tabemonpal` inside the current user's home folder. This keeps application data separate from the installation path and ensures it persists across updates.
+
 ### ChatGPT Integration
-The application leverages OpenAI's ChatGPT through the ChatGPT Java API to provide intelligent consultation and nutritional advice to users.
+The application leverages OpenAI's ChatGPT to provide intelligent consultation and nutritional advice to users.
 
 ### MVC Architecture
 The application follows the Model-View-Controller pattern with clear separation between data models, JavaFX views, and controller logic.
@@ -118,13 +124,13 @@ mvn test
 ### Required Libraries
 
 - MaterialFX: https://github.com/palexdev/MaterialFX
-- ChatGPT Java API: https://github.com/PlexPt/chatgpt-java
 - XStream: https://x-stream.github.io/
 
 ## 🙏 Acknowledgments
 
 - MaterialFX library by Alessandro Parisi for the modern UI components
 - PlexPt for the ChatGPT Java API integration
+- Praventa-desktop by rizalkalam for some code inpiration
 - XStream library for simplified XML serialization
 
 ## 📄 License

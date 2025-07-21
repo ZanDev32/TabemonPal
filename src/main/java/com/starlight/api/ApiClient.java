@@ -7,9 +7,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
+import com.starlight.model.User;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.User;
 
 /**
  * Client for interacting with the User API Server.
@@ -21,7 +21,7 @@ public class ApiClient {
     
     public ApiClient() {
         this.xstream = new XStream(new DomDriver());
-        this.xstream.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
+        this.xstream.allowTypesByWildcard(new String[]{"com.starlight.model.*"});
         this.xstream.alias("user", User.class);
         this.xstream.alias("error", ApiError.class);
     }

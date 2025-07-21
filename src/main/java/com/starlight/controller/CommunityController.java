@@ -1,29 +1,29 @@
 package com.starlight.controller;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 
-import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
+import com.starlight.model.Post;
+import com.starlight.model.User;
+import com.starlight.repository.PostDataRepository;
+import com.starlight.repository.UserDataRepository;
+import com.starlight.util.ImageUtils;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
-import javafx.animation.ScaleTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Rectangle;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.util.Duration;
 
 /**
  * Controller backing the community page. It displays recent posts and allows
@@ -31,25 +31,25 @@ import javafx.util.Duration;
  */
 public class CommunityController implements Initializable {
     @FXML
-    private MFXButton createpost;
+    private MFXButton toProfile;
 
     @FXML
-    private VBox post;
+    private VBox dailypost1;
 
     @FXML
-    private ImageView likebutton;
+    private VBox dailypost2;
 
     @FXML
-    private MFXButton commentcounter;
+    private VBox dailypost3;
 
     @FXML
-    private ImageView likebutton1;
+    private VBox dailypost4;
 
     @FXML
-    private MFXButton sharebutton;
+    private GridPane manu;
 
     @FXML
-    private ImageView likebutton11;
+    private ImageView dailyphoto1;
 
     @FXML
     private Label dailytitle1;
@@ -61,7 +61,7 @@ public class CommunityController implements Initializable {
     private Label dailylikecounter;
 
     @FXML
-    private Label title;
+    private ImageView dailyphoto2;
 
     @FXML
     private Label dailytitle2;
@@ -73,6 +73,9 @@ public class CommunityController implements Initializable {
     private Label dailylikecounter2;
 
     @FXML
+    private ImageView dailyphoto3;
+
+    @FXML
     private Label dailytitle3;
 
     @FXML
@@ -80,6 +83,9 @@ public class CommunityController implements Initializable {
 
     @FXML
     private Label dailylikecounter3;
+
+    @FXML
+    private ImageView dailyphoto4;
 
     @FXML
     private Label dailytitle4;
@@ -91,156 +97,186 @@ public class CommunityController implements Initializable {
     private Label dailylikecounter4;
 
     @FXML
-    private VBox post1;
-
-    @FXML
-    private Label username;
-
-    @FXML
-    private Label uploadtime;
-
-    @FXML
-    private Label description;
-
-    @FXML
-    private MFXButton likecounter;
-
-    @FXML
     private VBox postlist;
 
-    @FXML
-    private ImageView profile1;
-    @FXML
-    private ImageView dailyphoto1;
-    @FXML
-    private ImageView dailyphoto2;
-    @FXML
-    private ImageView dailyphoto3;
-    @FXML
-    private ImageView dailyphoto4;
-    @FXML
-    private ImageView recentphoto1;
+    private MainController main;
 
     private final PostDataRepository repository = new PostDataRepository();
+    private final UserDataRepository userRepository = new UserDataRepository();
 
+    public void setMainController(MainController main) {
+        this.main = main;
+        
+        // If posts haven't been loaded yet because main was null, load them now
+        if (postlist != null && postlist.getChildren().isEmpty()) {
+            loadPosts();
+            loadDailyPosts();
+        }
+    }
+
+    @FXML
+    void toProfile(MouseEvent event) {
+        main.loadPage("profile");
+    }
+    
     /**
-     * Crops the given {@link ImageView} to fit inside the specified frame size
-     * while preserving aspect ratio and applying rounded corners.
+     * Gets the profile picture path for a given username from UserData.xml
      */
-    private void cropToFit(ImageView imageView, double frameWidth, double frameHeight, double arcRadius) {
-        if (imageView.getImage() == null) return;
-        Image image = imageView.getImage();
-        double scaleX = frameWidth / image.getWidth();
-        double scaleY = frameHeight / image.getHeight();
-        double scale = Math.max(scaleX, scaleY);
-        imageView.setFitWidth(image.getWidth() * scale);
-        imageView.setFitHeight(image.getHeight() * scale);
-        Rectangle clip = new Rectangle(frameWidth, frameHeight);
-        clip.setArcWidth(arcRadius);
-        clip.setArcHeight(arcRadius);
-        imageView.setClip(clip);
+    public String getProfilePictureForUser(String username) {
+        if (username == null) return null;
+        
+        List<User> users = userRepository.loadUsers();
+        for (User user : users) {
+            if (username.equals(user.username)) {
+                return user.profilepicture;
+            }
+        }
+        return null;
     }
 
     /**
-     * Loads posts from the repository and populates the UI. The first post is
-     * shown in the main area while the rest are added to a list below.
+     * Gets the display username from UserData.xml for a given username
+     */
+    public String getDisplayUsernameForUser(String username) {
+        if (username == null) return null;
+        
+        List<User> users = userRepository.loadUsers();
+        for (User user : users) {
+            if (username.equals(user.username)) {
+                // Return fullname if available, otherwise return username
+                return user.fullname != null && !user.fullname.trim().isEmpty() 
+                    ? user.fullname : user.username;
+            }
+        }
+        return username; // fallback to original username if not found
+    }
+
+    /**
+     * Loads posts from the repository and populates the UI. All posts are
+     * added to the postlist container.
      */
     private void loadPosts() {
+        // Safety check - don't load posts if main controller isn't available
+        if (main == null) {
+            return;
+        }
+        
         postlist.getChildren().clear();
-        postlist.getChildren().add(post1);
 
         List<Post> posts = repository.loadPosts();
         if (posts == null || posts.isEmpty()) {
-            username.setText("");
-            uploadtime.setText("");
-            title.setText("");
-            description.setText("");
-            recentphoto1.setImage(null);
-            likecounter.setText("");
             return;
         }
 
         for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
             String tits = p.title;
-            String pp = p.profilepicture;
             String usr = p.username;
             String desc = p.description;
             String image = p.image;
             String time = p.uploadtime;
             String likes = p.likecount;
+            
+            // Get profile picture and display username from UserData.xml instead of Post data
+            String pp = getProfilePictureForUser(usr);
+            String displayUsername = getDisplayUsernameForUser(usr);
 
-            if (i == 0) {
-                username.setText(usr);
-                title.setText(tits);
-                description.setText(desc);
-                uploadtime.setText(time);
-                likecounter.setText(likes);
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
+                VBox node = loader.load();
+                PostItemController c = loader.getController();
 
-                if (pp != null) {
-                    File fp = new File(pp);
-                    if (fp.exists()) {
-                        profile1.setImage(new Image(fp.toURI().toString()));
-                    } else {
-                        profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                    }
-                } else {
-                    profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
+                c.username.setText(displayUsername != null ? displayUsername : usr);
+                c.title.setText(tits);
+                c.uploadtime.setText(formatRelativeTime(time));
+                c.description.setText(desc);
+                c.likecounter.setText(likes);
+                
+                // Set comment count (default to 0 if not set)
+                String commentCount = p.commentcount != null ? p.commentcount : "0";
+                c.commentcounter.setText(commentCount);
+                
+                // Set the post data for the controller
+                c.setPost(p);
+                
+                // Set main controller reference for navigation
+                c.setMainController(main);
+                
+                // Initialize isLiked field if not set
+                if (p.isLiked == null) {
+                    p.isLiked = "false";
                 }
-                cropToFit(profile1, 40, 40, 20);
 
-                if (image != null) {
-                    File f = new File(image);
-                    if (f.exists()) {
-                        recentphoto1.setImage(new Image(f.toURI().toString()));
-                    } else {
-                        recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                    }
-                } else {
-                    recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                }
-                cropToFit(recentphoto1, 425, 322, 20);
+                // Load profile picture
+                ImageUtils.loadImage(c.profile1, pp, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(c.profile1, 40, 40, 40);
 
-            } else {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/postItem.fxml"));
-                    VBox node = loader.load();
-                    PostItemController c = loader.getController();
+                // Load post image
+                ImageUtils.loadImage(c.recentphoto1, image, "/com/starlight/images/missing.png");
+                ImageUtils.scaleToFit(c.recentphoto1, 674, 485, 20);
 
-                    c.username.setText(usr);
-                    c.title.setText(tits);
-                    c.uploadtime.setText(time);
-                    c.description.setText(desc);
-                    c.likecounter.setText(likes);
+                postlist.getChildren().add(node);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 
-                    if (pp != null) {
-                        File fp = new File(pp);
-                        if (fp.exists()) {
-                            c.profile1.setImage(new Image(fp.toURI().toString()));
-                        } else {
-                            c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                        }
-                    } else {
-                        c.profile1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                    }
-                    cropToFit(c.profile1, 40, 40, 20);
+    /**
+     * Public method to refresh the posts and daily posts - used when posts are updated externally
+     */
+    public void refreshPosts() {
+        if (postlist != null) {
+            loadPosts();
+        }
+        loadDailyPosts();
+    }
 
-                    if (image != null) {
-                        File fi = new File(image);
-                        if (fi.exists()) {
-                            c.recentphoto1.setImage(new Image(fi.toURI().toString()));
-                        } else {
-                            c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                        }
-                    } else {
-                        c.recentphoto1.setImage(new Image(getClass().getResource("/com/starlight/images/missing.png").toExternalForm()));
-                    }
-                    cropToFit(c.recentphoto1, 425, 322, 20);
+    /**
+     * Loads the top posts into the daily post slots with random selection
+     */
+    private void loadDailyPosts() {
+        List<Post> posts = repository.loadPosts();
+        if (posts == null || posts.isEmpty()) {
+            return;
+        }
 
-                    postlist.getChildren().add(node);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        // Create a copy of the posts list and shuffle it randomly
+        List<Post> shuffledPosts = new java.util.ArrayList<>(posts);
+        Collections.shuffle(shuffledPosts);
+
+        // Take up to 4 posts for daily posts from the shuffled list
+        for (int i = 0; i < Math.min(4, shuffledPosts.size()); i++) {
+            Post post = shuffledPosts.get(i);
+            switch (i) {
+                case 0:
+                    dailytitle1.setText(post.title);
+                    starrating.setText(post.rating);
+                    dailylikecounter.setText(post.likecount);
+                    ImageUtils.loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto1, 280, 174, 30);
+                    break;
+                case 1:
+                    dailytitle2.setText(post.title);
+                    starrating2.setText(post.rating);
+                    dailylikecounter2.setText(post.likecount);
+                    ImageUtils.loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto2, 280, 174, 30);
+                    break;
+                case 2:
+                    dailytitle3.setText(post.title);
+                    starrating3.setText(post.rating);
+                    dailylikecounter3.setText(post.likecount);
+                    ImageUtils.loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto3, 280, 174, 30);
+                    break;
+                case 3:
+                    dailytitle4.setText(post.title);
+                    starrating4.setText(post.rating);
+                    dailylikecounter4.setText(post.likecount);
+                    ImageUtils.loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.scaleToFit(dailyphoto4, 280, 174, 30);
+                    break;
             }
         }
     }
@@ -251,49 +287,59 @@ public class CommunityController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         repository.ensureDummyData();
-        loadPosts();
-        createpost.setOnAction(e -> showCreatePostPopup());
-    }
-
-    @FXML
-    private void handleCreatePost() {
-        showCreatePostPopup();
+        
+        // Only load posts if main controller is available
+        // Otherwise, they'll be loaded when setMainController is called
+        if (main != null) {
+            loadPosts();
+            loadDailyPosts();
+        }
     }
 
     /**
-     * Displays a modal dialog that allows the user to create a new post.
+     * Formats a timestamp string into a relative time format like "2h ago", "1d ago"
      */
-    private void showCreatePostPopup() {
+    public String formatRelativeTime(String timeString) {
+        if (timeString == null || timeString.trim().isEmpty()) {
+            return "unknown";
+        }
+        
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/createPost.fxml"));
-            Parent popupRoot = loader.load();
-            CreatePostController controller = loader.getController();
-
-            popupRoot.setScaleX(0.7);
-            popupRoot.setScaleY(0.7);
-
-            Scene popupScene = new Scene(popupRoot);
-            Stage popupStage = new Stage();
-            popupStage.initModality(Modality.APPLICATION_MODAL);
-            popupStage.setScene(popupScene);
-            popupStage.setTitle("Create Post");
-            popupStage.setResizable(false);
-
-            popupStage.setOnShown(e -> {
-                ScaleTransition st = new ScaleTransition(Duration.millis(220), popupRoot);
-                st.setFromX(0.7);
-                st.setFromY(0.7);
-                st.setToX(1.0);
-                st.setToY(1.0);
-                st.play();
-            });
-
-            popupStage.showAndWait();
-            if (controller.isSuccess()) {
-                loadPosts();
+            LocalDateTime postTime;
+            String trimmedTime = timeString.trim();
+            
+            // Try different formats to handle various timestamp formats
+            try {
+                // First try format with seconds: "2025-07-11 17:12:55"
+                DateTimeFormatter formatterWithSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                postTime = LocalDateTime.parse(trimmedTime, formatterWithSeconds);
+            } catch (Exception e1) {
+                try {
+                    // Then try format without seconds: "2025-07-11 17:12"
+                    DateTimeFormatter formatterWithoutSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                    postTime = LocalDateTime.parse(trimmedTime, formatterWithoutSeconds);
+                } catch (Exception e2) {
+                    // If both fail, return original string
+                    return timeString;
+                }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            
+            long hours = ChronoUnit.HOURS.between(postTime, LocalDateTime.now());
+            long minutes = ChronoUnit.MINUTES.between(postTime, LocalDateTime.now());
+            
+            if (minutes < 1) return "just now";
+            if (minutes < 60) return minutes + "m ago";
+            if (hours < 24) return hours + "h ago";
+            
+            long days = hours / 24;
+            if (days < 30) return days + "d ago";
+            
+            long months = days / 30;
+            if (months < 12) return months + "mo ago";
+            
+            return (months / 12) + "y ago";
+        } catch (Exception e) {
+            return timeString;
         }
     }
 }

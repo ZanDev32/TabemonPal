@@ -4,23 +4,53 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import com.starlight.util.FXMLVerificator;
+import com.starlight.util.FileSystemManager;
 import com.starlight.api.UserApiServer;
 
 import java.io.IOException;
-
+import java.util.logging.Logger;
+import java.util.logging.Level;
 /**
  * Main JavaFX application entry point. This class starts the embedded
  * {@link UserApiServer} and loads the initial FXML views.
  */
 public class App extends Application {
 
+    private static final Logger logger = Logger.getLogger(App.class.getName());
 
     /** Main application scene used to swap views. */
     private static Scene scene;
+
+    /**
+     * Resizes the application window and centers it on the screen.
+     *
+     * @param width  The new width of the window.
+     * @param height The new height of the window.
+     */
+    public static void resizeWindow(double width, double height) {
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setWidth(width);
+            stage.setHeight(height);
+            stage.centerOnScreen();
+        }
+    }
+
+    /**
+     * Maximizes the application window to fill the screen.
+     */
+    public static void maximizeStage() {
+        Stage stage = (Stage) scene.getWindow();
+        if (stage != null) {
+            stage.setMaximized(true);
+        }
+    }
+
     /** Embedded HTTP server providing user API endpoints. */
     private UserApiServer apiServer;
     /** Thread running the API server. */
@@ -38,10 +68,17 @@ public class App extends Application {
         apiThread.start();
 
         FXMLVerificator.verifyAll();
-        scene = new Scene(loadFXML("splashScreen"), 1280, 720);
-
-        scene = new Scene(loadFXML("splashScreen"), 1280, 720);
+        scene = new Scene(loadFXML("splashScreen"));
         stage.setScene(scene);
+        resizeWindow(1280, 720);
+
+        try {
+            Image icon = new Image(getClass().getResourceAsStream("/com/starlight/images/AppLogo.png"));
+            stage.getIcons().add(icon);
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not load application icon: " + e.getMessage(), e);
+        }
+        
         stage.setTitle("TabemonPal by Starlight Inc.");
         stage.setResizable(true);
         stage.show();
@@ -58,6 +95,14 @@ public class App extends Application {
      */
     public static void setRoot(String fxml) throws IOException {
         scene.setRoot(loadFXML(fxml));
+
+        
+        // Maximize the stage based on the loaded FXML
+        if ("main".equals(fxml)) {
+            maximizeStage();
+        } else if ("Authorization".equals(fxml)) {
+            resizeWindow(1280, 720);
+        }
     }
 
     /**
@@ -77,31 +122,25 @@ public class App extends Application {
      */
     public static void loadMainWithSplash() {
         try {
-            System.out.println("Loading splash screen before main view");
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
-            System.err.println("Failed to load splash screen: " + ex.getMessage());
-            ex.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to load splash screen: " + ex.getMessage(), ex);
             return;
         }
 
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(e -> {
             try {
-                System.out.println("Now loading main view");
-                scene.setRoot(loadFXML("main"));
-                System.out.println("Main view loaded successfully");
+                setRoot("main");
             } catch (IOException ex) {
-                System.err.println("Failed to load main view: " + ex.getMessage());
-                ex.printStackTrace();
+                logger.log(Level.SEVERE, "Failed to load main view: " + ex.getMessage(), ex);
                 
                 // Fallback - try to load main directly if there was an error
                 try {
-                    System.out.println("Attempting direct load of main view");
-                    scene.setRoot(loadFXML("main"));
+                    logger.info("Attempting direct load of main view");
+                    setRoot("main");
                 } catch (IOException fallbackEx) {
-                    System.err.println("Fallback failed too: " + fallbackEx.getMessage());
-                    fallbackEx.printStackTrace();
+                    logger.log(Level.SEVERE, "Fallback failed too: " + fallbackEx.getMessage(), fallbackEx);
                 }
             }
         });
@@ -119,10 +158,10 @@ public class App extends Application {
         
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(resourcePath));
         if (fxmlLoader.getLocation() == null) {
-            System.err.println("FXML resource not found: " + resourcePath);
+            logger.warning("FXML resource not found: " + resourcePath);
             // Try with leading slash
             resourcePath = "/com/starlight/view/" + fxml + ".fxml";
-            System.out.println("Trying alternative path: " + resourcePath);
+            logger.info("Trying alternative path: " + resourcePath);
             fxmlLoader = new FXMLLoader(App.class.getClassLoader().getResource(resourcePath));
             
             if (fxmlLoader.getLocation() == null) {
@@ -150,7 +189,20 @@ public class App extends Application {
      * @param args command line arguments
      */
     public static void main(String[] args) {
+        FileSystemManager.initializeAppDataDirectory();
         launch();
+
+        /*Login information 
+         * 
+         * Administrator:
+         * Username: admin
+         * Password: admin123
+         * 
+         * User:
+         * Username: user
+         * Password: user
+         *
+        */
     }
 
 }

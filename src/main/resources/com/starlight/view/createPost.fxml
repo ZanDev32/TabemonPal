@@ -5,20 +5,22 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="520.0" styleClass="create-post" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="790.0" prefWidth="515.0" styleClass="background-window" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.CreatePostController">
    <children>
-      <Label styleClass="create-post-header" text="Create New Recipes">
+      <Label styleClass="Popup-post-title" text="Create New Recipe">
          <VBox.margin>
             <Insets bottom="5.0" />
          </VBox.margin>
       </Label>
       <HBox prefHeight="23.0" prefWidth="420.0">
          <children>
-            <Label styleClass="create-post-header" text="Recipe Title">
+            <Label styleClass="Popup-post-header" text="Recipe Title">
                <HBox.margin>
                   <Insets right="212.0" />
                </HBox.margin>
@@ -27,31 +29,14 @@
       </HBox>
       <HBox prefHeight="41.0" prefWidth="420.0">
          <children>
-            <MFXTextField fx:id="title" floatMode="BORDER" maxWidth="-Infinity" prefHeight="42.0" prefWidth="281.0" promptText="e.g., Avocado Guacamole">
+            <MFXTextField fx:id="title" floatMode="BORDER" maxWidth="1.7976931348623157E308" prefHeight="42.0" prefWidth="281.0" promptText="e.g., Avocado Guacamole" HBox.hgrow="ALWAYS">
                <padding>
                   <Insets bottom="18.0" left="10.0" />
                </padding>
             </MFXTextField>
-            <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="44.0" prefWidth="139.0" HBox.hgrow="ALWAYS">
-               <children>
-                  <MFXButton fx:id="imagepicker" maxWidth="-Infinity" prefHeight="22.0" prefWidth="110.0" style="-fx-font-size: 10;" text="Choose Image" textOverrun="CLIP">
-                     <VBox.margin>
-                        <Insets left="15.0" top="5.0" />
-                     </VBox.margin>
-                  </MFXButton>
-                  <Label fx:id="pickerstatus" prefHeight="18.0" prefWidth="80.0" text="No image picked">
-                     <font>
-                        <Font size="10.0" />
-                     </font>
-                     <VBox.margin>
-                        <Insets left="30.0" />
-                     </VBox.margin>
-                  </Label>
-               </children>
-            </VBox>
          </children>
       </HBox>
-      <Label styleClass="create-post-header" text="Description">
+      <Label styleClass="Popup-post-header" text="Description">
          <VBox.margin>
             <Insets bottom="5.0" top="5.0" />
          </VBox.margin>
@@ -64,17 +49,55 @@
             <Insets bottom="5.0" />
          </VBox.margin>
       </MFXTextField>
-      <Label styleClass="create-post-header" text="Ingredients">
+      <Label styleClass="Popup-post-header" text="Ingredients">
          <VBox.margin>
             <Insets bottom="5.0" top="5.0" />
          </VBox.margin>
       </Label>
-      <TextArea fx:id="ingredients" prefHeight="117.0" prefWidth="420.0" promptText="Tell us about your recipe" />
-      <Label prefWidth="155.0" styleClass="create-post-header" text="Directions" />
-      <TextArea fx:id="directions" prefHeight="120.0" prefWidth="420.0" promptText="Explain step by step">
+      <TextArea fx:id="ingredients" prefHeight="117.0" prefWidth="420.0" promptText="Tell us about your recipe" style="-fx-background-radius: 10;">
          <VBox.margin>
-            <Insets bottom="20.0" />
-         </VBox.margin></TextArea>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </TextArea>
+      <Label styleClass="Popup-post-header" text="Directions">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </Label>
+      <TextArea fx:id="directions" prefHeight="117.0" prefWidth="420.0" promptText="Explain step by step" style="-fx-background-radius: 10;">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </TextArea>
+      <Label prefWidth="155.0" styleClass="Popup-post-header" text="Image">
+         <VBox.margin>
+            <Insets bottom="5.0" />
+         </VBox.margin>
+      </Label>
+      <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" styleClass="Popup-image">
+         <children>
+            <Label fx:id="pickerstatus" prefHeight="18.0" text="Drag and Drop or upload media">
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
+            <MFXButton fx:id="imagepicker" buttonType="RAISED" minHeight="-Infinity" minWidth="-Infinity" prefHeight="30.0" prefWidth="30.0" style="-fx-background-radius: 50;" text=" " textOverrun="CLIP">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="28.0" pickOnBounds="true" preserveRatio="true" translateX="-3.8">
+                     <image>
+                        <Image url="@../icon/photo.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <HBox.margin>
+                  <Insets left="6.0" />
+               </HBox.margin>
+            </MFXButton>
+         </children>
+         <VBox.margin>
+            <Insets bottom="12.0" />
+         </VBox.margin>
+      </HBox>
       <MFXButton fx:id="submit" maxWidth="1.7976931348623157E308" styleClass="button-community" text="Save">
          <VBox.margin>
             <Insets bottom="10.0" />

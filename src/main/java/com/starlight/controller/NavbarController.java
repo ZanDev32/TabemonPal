@@ -1,15 +1,20 @@
 package com.starlight.controller;
 
-import com.starlight.models.User;
+import com.starlight.model.User;
+import com.starlight.util.ImageUtils;
 import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
 import javafx.fxml.FXML;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 public class NavbarController {
+    @FXML
+    private ImageView photoprofile;
+
     @FXML
     private HBox navbar;
 
@@ -36,7 +41,7 @@ public class NavbarController {
 
     @FXML
     void profile(MouseEvent event) {
-        main.loadPage("profile");
+        main.loadPage("editAccount");
     }
 
     @FXML
@@ -58,9 +63,15 @@ public class NavbarController {
     private void initialize() {
         User currentUser = Session.getCurrentUser();
         if (currentUser != null) {
-            profile.setText(currentUser.username);
+            if (currentUser.profilepicture != null && !currentUser.profilepicture.isEmpty()) {
+                ImageUtils.loadImage(photoprofile, currentUser.profilepicture, "/com/starlight/images/default-profile.png");
+            } else {
+                ImageUtils.loadImage(photoprofile, "/com/starlight/images/default-profile.png");
+            }
+            ImageUtils.scaleToFit(photoprofile, 40, 40, 80);
         } else {
-            profile.setText("Guest");
+            ImageUtils.loadImage(photoprofile, "/com/starlight/images/missing.png");
+            ImageUtils.scaleToFit(photoprofile, 40, 40, 80);
         }
     }
 }

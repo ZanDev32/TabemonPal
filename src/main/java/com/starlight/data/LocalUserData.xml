@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<users>
+  <user>
+    <username>admin</username>
+    <email>admin@tabemonpal.local</email>
+    <fullname>Administrator</fullname>
+    <password>admin123</password>
+    <birthDay>1990-01-01</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profileman.jpg</profilepicture>
+  </user>
+  <user>
+    <username>user</username>
+    <email>user@tabemonpal.local</email>
+    <fullname>Default User</fullname>
+    <password>user</password>
+    <birthDay>1995-01-01</birthDay>
+    <profilepicture>src/main/resources/com/starlight/images/dummy/profiledefault.png</profilepicture>
+  </user>
+</users>
