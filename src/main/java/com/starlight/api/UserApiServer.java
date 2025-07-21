@@ -7,11 +7,14 @@ import java.net.BindException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.User;
-import com.starlight.models.UserDataRepository;
+import com.starlight.model.User;
+import com.starlight.repository.LocalUserDataRepository;
+import com.starlight.repository.UserDataRepository;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
@@ -21,10 +24,14 @@ import com.sun.net.httpserver.HttpServer;
  * {@link XStream} for XML serialization of {@link User} objects.
  */
 public class UserApiServer {
+    private static final Logger logger = Logger.getLogger(UserApiServer.class.getName());
+
     /** Underlying lightweight HTTP server. */
     private HttpServer server;
     /** Repository used to read and write user data. */
     private final UserDataRepository repository = new UserDataRepository();
+    /** Local user data repository for admin and user accounts. */
+    private final LocalUserDataRepository localRepository = new LocalUserDataRepository();
     /** XStream instance configured for the user model. */
     private final XStream xstream = new XStream(new DomDriver());
     /** Flag to prevent multiple starts */
@@ -40,7 +47,7 @@ public class UserApiServer {
      */
     public UserApiServer(int port) throws IOException {
 
-        xstream.allowTypesByWildcard(new String[]{"com.starlight.models.*", "java.util.*"});
+        xstream.allowTypesByWildcard(new String[]{"com.starlight.model.*", "com.starlight.model.*", "java.util.*"});
         xstream.alias("user", User.class);
         xstream.alias("users", List.class);
         repository.ensureDummyData();
@@ -53,11 +60,11 @@ public class UserApiServer {
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
             try {
                 server = HttpServer.create(new InetSocketAddress(currentPort), 0);
-                System.out.println("Server created on port " + currentPort);
+                logger.info("Server created on port " + currentPort);
                 serverCreated = true;
                 break;
             } catch (BindException e) {
-                System.out.println("Port " + currentPort + " already in use, trying next port...");
+                logger.info("Port " + currentPort + " already in use, trying next port...");
                 currentPort++;
             }
         }
@@ -104,13 +111,25 @@ public class UserApiServer {
             
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             User creds = (User) xstream.fromXML(body);
+            
+            // First check local users (admin and user accounts)
+            String loginIdentifier = creds.email; // This could be username or email
+            User localUser = localRepository.validateCredentials(loginIdentifier, creds.password);
+            
+            if (localUser != null) {
+                logger.info("Local user authenticated: " + localUser.username);
+                sendXml(exchange, 200, xstream.toXML(localUser));
+                return;
+            }
+            
+            // Fallback to regular repository users
             List<User> users = repository.loadUsers();
             
             // Check for either email or username match
             Optional<User> match = users.stream()
                     .filter(u -> ((u.email != null && u.email.equals(creds.email)) || 
                                  (u.username != null && u.username.equals(creds.email))) && 
-                                 u.password.equals(creds.password))
+                                 u.password != null && u.password.equals(creds.password))
                     .findFirst();
                     
             if (match.isPresent()) {
@@ -187,8 +206,7 @@ public class UserApiServer {
                 }
             } catch (Exception e) {
                 // Log the exception
-                System.err.println("Error handling user request: " + e.getMessage());
-                e.printStackTrace();
+                logger.log(Level.SEVERE, "Error handling user request: " + e.getMessage(), e);
                 sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
             }
         }
@@ -211,6 +229,14 @@ public class UserApiServer {
          * Handles GET request to retrieve user profile
          */
         private void handleGetUser(HttpExchange exchange, String username) throws IOException {
+            // First check local users (admin and user accounts)
+            User localUser = localRepository.findUser(username);
+            if (localUser != null) {
+                sendXml(exchange, 200, xstream.toXML(localUser));
+                return;
+            }
+            
+            // Fallback to regular repository users
             List<User> users = repository.loadUsers();
             Optional<User> user = users.stream()
                     .filter(u -> u.username != null && u.username.equals(username))
@@ -227,6 +253,13 @@ public class UserApiServer {
          * Handles PUT request to update user profile
          */
         private void handleUpdateUser(HttpExchange exchange, String username) throws IOException {
+            // Check if trying to update local users (admin or user)
+            User localUser = localRepository.findUser(username);
+            if (localUser != null) {
+                sendErrorResponse(exchange, 403, "Local system accounts cannot be modified");
+                return;
+            }
+            
             // Read and parse request body
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             if (body == null || body.isEmpty()) {
@@ -243,7 +276,7 @@ public class UserApiServer {
                 return;
             }
             
-            // Find and update user
+            // Find and update user in regular repository
             List<User> users = repository.loadUsers();
             boolean userFound = false;
             

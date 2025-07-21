@@ -4,9 +4,11 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 
-import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
+import com.starlight.model.Post;
+import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -17,13 +19,18 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import javafx.stage.Modality;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.fxml.FXMLLoader;
 
 
 /**
  * Controller responsible for the "edit post" dialog.
  */
 public class EditPostController implements Initializable {
+    private static final Logger logger = Logger.getLogger(EditPostController.class.getName());
 
     @FXML
     private MFXTextField title;
@@ -90,8 +97,7 @@ public class EditPostController implements Initializable {
             String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
-            System.err.println("Failed to copy image to user directory: " + e.getMessage());
-            e.printStackTrace();
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
             return null;
         }
     }
@@ -132,7 +138,7 @@ public class EditPostController implements Initializable {
         // Submit button logic
         submit.setOnAction(event -> {
             if (currentPost == null) {
-                System.err.println("No post to edit");
+                logger.warning("No post to edit");
                 return;
             }
 
@@ -142,7 +148,7 @@ public class EditPostController implements Initializable {
             String postDirections = directions.getText();
 
             if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty()) {
-                System.err.println("Please complete all fields.");
+                logger.warning("Please complete all fields.");
                 return;
             }
 
@@ -164,21 +170,37 @@ public class EditPostController implements Initializable {
             }
 
             // Save the updated post
-            List<Post> posts = repository.loadPosts();
-            for (int i = 0; i < posts.size(); i++) {
-                Post post = posts.get(i);
-                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
-                    posts.set(i, currentPost);
-                    break;
+            try {
+                List<Post> posts = repository.loadPosts();
+                for (int i = 0; i < posts.size(); i++) {
+                    Post post = posts.get(i);
+                    if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                        posts.set(i, currentPost);
+                        break;
+                    }
                 }
+                repository.savePosts(posts);
+
+                success = true;
+                logger.info("Post updated successfully");
+
+                // Close the dialog first
+                Stage stage = (Stage) submit.getScene().getWindow();
+                stage.close();
+                
+                // Show success message
+                showResultDialog("post_updated_success");
+                
+            } catch (Exception e) {
+                logger.log(Level.SEVERE, "Failed to update post: " + e.getMessage(), e);
+                
+                // Show failure message
+                showResultDialog("post_update_failed");
+                
+                // Still close the dialog
+                Stage stage = (Stage) submit.getScene().getWindow();
+                stage.close();
             }
-            repository.savePosts(posts);
-
-            success = true;
-
-            // Close the dialog
-            Stage stage = (Stage) submit.getScene().getWindow();
-            stage.close();
         });
 
         // Cancel button logic
@@ -187,5 +209,45 @@ public class EditPostController implements Initializable {
             Stage stage = (Stage) cancel.getScene().getWindow();
             stage.close();
         });
+    }
+    
+    /**
+     * Shows a popup dialog with success or failure message
+     */
+    private void showResultDialog(String resultType) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/popupDialog.fxml"));
+            Parent root = loader.load();
+            
+            PopupDialogController controller = loader.getController();
+            
+            // Set appropriate message based on result type
+            switch (resultType) {
+                case "post_updated_success":
+                    controller.setPostUpdatedSuccess();
+                    break;
+                case "post_update_failed":
+                    controller.setPostUpdateFailed();
+                    break;
+                default:
+                    controller.setMessage("Operation completed.");
+                    break;
+            }
+            
+            Stage dialogStage = new Stage();
+            dialogStage.setTitle(resultType.contains("success") ? "Success" : "Error");
+            dialogStage.initModality(Modality.APPLICATION_MODAL);
+            dialogStage.setScene(new Scene(root));
+            dialogStage.setResizable(false);
+            
+            // Center the dialog
+            dialogStage.centerOnScreen();
+            
+            // Show the dialog
+            dialogStage.showAndWait();
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+        }
     }
 }

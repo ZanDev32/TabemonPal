@@ -200,7 +200,7 @@
                         --add-opens=javafx.graphics/com.sun.javafx.application.HostServicesDelegate=ALL-UNNAMED
                         --add-opens=com.starlight/com.starlight=ALL-UNNAMED
                         --add-opens=com.starlight/com.starlight.api=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight.models=ALL-UNNAMED
+                        --add-opens=com.starlight/com.starlight.model=ALL-UNNAMED
                         --add-opens=com.starlight/com.starlight.util=ALL-UNNAMED
                         --add-opens=com.starlight/com.starlight.controller=ALL-UNNAMED
                     </argLine>

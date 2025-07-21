@@ -9,10 +9,13 @@
 
 <HBox fx:id="navbar" alignment="CENTER_LEFT" maxHeight="-Infinity" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="95.0" prefWidth="861.0" stylesheets="@../style.css" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.starlight.controller.NavbarController">
    <children>
-      <MFXTextField fx:id="searchbar" floatMode="ABOVE" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="62.0" prefWidth="378.0" promptText="Search Anything" HBox.hgrow="ALWAYS">
+      <MFXTextField fx:id="searchbar" floatMode="DISABLED" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" prefHeight="62.0" prefWidth="378.0" promptText="Search Anything" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-padding: 0 0 0 10;" HBox.hgrow="ALWAYS">
          <HBox.margin>
             <Insets left="55.0" />
          </HBox.margin>
+         <opaqueInsets>
+            <Insets />
+         </opaqueInsets>
       </MFXTextField>
       <HBox alignment="CENTER_RIGHT" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="95.0" prefWidth="325.0" HBox.hgrow="ALWAYS">
          <children>
@@ -52,9 +55,9 @@
                   <Insets left="35.0" />
                </HBox.margin>
             </MFXButton>
-            <MFXButton fx:id="profile" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#profile" prefHeight="48.0" styleClass="button-icon" text="user">
+            <MFXButton fx:id="profile" maxWidth="1.7976931348623157E308" minWidth="-Infinity" onMouseClicked="#profile" prefHeight="52.0" prefWidth="45.0" style="-fx-font-size: 18;" styleClass="button-icon" text=" ">
                <graphic>
-                  <ImageView fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
+                  <ImageView fx:id="photoprofile" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true" translateX="-10.0">
                      <image>
                         <Image url="@../icon/account-circle-outline.png" />
                      </image>

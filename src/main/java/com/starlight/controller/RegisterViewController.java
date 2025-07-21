@@ -2,10 +2,10 @@ package com.starlight.controller;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-
+import java.util.logging.Logger;
 import com.starlight.api.ApiClient;
 import com.starlight.api.ApiClient.ApiException;
-import com.starlight.models.User;
+import com.starlight.model.User;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;
@@ -24,6 +24,7 @@ import javafx.scene.paint.Color;
  * Controller used for registering a new user account within the Authorization panel.
  */
 public class RegisterViewController implements Initializable {
+    private static final Logger logger = Logger.getLogger(RegisterViewController.class.getName());
     @FXML
     private VBox registerView;
 
@@ -111,7 +112,7 @@ public class RegisterViewController implements Initializable {
         
         try {
             User registered = apiClient.register(user, em, pass);
-            System.out.println("Register success for user: " + registered.username);
+            logger.info("Register success for user: " + registered.username);
             
             // Show success message before switching view
             showSuccess("Account created successfully! Please log in.");
@@ -121,7 +122,7 @@ public class RegisterViewController implements Initializable {
                 authController.showLoginView();
             }
         } catch (ApiException e) {
-            System.out.println("Register failed: " + e.getMessage());
+            logger.warning("Register failed: " + e.getMessage());
             
             // Show user-friendly error message
             if (e.getStatusCode() == 409) {

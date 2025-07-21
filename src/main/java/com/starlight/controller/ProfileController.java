@@ -4,10 +4,11 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
-import com.starlight.models.Post;
-import com.starlight.models.PostDataRepository;
-import com.starlight.models.User;
+import com.starlight.model.Post;
+import com.starlight.model.User;
+import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 import com.starlight.util.ImageUtils;
 
@@ -38,6 +39,8 @@ import javafx.util.Duration;
  * operations to the CommunityController which serves as a shared utility provider.
  */
 public class ProfileController implements Initializable {
+    private static final Logger logger = Logger.getLogger(ProfileController.class.getName());
+    
     @FXML
     private MFXButton editBio;
 
@@ -88,6 +91,30 @@ public class ProfileController implements Initializable {
         this.main = main;
         // Also set the main controller for the community controller if needed
         // No need to set main controller for utility class
+        
+        // Update any existing RecipeItemControllers with the MainController reference
+        updateRecipeItemControllersMainController();
+    }
+    
+    /**
+     * Updates all existing RecipeItemControllers with MainController reference
+     * This handles the timing issue where recipes are loaded before MainController is set
+     */
+    private void updateRecipeItemControllersMainController() {
+        if (main == null || myrepiceList == null) {
+            return;
+        }
+        
+        // Since we can't easily access individual controllers after they're created,
+        // the best approach is to reload recipes if they were loaded before MainController was set
+        javafx.scene.Node content = myrepiceList.getContent();
+        if (content != null && content instanceof javafx.scene.Parent) {
+            javafx.scene.Parent parentContent = (javafx.scene.Parent) content;
+            if (parentContent.getChildrenUnmodifiable().size() > 0) {
+                logger.info("Reloading recipes with MainController reference");
+                loadUserRecipes();
+            }
+        }
     }
     
     @FXML
@@ -182,6 +209,14 @@ public class ProfileController implements Initializable {
                 
                 // Set the post data for edit/delete functionality
                 controller.setPost(post);
+                
+                // Set the main controller reference for navigation (check if available)
+                if (main != null) {
+                    controller.setMainController(main);
+                } else {
+                    // Log warning if main controller not available yet
+                    logger.warning("MainController not available for RecipeItemController - navigation will not work");
+                }
                 
                 // Set up callback to refresh the recipes when post is updated/deleted
                 controller.setOnPostUpdated(() -> loadUserRecipes());

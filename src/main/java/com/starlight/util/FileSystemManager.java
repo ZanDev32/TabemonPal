@@ -31,6 +31,7 @@ public class FileSystemManager {
     /**
      * Initializes the application data directory structure.
      * Creates .tabemonpal directory with UserData and Database subdirectories.
+     * Also creates .SECRET_KEY.xml file with default configuration.
      * This method is cross-platform compatible and works when running as JAR.
      */
     public static void initializeAppDataDirectory() {
@@ -46,6 +47,17 @@ public class FileSystemManager {
             // Create Database directory for XML files
             Path databaseDir = Paths.get(DATABASE_DIR);
             Files.createDirectories(databaseDir);
+            
+            // Create .SECRET_KEY.xml file if it doesn't exist
+            Path secretKeyPath = databaseDir.resolve(".SECRET_KEY.xml");
+            if (!Files.exists(secretKeyPath)) {
+                String secretKeyContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                        "<config>\n" +
+                                        "    <openai-key>PASTE-YOUR-SECRET-KEY-HERE</openai-key>\n" +
+                                        "</config>";
+                Files.write(secretKeyPath, secretKeyContent.getBytes("UTF-8"));
+                LOGGER.info("Paste your secret key at: " + secretKeyPath);
+            }
             
             LOGGER.info("App data directory initialized at: " + APP_DATA_DIR);
             
@@ -160,8 +172,7 @@ public class FileSystemManager {
             
             return copyFileToUserDirectory(sourceFile, username, uniqueFileName);
         } catch (SecurityException e) {
-            System.err.println("Failed to copy file with unique filename: " + e.getMessage());
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "Failed to copy file with unique filename: " + e.getMessage(), e);
             return null;
         }
     }
@@ -230,20 +241,9 @@ public class FileSystemManager {
             return null;
         }
         
-        // Handle absolute paths (including user directory paths)
-        Path absolutePath = Paths.get(imagePath);
-        if (absolutePath.isAbsolute()) {
-            if (Files.exists(absolutePath)) {
-                return absolutePath;
-            } else {
-                LOGGER.warning("Could not resolve absolute path: " + imagePath);
-                return null;
-            }
-        }
-        
-        // Handle resource paths (paths starting with /)
-        if (imagePath.startsWith("/")) {
-            // Try to resolve as resource from classpath
+        // Handle resource paths (paths starting with /) - check this before absolute paths
+        if (imagePath.startsWith("/") && imagePath.contains("com/starlight")) {
+            // Try to resolve as resource from classpath first
             URL resource = FileSystemManager.class.getResource(imagePath);
             if (resource != null) {
                 try {
@@ -266,6 +266,17 @@ public class FileSystemManager {
             return null;
         }
         
+        // Handle absolute filesystem paths (but not resource paths)
+        Path absolutePath = Paths.get(imagePath);
+        if (absolutePath.isAbsolute()) {
+            if (Files.exists(absolutePath)) {
+                return absolutePath;
+            } else {
+                LOGGER.warning("Could not resolve absolute path: " + imagePath);
+                return null;
+            }
+        }
+        
         // Handle relative paths - try different base directories
         
         // Try relative to user data directory
@@ -286,7 +297,7 @@ public class FileSystemManager {
             return projectResourcesPath;
         }
         
-        System.out.println("Warning: Could not resolve image path: " + imagePath);
+        LOGGER.warning("Could not resolve image path: " + imagePath);
         return null;
     }
 

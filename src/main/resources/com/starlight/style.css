@@ -15,7 +15,7 @@
 .sideBar{
     -fx-background-color: #EED8AF;
         background-color: #EED8AF;
-    -fx-background-radius: 0 50 50 0;
+    -fx-background-radius: 0 30 30 0;
 }
 
 .button-sidebar {  
@@ -59,10 +59,24 @@
 }
 
 .button-active-bar {
-    -fx-background-color: #3F3F5B;
-        background-color: #3F3F5B;
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
 }
 
+/* Ensure activeBar maintains its color regardless of position */
+.sideBar .button-active-bar {
+    -fx-background-color: #3F3F5B !important;
+        background-color: #3F3F5B !important;
+    -fx-border-color: #3F3F5B !important;
+        border-color: #3F3F5B !important;
+}
+
+.black {
+    -fx-background-color: #000000;
+        background-color: #000000;
+}
 .icon{
     -fx-padding: 0px 26px 0px 0px;
         padding: 0px 26px 0px 0px;
@@ -73,11 +87,11 @@
         font-family: Poppins;
     -fx-font-style: normal;
         font-style: normal;
-    -fx-font-size: 15;
-        font-size: 15;
-    -fx-text-fill: #5b543f;
-    -fx-background-color:#EED8AF;
-        background-color:#EED8AF;
+    -fx-font-size: 16;
+        font-size: 16;
+    -fx-text-fill:  white;
+    -fx-background-color:#92598C;
+        background-color:#92598C;
     -fx-background-radius: 10 10 10 10;
 }
 
@@ -190,10 +204,10 @@
 }
 
 .normal-button {
-    -fx-background-color: #EED8AF;
-        background-color: #EED8AF;
+    -fx-background-color: #92598C;
+        background-color: #92598C;
     -fx-background-radius: 20 20 20 20;
-    -fx-text-fill: #5b543f;
+    -fx-text-fill: white;
     -fx-font-family: Poppins;
         font-family: Poppins;
     -fx-font-style: normal;
@@ -206,6 +220,153 @@
         border-radius: 25 25 25 25;
 }
 
+<<<<<<< HEAD
+.text-area, .text-area .viewport, .text-area .content {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+
+.text-prompt {
+    -fx-font-size: 18;
+        font-size: 18;
+}
+
+.button-topic {
+    -fx-background-radius: 10;
+    -fx-text-fill: #5b543f;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 16;
+        font-size: 16;
+}
+
+.food-tag {
+    -fx-background-color: #EED8AF;
+        background-color: #EED8AF;
+    -fx-background-radius: 40;
+    -fx-text-fill: #000000;
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+}
+
+/* Verdict-specific styling */
+.verdict-healthy {
+    -fx-background-color: #4CAF50 !important;
+        background-color: #4CAF50 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-moderate {
+    -fx-background-color: #FF9800 !important;
+        background-color: #FF9800 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-unhealthy {
+    -fx-background-color: #F44336 !important;
+        background-color: #F44336 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-junk {
+    -fx-background-color: #9C27B0 !important;
+        background-color: #9C27B0 !important;
+    -fx-text-fill: white !important;
+}
+
+.verdict-unknown {
+    -fx-background-color: #9E9E9E !important;
+        background-color: #9E9E9E !important;
+    -fx-text-fill: white !important;
+}
+
+.post-username {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 20;
+        font-size: 20;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-date {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 14;
+        font-size: 14;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-desc {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 28;
+        font-size: 28;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+}
+
+.post-recipe-background {
+    -fx-background-color: #FBFAFA;
+        background-color: #FBFAFA;
+    -fx-background-radius: 20 20 20 20;
+}
+
+.app-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 22;
+        font-size: 22;
+    -fx-text-fill: #3F3F5B;
+}
+
+/* Recipe text formatting styles */
+.recipe-title {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 26;
+        font-size: 26;
+    -fx-font-weight: bold;
+        font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.recipe-content {
+    -fx-font-family: Poppins;
+        font-family: Poppins;
+    -fx-font-style: normal;
+        font-style: normal;
+    -fx-font-size: 24;
+        font-size: 24;
+    -fx-text-fill: #3F3F5B;
+    -fx-line-spacing: 2px;
+}
+=======
 /* TabeStreak */
 
 .button-Mission {
@@ -267,6 +428,7 @@
     -fx-background-radius: 20 20 20 20;
 }
     
+>>>>>>> origin/mission
 
 /* debugging only
 
@@ -276,3 +438,242 @@
 }
 
 */
+
+/* Nutrition Facts Chart Styling */
+.nutrition-chart {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 20px;
+        padding: 20px;
+}
+
+.nutrition-chart .chart-title {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 24px;
+        font-size: 24px;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .chart-legend {
+    -fx-background-color: transparent;
+        background-color: transparent;
+    -fx-padding: 10px;
+        padding: 10px;
+}
+
+.nutrition-chart .chart-legend .legend-item {
+    -fx-font-family: "Poppins";
+        font-family: "Poppins";
+    -fx-font-size: 14px;
+        font-size: 14px;
+    -fx-text-fill: #3F3F5B;
+}
+
+.nutrition-chart .pie-slice[data-name="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name^="Protein"] {
+    -fx-pie-color: #FF6B6B;
+}
+
+.nutrition-chart .pie-slice[data-name="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fat"] {
+    -fx-pie-color: #4ECDC4;
+}
+
+.nutrition-chart .pie-slice[data-name="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name^="Carbohydrates"] {
+    -fx-pie-color: #45B7D1;
+}
+
+.nutrition-chart .pie-slice[data-name="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name^="Fiber"] {
+    -fx-pie-color: #96CEB4;
+}
+
+.nutrition-chart .pie-slice[data-name="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}
+
+.nutrition-chart .pie-slice[data-name^="Calories"] {
+    -fx-pie-color: #FFEAA7;
+}
+
+/* Admin Panel Styles */
+.admin-header {
+    -fx-background-color: #2C3E50;
+        background-color: #2C3E50;
+    -fx-text-fill: white;
+}
+
+.admin-title {
+    -fx-text-fill: #FFFFFF;
+    -fx-font-weight: bold;
+        font-weight: bold;
+}
+
+.admin-subtitle {
+    -fx-text-fill: #BDC3C7;
+}
+
+.admin-controls {
+    -fx-background-color: #ECF0F1;
+        background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+        border-color: #BDC3C7;
+    -fx-border-width: 0 0 1 0;
+        border-width: 0 0 1 0;
+}
+
+.stats-label {
+    -fx-text-fill: #2C3E50;
+    -fx-font-size: 12px;
+        font-size: 12px;
+    -fx-font-weight: bold;
+        font-weight: bold;
+}
+
+.admin-table {
+    -fx-background-color: #FFFFFF;
+        background-color: #FFFFFF;
+    -fx-pref-height: 400;
+    -fx-min-height: 300;
+        min-height: 300;
+}
+
+/* MFXTableView specific styling */
+.admin-table .mfx-table-view {
+    -fx-background-color: #FFFFFF;
+        background-color: #FFFFFF;
+    -fx-border-color: #E1E8ED;
+        border-color: #E1E8ED;
+    -fx-border-width: 1;
+        border-width: 1;
+    -fx-border-radius: 8;
+        border-radius: 8;
+}
+
+.admin-table .mfx-table-column-header {
+    -fx-background-color: #34495E;
+        background-color: #34495E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+        font-weight: bold;
+    -fx-padding: 10;
+        padding: 10;
+    -fx-font-size: 14;
+        font-size: 14;
+}
+
+.admin-table .mfx-table-row-cell {
+    -fx-padding: 8;
+        padding: 8;
+    -fx-border-color: #E1E8ED;
+        border-color: #E1E8ED;
+    -fx-border-width: 0 0 1 0;
+        border-width: 0 0 1 0;
+}
+
+.admin-table .mfx-table-row-cell:odd {
+    -fx-background-color: #F8F9FA;
+        background-color: #F8F9FA;
+}
+
+.admin-table .mfx-table-row-cell:hover {
+    -fx-background-color: #E3F2FD;
+        background-color: #E3F2FD;
+}
+
+.admin-table .mfx-table-row-cell:selected {
+    -fx-background-color: #3498DB;
+        background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+/* Legacy TableView styling (keep for compatibility) */
+.admin-table .table-view {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+
+.admin-table .table-view .column-header {
+    -fx-background-color: #34495E;
+        background-color: #34495E;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+        font-weight: bold;
+}
+
+.admin-table .table-view .column-header-background {
+    -fx-background-color: #34495E;
+        background-color: #34495E;
+}
+
+.admin-table .table-row-cell {
+    -fx-background-color: transparent;
+        background-color: transparent;
+}
+
+.admin-table .table-row-cell:odd {
+    -fx-background-color: #F8F9FA;
+        background-color: #F8F9FA;
+}
+
+.admin-table .table-row-cell:selected {
+    -fx-background-color: #3498DB;
+        background-color: #3498DB;
+    -fx-text-fill: white;
+}
+
+.admin-table .table-cell {
+    -fx-border-color: #E1E8ED;
+        border-color: #E1E8ED;
+    -fx-border-width: 0 0 1 0;
+        border-width: 0 0 1 0;
+    -fx-padding: 8;
+        padding: 8;
+}
+
+.mfx-button-primary {
+    -fx-background-color: #3498DB;
+        background-color: #3498DB;
+    -fx-text-fill: white;
+    -fx-background-radius: 6;
+    -fx-border-radius: 6;
+        border-radius: 6;
+    -fx-font-weight: bold;
+        font-weight: bold;
+}
+
+.mfx-button-primary:hover {
+    -fx-background-color: #2980B9;
+        background-color: #2980B9;
+}
+
+.admin-footer {
+    -fx-background-color: #ECF0F1;
+        background-color: #ECF0F1;
+    -fx-border-color: #BDC3C7;
+        border-color: #BDC3C7;
+    -fx-border-width: 1 0 0 0;
+        border-width: 1 0 0 0;
+}
+
+.footer-text {
+    -fx-text-fill: #7F8C8D;
+    -fx-font-style: italic;
+        font-style: italic;
+}
