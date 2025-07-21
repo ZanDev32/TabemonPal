@@ -1,11 +1,9 @@
-package com.starlight.models;
+package com.starlight.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.starlight.model.Post;
 
 /**
  * Unit tests for {@link Post} data model.

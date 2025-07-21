@@ -11,8 +11,8 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class AchievementDataRepository {
-    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
-    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
+    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/model/PostData.xml";
+    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/model/PostDataDummy.xml";
 
     private final String xmlPath;
     private final XStream xstream;

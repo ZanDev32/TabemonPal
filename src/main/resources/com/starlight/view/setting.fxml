@@ -22,7 +22,7 @@
             <Insets bottom="50.0" />
          </VBox.margin>
       </MFXButton>
-      <Label prefHeight="36.0" prefWidth="389.0" style="-fx-font-size: 20;" text="Input your ChatGPT's Secrect Key here" wrapText="true" />
+      <Label prefHeight="36.0" prefWidth="389.0" style="-fx-font-size: 20;" text="Input your ChatGPT's Secret Key here" wrapText="true" />
       <MFXPasswordField fx:id="secret_key" floatMode="ABOVE" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="46.0" prefWidth="839.0" promptText="SECRET_KEY" style="-fx-font-size: 18;">
          <VBox.margin>
             <Insets bottom="20.0" />

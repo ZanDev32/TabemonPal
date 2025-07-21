@@ -49,7 +49,7 @@ public class LocalUserDataRepository {
             File xmlFile = new File(LOCAL_XML_PATH);
             if (!xmlFile.exists()) {
                 // Try to load from resources if file doesn't exist in src
-                InputStream resourceStream = getClass().getResourceAsStream("/com/starlight/models/LocalUserData.xml");
+                InputStream resourceStream = getClass().getResourceAsStream("/com/starlight/model/LocalUserData.xml");
                 if (resourceStream == null) {
                     logger.warning("LocalUserData.xml not found in resources, creating default users");
                     return createDefaultUsers();

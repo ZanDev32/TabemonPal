@@ -20,7 +20,7 @@
                   <Font name="System Bold" size="24.0" />
                </font>
             </Label>
-            <Label styleClass="admin-subtitle" text="Manage and monitor all user account from XML data">
+            <Label styleClass="admin-subtitle" text="Manage and monitor all user accounts from XML data">
                <font>
                   <Font size="14.0" />
                </font>

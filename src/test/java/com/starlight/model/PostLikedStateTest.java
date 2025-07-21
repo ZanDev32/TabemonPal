@@ -1,8 +1,7 @@
-package com.starlight.models;
+package com.starlight.model;
 
 import org.junit.jupiter.api.Test;
 
-import com.starlight.model.Post;
 import com.starlight.repository.PostDataRepository;
 
 import org.junit.jupiter.api.BeforeEach;

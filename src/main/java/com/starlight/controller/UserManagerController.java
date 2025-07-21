@@ -32,12 +32,15 @@ import java.util.ResourceBundle;
 import java.util.List;
 import java.util.Comparator;
 import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 /**
  * Controller for the user management panel that displays and manages user data.
  * Provides functionality to view, edit, sort, and delete users from XML data.
  */
 public class UserManagerController implements Initializable {
+
+    private static final Logger logger = Logger.getLogger(UserManagerController.class.getName());
 
     @FXML
     private MFXTableView<UserTableData> postsTable;
@@ -125,7 +128,7 @@ public class UserManagerController implements Initializable {
             return;
         }
         
-        System.out.println("DEBUG: Initializing UserManagerController...");
+        logger.info("Initializing UserManagerController...");
         
         // Initialize repositories
         postRepository = new PostDataRepository();
@@ -134,7 +137,7 @@ public class UserManagerController implements Initializable {
 
         // Setup table columns first
         setupTableColumns();
-        System.out.println("DEBUG: Table columns setup completed");
+        logger.info("Table columns setup completed");
 
         // Setup sort combo box
         setupSortComboBox();
@@ -145,7 +148,7 @@ public class UserManagerController implements Initializable {
         // Setup refresh button
         refreshButton.setOnAction(e -> loadData());
         
-        System.out.println("DEBUG: UserManagerController initialization completed");
+        logger.info("UserManagerController initialization completed");
     }
     
     /**
@@ -182,7 +185,7 @@ public class UserManagerController implements Initializable {
      * Sets up table columns with appropriate cell factories and value factories
      */
     private void setupTableColumns() {
-        System.out.println("DEBUG: Setting up MFXTableView columns for users...");
+        logger.info("Setting up MFXTableView columns for users...");
         
         // Create table columns programmatically
         usernameColumn = new MFXTableColumn<>("Username");
@@ -264,12 +267,12 @@ public class UserManagerController implements Initializable {
         postsTable.setMinHeight(300.0);
         postsTable.setMaxHeight(Double.MAX_VALUE);
         
-        System.out.println("DEBUG: MFXTableView columns setup completed, userDataList size: " + userDataList.size());
+        logger.info("MFXTableView columns setup completed, userDataList size: " + userDataList.size());
         
         // Force table update
         Platform.runLater(() -> {
             postsTable.update();
-            System.out.println("DEBUG: Platform.runLater update called for users table");
+            logger.fine("Platform.runLater update called for users table");
         });
     }
 
@@ -407,7 +410,7 @@ public class UserManagerController implements Initializable {
                 List<User> users = userRepository.loadUsers();
                 List<Post> posts = postRepository.loadPosts();
 
-                System.out.println("DEBUG: Loaded " + users.size() + " users from repository");
+                logger.info("Loaded " + users.size() + " users from repository");
 
                 Platform.runLater(() -> {
                     // Clear existing data
@@ -423,17 +426,17 @@ public class UserManagerController implements Initializable {
                         })
                         .collect(Collectors.toList());
 
-                    System.out.println("DEBUG: Converted " + tableData.size() + " users to table data");
+                    logger.info("Converted " + tableData.size() + " users to table data");
                     
                     // Debug: Print first few items
                     for (int i = 0; i < Math.min(3, tableData.size()); i++) {
                         UserTableData item = tableData.get(i);
-                        System.out.println("DEBUG: User " + i + ": " + item.getUsername() + " (" + item.getEmail() + ")");
+                        logger.fine("User " + i + ": " + item.getUsername() + " (" + item.getEmail() + ")");
                     }
 
                     userDataList.addAll(tableData);
 
-                    System.out.println("DEBUG: Added data to table, userDataList size: " + userDataList.size());
+                    logger.info("Added data to table, userDataList size: " + userDataList.size());
                     
                     // Force MFXTableView to recognize the new data
                     postsTable.setItems(null);  // Clear first
@@ -443,12 +446,12 @@ public class UserManagerController implements Initializable {
                     // Try to manually trigger table update with delay
                     Platform.runLater(() -> {
                         postsTable.update();
-                        System.out.println("DEBUG: Manual table update after data load");
+                        logger.fine("Manual table update after data load");
                         
                         // Additional force update
                         Platform.runLater(() -> {
                             postsTable.update();
-                            System.out.println("DEBUG: Second manual table update");
+                            logger.fine("Second manual table update");
                         });
                     });
 
@@ -460,12 +463,12 @@ public class UserManagerController implements Initializable {
                     postsTable.update();
                     
                     // Additional debug
-                    System.out.println("DEBUG: After refresh - Table items: " + postsTable.getItems().size());
-                    System.out.println("DEBUG: After refresh - Table columns: " + postsTable.getTableColumns().size());
+                    logger.fine("After refresh - Table items: " + postsTable.getItems().size());
+                    logger.fine("After refresh - Table columns: " + postsTable.getTableColumns().size());
 
                     loadingIndicator.setVisible(false);
                     
-                    System.out.println("DEBUG: User data loading completed successfully");
+                    logger.info("User data loading completed successfully");
                 });
 
                 return null;
@@ -475,7 +478,7 @@ public class UserManagerController implements Initializable {
         loadTask.setOnFailed(e -> {
             Platform.runLater(() -> {
                 loadingIndicator.setVisible(false);
-                System.err.println("DEBUG: Failed to load data: " + e.getSource().getException());
+                logger.severe("Failed to load data: " + e.getSource().getException());
                 e.getSource().getException().printStackTrace();
                 showErrorAlert("Error", "Failed to load data from XML files: " + e.getSource().getException().getMessage());
             });

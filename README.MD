@@ -26,7 +26,7 @@
 ### Prerequisites
 
 Ensure you have the following installed on your system:
-- Java Development Kit (JDK) 11 or higher
+- Java Development Kit (JDK) 17 or higher
 - Maven for dependency management
 
 ### Installation
@@ -60,7 +60,9 @@ TabemonPal/
     │   │           ├── App.java                  # Main application entry point
     │   │           ├── api/
     │   │           ├── controller/
-    │   │           ├── models/
+    │   │           ├── data/    
+    │   │           ├── model/
+    │   │           ├── repository/    
     │   │           └── util/
     │   └── resources/
     │       └── com/
@@ -72,7 +74,9 @@ TabemonPal/
         └── java/
             └── com/
                 └── starlight/
-                    ├── models/
+                    ├── api/
+                    ├── controller/
+                    ├── model/
                     └── util/
 ```
 
@@ -126,6 +130,7 @@ mvn test
 
 - MaterialFX library by Alessandro Parisi for the modern UI components
 - PlexPt for the ChatGPT Java API integration
+- Praventa-desktop by rizalkalam for some code inpiration
 - XStream library for simplified XML serialization
 
 ## 📄 License
