@@ -7,7 +7,8 @@ import javafx.stage.Modality;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.fxml.FXMLLoader;
-import com.starlight.models.Post;
+
+import com.starlight.model.Post;
 import com.starlight.repository.PostDataRepository;
 
 import java.util.List;

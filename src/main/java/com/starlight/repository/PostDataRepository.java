@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.Post;
+import com.starlight.model.Post;
 import com.starlight.util.FileSystemManager;
 
 /**
@@ -15,7 +15,7 @@ import com.starlight.util.FileSystemManager;
  */
 public class PostDataRepository {
     private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "PostData.xml";
-    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
+    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/data/PostDataDummy.xml";
 
     private final String xmlPath;
     private final XStream xstream;
@@ -37,18 +37,18 @@ public class PostDataRepository {
             parent.mkdirs();
         }
         xstream = new XStream(new DomDriver());
-        xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
+        xstream.allowTypesByWildcard(new String[] {"com.starlight.model.*", "java.util.*"});
         xstream.alias("posts", List.class);
         xstream.alias("post", Post.class);
-        xstream.alias("nutrition", com.starlight.models.Nutrition.class);
-        xstream.alias("ingredient", com.starlight.models.Nutrition.NutritionIngredient.class);
-        xstream.alias("calories", com.starlight.models.Nutrition.Calories.class);
-        xstream.alias("protein", com.starlight.models.Nutrition.Protein.class);
-        xstream.alias("fat", com.starlight.models.Nutrition.Fat.class);
-        xstream.alias("carbohydrates", com.starlight.models.Nutrition.Carbohydrates.class);
-        xstream.alias("fiber", com.starlight.models.Nutrition.Fiber.class);
-        xstream.alias("sugar", com.starlight.models.Nutrition.Sugar.class);
-        xstream.alias("salt", com.starlight.models.Nutrition.Salt.class);
+        xstream.alias("nutrition", com.starlight.model.Nutrition.class);
+        xstream.alias("ingredient", com.starlight.model.Nutrition.NutritionIngredient.class);
+        xstream.alias("calories", com.starlight.model.Nutrition.Calories.class);
+        xstream.alias("protein", com.starlight.model.Nutrition.Protein.class);
+        xstream.alias("fat", com.starlight.model.Nutrition.Fat.class);
+        xstream.alias("carbohydrates", com.starlight.model.Nutrition.Carbohydrates.class);
+        xstream.alias("fiber", com.starlight.model.Nutrition.Fiber.class);
+        xstream.alias("sugar", com.starlight.model.Nutrition.Sugar.class);
+        xstream.alias("salt", com.starlight.model.Nutrition.Salt.class);
     }
 
     /**
@@ -137,5 +137,27 @@ public class PostDataRepository {
         } catch (Exception e) {
             throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
         }
+    }
+
+    /**
+     * Deletes a post by UUID and saves the updated post list
+     * @param uuid the UUID of the post to delete
+     * @return true if post was found and deleted, false otherwise
+     */
+    public boolean deletePost(String uuid) {
+        List<Post> posts = loadPosts();
+        int initialSize = posts.size();
+        
+        // Remove the post with the specified UUID
+        posts.removeIf(post -> post.uuid != null && post.uuid.equals(uuid));
+        
+        // Check if any posts were removed
+        if (posts.size() < initialSize) {
+            // Save the updated list
+            savePosts(posts);
+            return true;
+        }
+        
+        return false;
     }
 }

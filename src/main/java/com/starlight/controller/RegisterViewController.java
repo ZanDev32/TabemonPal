@@ -5,7 +5,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import com.starlight.api.ApiClient;
 import com.starlight.api.ApiClient.ApiException;
-import com.starlight.models.User;
+import com.starlight.model.User;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
 import io.github.palexdev.materialfx.controls.MFXTextField;

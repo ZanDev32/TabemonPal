@@ -6,7 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.starlight.models.User;
+import com.starlight.model.User;
 
 /**
  * Unit tests for {@link Session} utility class.

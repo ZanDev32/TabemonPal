@@ -1,6 +1,6 @@
 package com.starlight.util;
 
-import com.starlight.models.User;
+import com.starlight.model.User;
 
 /**
  * Simple holder for the currently logged in user.

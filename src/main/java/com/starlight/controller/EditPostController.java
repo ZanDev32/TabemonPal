@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import com.starlight.models.Post;
+import com.starlight.model.Post;
 import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 

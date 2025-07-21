@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.model;
 
 import java.util.ArrayList;
 import java.util.List;

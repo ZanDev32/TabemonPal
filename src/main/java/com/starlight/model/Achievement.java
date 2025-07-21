@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.model;
 
 /**
  * Simple data model representing a Achievement.

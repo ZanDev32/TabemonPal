@@ -1,4 +1,4 @@
-package com.starlight.models;
+package com.starlight.model;
 
 import org.junit.jupiter.api.Test;
 

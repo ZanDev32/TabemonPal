@@ -8,7 +8,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.User;
+import com.starlight.model.User;
 import com.starlight.util.FileSystemManager;
 
 /**
@@ -16,7 +16,7 @@ import com.starlight.util.FileSystemManager;
  */
 public class UserDataRepository {
     private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "UserData.xml";
-    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/UserDataDummy.xml";
+    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/data/UserDataDummy.xml";
 
     private final String xmlPath;
     private final XStream xstream;
@@ -38,7 +38,7 @@ public class UserDataRepository {
             parent.mkdirs();
         }
         xstream = new XStream(new DomDriver());
-        xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
+        xstream.allowTypesByWildcard(new String[] {"com.starlight.model.*", "java.util.*"});
         xstream.alias("users", List.class);
         xstream.alias("user", User.class);
     }

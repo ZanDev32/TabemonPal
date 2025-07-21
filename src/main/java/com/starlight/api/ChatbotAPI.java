@@ -108,7 +108,7 @@ public class ChatbotAPI {
         }
         
         if (apiKey == null) {
-            return "I'm currently in demo mode. Please configure your OpenAI API key in ~/.tabemonpal/Database/.SECRET_KEY.xml to enable full functionality.";
+            return "I'm currently in demo mode. Please configure your OpenAI API key in the Settings to enable full functionality.";
         }
         
         try {

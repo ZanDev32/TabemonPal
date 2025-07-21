@@ -10,10 +10,10 @@ import java.util.UUID;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
-import com.starlight.models.Post;
 import com.starlight.repository.PostDataRepository;
 import com.starlight.util.Session;
 import com.starlight.api.ChatbotAPI;
+import com.starlight.model.Post;
 import com.starlight.util.NutritionParser;
 import com.starlight.App;
 import javafx.fxml.FXMLLoader;

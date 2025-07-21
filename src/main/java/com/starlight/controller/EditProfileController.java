@@ -25,8 +25,8 @@ import javafx.stage.Modality;
 import java.util.logging.Level;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.starlight.models.User;
 import com.starlight.util.Session;
+import com.starlight.model.User;
 import com.starlight.util.ImageUtils;
 
 /**
@@ -160,8 +160,8 @@ public class EditProfileController implements Initializable {
             
             // Update the UserData XML file
             com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
-            java.util.List<com.starlight.models.User> users = repo.loadUsers();
-            for (com.starlight.models.User u : users) {
+            java.util.List<com.starlight.model.User> users = repo.loadUsers();
+            for (com.starlight.model.User u : users) {
                 if (u.username.equals(currentSessionUser.username)) {
                     u.profilepicture = copiedFilePath;
                     break;
@@ -199,7 +199,7 @@ public class EditProfileController implements Initializable {
                 u.password = newPass;
                 u.birthDay = birth;
                 XStream xs = new XStream(new DomDriver());
-                xs.allowTypesByWildcard(new String[]{"com.starlight.models.*"});
+                xs.allowTypesByWildcard(new String[]{"com.starlight.model.*"});
                 xs.alias("user", User.class);
                 String xml = xs.toXML(u);
                 try (OutputStream os = conn.getOutputStream()) {
@@ -240,8 +240,8 @@ public class EditProfileController implements Initializable {
             return;
         }
         com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
-        java.util.List<com.starlight.models.User> users = repo.loadUsers();
-        for (com.starlight.models.User u : users) {
+        java.util.List<com.starlight.model.User> users = repo.loadUsers();
+        for (com.starlight.model.User u : users) {
             if (u.username.equals(currentUser.username)) {
                 u.email = email;
                 u.password = password;

@@ -9,8 +9,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 
-import com.starlight.models.Post;
-import com.starlight.models.User;
+import com.starlight.model.Post;
+import com.starlight.model.User;
 import com.starlight.repository.PostDataRepository;
 import com.starlight.repository.UserDataRepository;
 import com.starlight.util.ImageUtils;

@@ -1,16 +1,18 @@
-package com.starlight.models;
+package com.starlight.repository;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.starlight.model.Post;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
 public class AchievementDataRepository {
-    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/models/PostData.xml";
-    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/models/PostDataDummy.xml";
+    private static final String DEFAULT_XML_PATH = "src/main/java/com/starlight/model/PostData.xml";
+    private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/model/PostDataDummy.xml";
 
     private final String xmlPath;
     private final XStream xstream;
@@ -28,7 +30,7 @@ public class AchievementDataRepository {
     public AchievementDataRepository(String xmlPath) {
         this.xmlPath = xmlPath;
         xstream = new XStream(new DomDriver());
-        xstream.allowTypesByWildcard(new String[] {"com.starlight.models.*", "java.util.*"});
+        xstream.allowTypesByWildcard(new String[] {"com.starlight.model.*", "java.util.*"});
         xstream.alias("posts", List.class);
         xstream.alias("post", Post.class);
     }

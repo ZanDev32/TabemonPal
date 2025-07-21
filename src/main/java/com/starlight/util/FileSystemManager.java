@@ -31,6 +31,7 @@ public class FileSystemManager {
     /**
      * Initializes the application data directory structure.
      * Creates .tabemonpal directory with UserData and Database subdirectories.
+     * Also creates .SECRET_KEY.xml file with default configuration.
      * This method is cross-platform compatible and works when running as JAR.
      */
     public static void initializeAppDataDirectory() {
@@ -46,6 +47,17 @@ public class FileSystemManager {
             // Create Database directory for XML files
             Path databaseDir = Paths.get(DATABASE_DIR);
             Files.createDirectories(databaseDir);
+            
+            // Create .SECRET_KEY.xml file if it doesn't exist
+            Path secretKeyPath = databaseDir.resolve(".SECRET_KEY.xml");
+            if (!Files.exists(secretKeyPath)) {
+                String secretKeyContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
+                                        "<config>\n" +
+                                        "    <openai-key>PASTE-YOUR-SECRET-KEY-HERE</openai-key>\n" +
+                                        "</config>";
+                Files.write(secretKeyPath, secretKeyContent.getBytes("UTF-8"));
+                LOGGER.info("Paste your secret key at: " + secretKeyPath);
+            }
             
             LOGGER.info("App data directory initialized at: " + APP_DATA_DIR);
             
