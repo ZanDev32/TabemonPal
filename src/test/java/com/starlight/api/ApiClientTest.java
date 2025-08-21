@@ -109,26 +109,4 @@ class ApiClientTest {
             return serverSocket.getLocalPort();
         }
     }
-
-    // The following original tests are commented out as they are not true unit tests
-    // and depend on a running server, which is not ideal for a typical build pipeline.
-    // The tests above provide better coverage for the intended scenarios (error handling).
-
-    /*
-    @Test
-    void testLoginMethodExists() {
-        // This test is replaced by testLoginThrowsExceptionOnConnectionError
-        assertThrows(ApiException.class, () -> {
-            apiClient.login("test@example.com", "password");
-        });
-    }
-    
-    @Test
-    void testRegisterMethodExists() {
-        // This test is replaced by testRegisterThrowsExceptionOnConnectionError
-        assertThrows(ApiException.class, () -> {
-            apiClient.register("testuser", "test@example.com", "password");
-        });
-    }
-    */
 }

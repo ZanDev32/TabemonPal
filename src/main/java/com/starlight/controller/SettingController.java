@@ -32,7 +32,7 @@ public class SettingController {
     private MFXButton goBack;
 
     @FXML
-    private MFXPasswordField secret_key;
+    private MFXPasswordField secretKey;
 
     @FXML
     private MFXButton saveButton;
@@ -52,7 +52,7 @@ public class SettingController {
         loadExistingApiKey();
         
         // Add key event handler for Enter key
-        secret_key.setOnKeyPressed(this::handleKeyPressed);
+        secretKey.setOnKeyPressed(this::handleKeyPressed);
     }
     
     /**
@@ -87,7 +87,7 @@ public class SettingController {
      */
     @FXML
     private void saveApiKey() {
-        String apiKey = secret_key.getText();
+        String apiKey = secretKey.getText();
         
         if (apiKey == null || apiKey.trim().isEmpty()) {
             showAlert("Error", "Please enter a valid API key.", Alert.AlertType.ERROR);
@@ -114,10 +114,11 @@ public class SettingController {
             logger.info("API key saved successfully to: " + configFile.getAbsolutePath());
             
             // Clear the password field for security
-            secret_key.clear();
-            
+            secretKey.clear();
+
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Failed to save API key: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to save API key: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, "Exception details", e);
             showAlert("Error", "Failed to save API key: " + e.getMessage(), Alert.AlertType.ERROR);
         }
     }
@@ -135,11 +136,12 @@ public class SettingController {
                 if (config.getOpenaiKey() != null && !config.getOpenaiKey().trim().isEmpty() 
                     && !config.getOpenaiKey().equals("your-openai-api-key-here")) {
                     // Show placeholder text to indicate key is already set
-                    secret_key.setPromptText("API key is already configured");
+                    secretKey.setPromptText("API key is already configured");
                 }
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not load existing API key: " + e.getMessage(), e);
+            logger.log(Level.WARNING, "Could not load existing API key: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.WARNING, "Exception details", e);
         }
     }
     

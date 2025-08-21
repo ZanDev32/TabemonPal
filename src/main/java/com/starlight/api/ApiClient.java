@@ -56,16 +56,11 @@ public class ApiClient {
             creds.email = emailOrUsername;
             creds.password = password;
 
-            String xml = xstream.toXML(creds);
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(xml.getBytes(StandardCharsets.UTF_8));
-            }
+            writeXmlToConnection(conn, creds);
 
             int responseCode = conn.getResponseCode();
             if (responseCode == 200) {
-                try (InputStream is = conn.getInputStream()) {
-                    return (User) xstream.fromXML(is);
-                }
+                return parseUserFromConnection(conn);
             } else {
                 // Parse error response
                 ApiError error = parseErrorResponse(conn);
@@ -94,16 +89,11 @@ public class ApiClient {
             newUser.email = email;
             newUser.password = password;
             
-            String xml = xstream.toXML(newUser);
-            try (OutputStream os = conn.getOutputStream()) {
-                os.write(xml.getBytes(StandardCharsets.UTF_8));
-            }
+            writeXmlToConnection(conn, newUser);
             
             int responseCode = conn.getResponseCode();
             if (responseCode == 201) {
-                try (InputStream is = conn.getInputStream()) {
-                    return (User) xstream.fromXML(is);
-                }
+                return parseUserFromConnection(conn);
             } else {
                 // Parse error response
                 ApiError error = parseErrorResponse(conn);
@@ -119,15 +109,47 @@ public class ApiClient {
     }
     
     /**
+     * Writes XML data to the connection's output stream
+     */
+    private void writeXmlToConnection(HttpURLConnection conn, Object data) throws IOException {
+        String xml = xstream.toXML(data);
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(xml.getBytes(StandardCharsets.UTF_8));
+        }
+    }
+    
+    /**
+     * Reads and parses User XML from the connection's input stream
+     */
+    private User parseUserFromConnection(HttpURLConnection conn) throws IOException {
+        try (InputStream is = conn.getInputStream()) {
+            return (User) xstream.fromXML(is);
+        }
+    }
+    
+    /**
+     * Attempts to parse XML error response from error stream
+     */
+    private ApiError parseXmlErrorResponse(InputStream errorStream) {
+        try {
+            // Try to parse the XML error response
+            return (ApiError) xstream.fromXML(errorStream);
+        } catch (Exception e) {
+            // If XML parsing fails, return null to indicate parsing failure
+            return null;
+        }
+    }
+    
+    /**
      * Parses an error response from the server
      */
     private ApiError parseErrorResponse(HttpURLConnection conn) {
         try (InputStream errorStream = conn.getErrorStream()) {
             if (errorStream != null) {
-                try {
-                    // Try to parse the XML error response
-                    return (ApiError) xstream.fromXML(errorStream);
-                } catch (Exception e) {
+                ApiError parsedError = parseXmlErrorResponse(errorStream);
+                if (parsedError != null) {
+                    return parsedError;
+                } else {
                     // If XML parsing fails, return a more descriptive message based on status code
                     return createContextualErrorMessage(conn.getResponseCode());
                 }

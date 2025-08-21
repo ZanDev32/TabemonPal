@@ -10,20 +10,68 @@ import java.util.List;
  */
 public class ChatHistory {
     /** List of chat messages in chronological order. */
-    public List<ChatMessage> messages;
+    List<ChatMessage> messages;
     
     /** Session start timestamp. */
-    public String sessionStart;
-    
+    String sessionStart;
+
     /** Session end timestamp. */
-    public String sessionEnd;
-    
+    String sessionEnd;
+
     /** Username of the user who participated in this session. */
-    public String username;
+    String username;
     
     /** Session ID for unique identification. */
-    public String sessionId;
-    
+    String sessionId;
+
+    /**
+     * Gets the messages contained in this chat history.
+     *
+     * @return list of ChatMessage (may be empty but never null)
+     */
+    public java.util.List<ChatMessage> getMessages() {
+        if (messages == null) {
+            return new java.util.ArrayList<>();
+        }
+        return messages;
+    }
+
+    /**
+     * Gets the session start timestamp.
+     *
+     * @return ISO_LOCAL_DATE_TIME string or null
+     */
+    public String getSessionStart() {
+        return sessionStart;
+    }
+
+    /**
+     * Gets the username associated with this chat history.
+     *
+     * @return username or null
+     */
+    public String getUsername() {
+        return username;
+    }
+
+    /**
+     * Gets the session end timestamp.
+     *
+     * @return session end timestamp or null if not ended
+     */
+    public String getSessionEnd() {
+        return sessionEnd;
+    }
+
+    /**
+     * Public accessor for sessionId so external packages can read it.
+     *
+     * @return session id string
+     */
+    public String getSessionId() {
+        return sessionId;
+    }
+
     /**
      * Default constructor for XML serialization.
      */

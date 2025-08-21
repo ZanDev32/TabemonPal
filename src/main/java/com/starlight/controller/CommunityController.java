@@ -208,11 +208,11 @@ public class CommunityController implements Initializable {
                 }
 
                 // Load profile picture
-                ImageUtils.loadImage(c.profile1, pp, "/com/starlight/images/missing.png");
+                ImageUtils.loadImage(c.profile1, pp, ImageUtils.DEFAULT_MISSING_IMAGE);
                 ImageUtils.scaleToFit(c.profile1, 40, 40, 40);
 
                 // Load post image
-                ImageUtils.loadImage(c.recentphoto1, image, "/com/starlight/images/missing.png");
+                ImageUtils.loadImage(c.recentphoto1, image, ImageUtils.DEFAULT_MISSING_IMAGE);
                 ImageUtils.scaleToFit(c.recentphoto1, 674, 485, 20);
 
                 postlist.getChildren().add(node);
@@ -253,29 +253,31 @@ public class CommunityController implements Initializable {
                     dailytitle1.setText(post.title);
                     starrating.setText(post.rating);
                     dailylikecounter.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto1, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.loadImage(dailyphoto1, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto1, 280, 174, 30);
                     break;
                 case 1:
                     dailytitle2.setText(post.title);
                     starrating2.setText(post.rating);
                     dailylikecounter2.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto2, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.loadImage(dailyphoto2, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto2, 280, 174, 30);
                     break;
                 case 2:
                     dailytitle3.setText(post.title);
                     starrating3.setText(post.rating);
                     dailylikecounter3.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto3, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.loadImage(dailyphoto3, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto3, 280, 174, 30);
                     break;
                 case 3:
                     dailytitle4.setText(post.title);
                     starrating4.setText(post.rating);
                     dailylikecounter4.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto4, post.image, "/com/starlight/images/missing.png");
+                    ImageUtils.loadImage(dailyphoto4, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto4, 280, 174, 30);
+                    break;
+                default:
                     break;
             }
         }
@@ -305,23 +307,9 @@ public class CommunityController implements Initializable {
         }
         
         try {
-            LocalDateTime postTime;
-            String trimmedTime = timeString.trim();
-            
-            // Try different formats to handle various timestamp formats
-            try {
-                // First try format with seconds: "2025-07-11 17:12:55"
-                DateTimeFormatter formatterWithSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-                postTime = LocalDateTime.parse(trimmedTime, formatterWithSeconds);
-            } catch (Exception e1) {
-                try {
-                    // Then try format without seconds: "2025-07-11 17:12"
-                    DateTimeFormatter formatterWithoutSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-                    postTime = LocalDateTime.parse(trimmedTime, formatterWithoutSeconds);
-                } catch (Exception e2) {
-                    // If both fail, return original string
-                    return timeString;
-                }
+            LocalDateTime postTime = parseDateTime(timeString.trim());
+            if (postTime == null) {
+                return timeString;
             }
             
             long hours = ChronoUnit.HOURS.between(postTime, LocalDateTime.now());
@@ -340,6 +328,30 @@ public class CommunityController implements Initializable {
             return (months / 12) + "y ago";
         } catch (Exception e) {
             return timeString;
+        }
+    }
+    
+    /**
+     * Parses a date time string using multiple formats.
+     * 
+     * @param trimmedTime The trimmed time string to parse
+     * @return LocalDateTime if parsing is successful, null otherwise
+     */
+    private LocalDateTime parseDateTime(String trimmedTime) {
+        // Try different formats to handle various timestamp formats
+        try {
+            // First try format with seconds: "2025-07-11 17:12:55"
+            DateTimeFormatter formatterWithSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            return LocalDateTime.parse(trimmedTime, formatterWithSeconds);
+        } catch (Exception e1) {
+            try {
+                // Then try format without seconds: "2025-07-11 17:12"
+                DateTimeFormatter formatterWithoutSeconds = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+                return LocalDateTime.parse(trimmedTime, formatterWithoutSeconds);
+            } catch (Exception e2) {
+                // If both fail, return null
+                return null;
+            }
         }
     }
 }

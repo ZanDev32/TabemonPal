@@ -38,6 +38,7 @@ import javafx.concurrent.Task;
  */
 public class CreatePostController implements Initializable {
     private static final Logger logger = Logger.getLogger(CreatePostController.class.getName());
+    private static final String EXCEPTION_DETAILS = "Exception details";
 
     @FXML
     private MFXTextField title;
@@ -176,7 +177,7 @@ public class CreatePostController implements Initializable {
         return text.trim()
                   .replaceAll("\\r?\\n", "| ")  // Replace newlines with "| "
                   .replaceAll("\\|\\s*\\|", "|")    // Remove duplicate vertical lines
-                  .replaceAll("^\\|\\s*|\\|\\s*$", "") // Remove leading/trailing vertical lines
+                  .replaceAll("(^\\|\\s*)|(\\|\\s*$)", "") // Remove leading/trailing vertical lines
                   .replaceAll("\\s{2,}", " ");  // Replace multiple spaces with single space
     }
 
@@ -191,7 +192,8 @@ public class CreatePostController implements Initializable {
             String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
             return null;
         }
     }
@@ -238,7 +240,11 @@ public class CreatePostController implements Initializable {
                         final int currentAttempt = attempt; // Final copy for lambda use
                         
                         try {
-                            logger.info("Analyzing nutrition facts for ingredients (attempt " + currentAttempt + "/" + MAX_RETRIES + "): " + ingredients);
+                            if (logger.isLoggable(Level.INFO)) {
+                                logger.info(java.text.MessageFormat.format(
+                                    "Analyzing nutrition facts for ingredients (attempt {0}/{1}): {2}",
+                                    currentAttempt, MAX_RETRIES, ingredients));
+                            }
                             
                             // Update status on UI thread
                             Platform.runLater(() -> {
@@ -258,7 +264,8 @@ public class CreatePostController implements Initializable {
                             
             // Check if we got valid nutrition data
             if (newPost.nutrition != null && newPost.nutrition.ingredient != null && !newPost.nutrition.ingredient.isEmpty()) {
-                logger.info("Nutrition analysis completed successfully on attempt " + currentAttempt);
+                logger.info(java.text.MessageFormat.format(
+                    "Nutrition analysis completed successfully on attempt {0}", currentAttempt));
                 
                 // Update status to show success  
                 Platform.runLater(() -> {
@@ -275,15 +282,20 @@ public class CreatePostController implements Initializable {
                             // Detect specific error types
                             if (errorMessage.contains("api key") || errorMessage.contains("configure your openai api key")) {
                                 isApiKeyIssue = true;
-                                logger.log(Level.WARNING, "API Key issue detected: " + e.getMessage(), e);
+                                logger.log(Level.WARNING, "API Key issue detected: {0}", new Object[]{e.getMessage()});
+                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
                                 break; // No point retrying API key issues
                             } else if (errorMessage.contains("network") || errorMessage.contains("connection") || 
                                      errorMessage.contains("timeout") || errorMessage.contains("unreachable") ||
                                      errorMessage.contains("failed to get response")) {
                                 isNetworkIssue = true;
-                                logger.log(Level.WARNING, "Network issue detected on attempt " + currentAttempt + ": " + e.getMessage(), e);
+                                logger.log(Level.WARNING, "Network issue detected on attempt {0}: {1}", 
+                                          new Object[]{currentAttempt, e.getMessage()});
+                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
                             } else {
-                                logger.log(Level.WARNING, "Nutrition analysis attempt " + currentAttempt + " failed: " + e.getMessage(), e);
+                                logger.log(Level.WARNING, "Nutrition analysis attempt {0} failed: {1}", 
+                                          new Object[]{currentAttempt, e.getMessage()});
+                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
                             }
                             
                             if (currentAttempt < MAX_RETRIES && !isApiKeyIssue) {
@@ -429,7 +441,8 @@ public class CreatePostController implements Initializable {
             analysisThread.start();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show processing screen: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show processing screen: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
             
             // Fallback: try to save post and navigate directly
             try {
@@ -442,7 +455,8 @@ public class CreatePostController implements Initializable {
                     mainController.refreshCommunityPage();
                 }
             } catch (Exception fallbackEx) {
-                logger.log(Level.SEVERE, "Fallback save and navigation failed: " + fallbackEx.getMessage(), fallbackEx);
+                logger.log(Level.SEVERE, "Fallback save and navigation failed: {0}", new Object[]{fallbackEx.getMessage()});
+                logger.log(Level.SEVERE, EXCEPTION_DETAILS, fallbackEx);
             }
         }
     }
@@ -486,7 +500,8 @@ public class CreatePostController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to show warning dialog: " + e.getMessage(), e);
+            logger.log(Level.WARNING, "Failed to show warning dialog: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
             // Fallback: just log the warning
             logger.warning("WARNING: " + warningType + " - Nutrition analysis skipped, using default values");
         }
@@ -531,7 +546,8 @@ public class CreatePostController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show result dialog: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
         }
     }
 }

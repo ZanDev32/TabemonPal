@@ -8,6 +8,8 @@ import com.starlight.model.User;
 public class Session {
     private static User currentUser;
 
+    private Session() {}
+
     /**
      * Returns the currently logged in user or {@code null} if none is set.
      */

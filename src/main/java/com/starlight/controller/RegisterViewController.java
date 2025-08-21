@@ -29,7 +29,7 @@ public class RegisterViewController implements Initializable {
     private VBox registerView;
 
     @FXML
-    private ImageView AppLogo;
+    private ImageView appLogo;
     
     @FXML
     private Label errorMessage;

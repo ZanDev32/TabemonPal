@@ -77,7 +77,7 @@ public class EditProfileController implements Initializable {
         
         // Load and scale profile image using ImageUtils
         if (Image != null) {
-            ImageUtils.loadImage(Image, user.profilepicture, "/com/starlight/images/missing.png");
+            ImageUtils.loadImage(Image, user.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(Image, 170, 170, 200);
         }
     }
@@ -102,7 +102,7 @@ public class EditProfileController implements Initializable {
         User currentSessionUser = Session.getCurrentUser();
         if (currentSessionUser != null && Image != null) {
             // Load profile image using ImageUtils
-            ImageUtils.loadImage(Image, currentSessionUser.profilepicture, "/com/starlight/images/missing.png");
+            ImageUtils.loadImage(Image, currentSessionUser.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
         }
     }

@@ -61,11 +61,11 @@ public class UserApiServer {
         for (int attempt = 0; attempt < maxAttempts; attempt++) {
             try {
                 server = HttpServer.create(new InetSocketAddress(currentPort), 0);
-                logger.info("Server created on port " + currentPort);
+                logger.log(Level.INFO, "Server created on port {0}", currentPort);
                 serverCreated = true;
                 break;
             } catch (BindException e) {
-                logger.info("Port " + currentPort + " already in use, trying next port...");
+                logger.log(Level.INFO, "Port {0} already in use, trying next port...", currentPort);
                 currentPort++;
             }
         }
@@ -118,7 +118,7 @@ public class UserApiServer {
             User localUser = localRepository.validateCredentials(loginIdentifier, creds.password);
             
             if (localUser != null) {
-                logger.info("Local user authenticated: " + localUser.username);
+                logger.log(Level.INFO, "Local user authenticated: {0}", localUser.username);
                 sendXml(exchange, 200, xstream.toXML(localUser));
                 return;
             }
@@ -207,7 +207,7 @@ public class UserApiServer {
                 }
             } catch (Exception e) {
                 // Log the exception
-                logger.log(Level.SEVERE, "Error handling user request: " + e.getMessage(), e);
+                logger.log(Level.SEVERE, e, () -> "Error handling user request: " + e.getMessage());
                 sendErrorResponse(exchange, 500, "Internal server error: " + e.getMessage());
             }
         }
@@ -255,51 +255,72 @@ public class UserApiServer {
          */
         private void handleUpdateUser(HttpExchange exchange, String username) throws IOException {
             // Check if trying to update local users (admin or user)
-            User localUser = localRepository.findUser(username);
-            if (localUser != null) {
+            if (isLocalUser(username)) {
                 sendErrorResponse(exchange, 403, "Local system accounts cannot be modified");
                 return;
             }
             
-            // Read and parse request body
+            // Parse and validate request body
+            User updated = parseRequestBody(exchange);
+            if (updated == null) {
+                return; // Error response already sent
+            }
+            
+            // Find and update user
+            updateUserInRepository(exchange, username, updated);
+        }
+        
+        /**
+         * Checks if the username belongs to a local user
+         */
+        private boolean isLocalUser(String username) {
+            return localRepository.findUser(username) != null;
+        }
+        
+        /**
+         * Parses and validates the request body
+         */
+        private User parseRequestBody(HttpExchange exchange) throws IOException {
             String body = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
             if (body == null || body.isEmpty()) {
                 sendErrorResponse(exchange, 400, "Request body is empty");
-                return;
+                return null;
             }
             
-            // Parse user object
-            User updated;
             try {
-                updated = (User) xstream.fromXML(body);
+                return (User) xstream.fromXML(body);
             } catch (Exception e) {
                 sendErrorResponse(exchange, 400, "Invalid user data format: " + e.getMessage());
-                return;
+                return null;
             }
-            
-            // Find and update user in regular repository
+        }
+        
+        /**
+         * Updates user in repository and sends response
+         */
+        private void updateUserInRepository(HttpExchange exchange, String username, User updated) throws IOException {
             List<User> users = repository.loadUsers();
-            boolean userFound = false;
             
             for (int i = 0; i < users.size(); i++) {
                 User existingUser = users.get(i);
                 if (existingUser.username != null && existingUser.username.equals(username)) {
-                    // Update user fields if provided
-                    if (updated.email != null) existingUser.email = updated.email;
-                    if (updated.password != null) existingUser.password = updated.password;
-                    if (updated.birthDay != null) existingUser.birthDay = updated.birthDay;
-                    
-                    // Save updates and send response
+                    updateUserFields(existingUser, updated);
                     repository.saveUsers(users);
                     sendXml(exchange, 200, xstream.toXML(existingUser));
-                    userFound = true;
-                    break;
+                    return;
                 }
             }
             
-            if (!userFound) {
-                sendErrorResponse(exchange, 404, "User not found: " + username);
-            }
+            sendErrorResponse(exchange, 404, "User not found: " + username);
+        }
+        
+        /**
+         * Updates user fields from the updated user object
+         */
+        private void updateUserFields(User existingUser, User updated) {
+            if (updated.email != null) existingUser.email = updated.email;
+            if (updated.password != null) existingUser.password = updated.password;
+            if (updated.birthDay != null) existingUser.birthDay = updated.birthDay;
         }
         
         /**

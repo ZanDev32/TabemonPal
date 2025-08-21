@@ -1,5 +1,6 @@
 package com.starlight.controller;
 
-public class SplashScreenController {
+public interface SplashScreenController {
 
-}
+    
+}  

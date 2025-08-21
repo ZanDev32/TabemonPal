@@ -32,6 +32,10 @@ import javafx.fxml.FXMLLoader;
 public class EditPostController implements Initializable {
     private static final Logger logger = Logger.getLogger(EditPostController.class.getName());
 
+    // Reused status message when no image is chosen
+    private static final String NO_IMAGE_SELECTED = "No image selected";
+    private static final String EXCEPTION_DETAILS = "Exception details";
+
     @FXML
     private MFXTextField title;
 
@@ -85,7 +89,7 @@ public class EditPostController implements Initializable {
         if (currentPost.image != null && !currentPost.image.isEmpty()) {
             pickerstatus.setText("Current: " + new File(currentPost.image).getName());
         } else {
-            pickerstatus.setText("No image selected");
+            pickerstatus.setText(NO_IMAGE_SELECTED);
         }
     }
 
@@ -97,7 +101,8 @@ public class EditPostController implements Initializable {
             String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to copy image to user directory: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to copy image to user directory: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
             return null;
         }
     }
@@ -111,104 +116,121 @@ public class EditPostController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        pickerstatus.setText("No image selected");
+        pickerstatus.setText(NO_IMAGE_SELECTED);
+        setupImagePicker();
+        setupSubmitHandler();
+        setupCancelHandler();
+    }
 
-        // Image picker logic - reuse from CreatePostController
+    /** Sets up the image picker button logic. */
+    private void setupImagePicker() {
         imagepicker.setOnAction(event -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Choose an image");
-            fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg")
-            );
-            Stage stage = (Stage)((Node)event.getSource()).getScene().getWindow();
+            fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg"));
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             File file = fileChooser.showOpenDialog(stage);
             if (file != null) {
                 selectedImage = file;
                 pickerstatus.setText("Selected: " + file.getName());
             } else {
-                // Reset to current image status if no new image selected
-                if (currentPost != null && currentPost.image != null && !currentPost.image.isEmpty()) {
-                    pickerstatus.setText("Current: " + new File(currentPost.image).getName());
-                } else {
-                    pickerstatus.setText("No image selected");
-                }
+                restoreOrShowNoImage();
             }
         });
+    }
 
-        // Submit button logic
+    /** If current post has an image keep showing it, else show no image message. */
+    private void restoreOrShowNoImage() {
+        if (currentPost != null && currentPost.image != null && !currentPost.image.isEmpty()) {
+            pickerstatus.setText("Current: " + new File(currentPost.image).getName());
+        } else {
+            pickerstatus.setText(NO_IMAGE_SELECTED);
+        }
+    }
+
+    /** Sets up the submit button logic extracting complexity into helpers. */
+    private void setupSubmitHandler() {
         submit.setOnAction(event -> {
-            if (currentPost == null) {
-                logger.warning("No post to edit");
+            if (!validateCurrentPost()) return;
+            if (!validateFormInputs()) return;
+            applyFormToPost();
+            handleImageUpdate();
+            persistPostAndShowResult();
+        });
+    }
+
+    private boolean validateCurrentPost() {
+        if (currentPost == null) {
+            logger.warning("No post to edit");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean validateFormInputs() {
+        if (isEmpty(title) || isEmpty(description) || isEmpty(ingredients) || isEmpty(directions)) {
+            logger.warning("Please complete all fields.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isEmpty(MFXTextField field) { return field.getText() == null || field.getText().isEmpty(); }
+    private boolean isEmpty(TextArea area) { return area.getText() == null || area.getText().isEmpty(); }
+
+    private void applyFormToPost() {
+        currentPost.title = title.getText();
+        currentPost.description = description.getText();
+        currentPost.ingredients = ingredients.getText();
+        currentPost.directions = directions.getText();
+    }
+
+    private void handleImageUpdate() {
+        if (selectedImage == null) return;
+        try {
+            String storedPath = copyImageToUserDir(selectedImage);
+            currentPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Image copy failed, using original path: {0}", new Object[]{e.getMessage()});
+            currentPost.image = selectedImage.getAbsolutePath();
+        }
+    }
+
+    private void persistPostAndShowResult() {
+        try {
+            List<Post> posts = repository.loadPosts();
+            replacePostInList(posts, currentPost);
+            repository.savePosts(posts);
+            success = true;
+            logger.info("Post updated successfully");
+            closeDialog();
+            showResultDialog("post_updated_success");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update post: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
+            showResultDialog("post_update_failed");
+            closeDialog();
+        }
+    }
+
+    private void replacePostInList(List<Post> posts, Post updated) {
+        for (int i = 0; i < posts.size(); i++) {
+            Post p = posts.get(i);
+            if (p.uuid != null && p.uuid.equals(updated.uuid)) {
+                posts.set(i, updated);
                 return;
             }
+        }
+    }
 
-            String postTitle = title.getText();
-            String postDescription = description.getText();
-            String postIngredients = ingredients.getText();
-            String postDirections = directions.getText();
+    private void closeDialog() {
+        Stage stage = (Stage) submit.getScene().getWindow();
+        stage.close();
+    }
 
-            if (postTitle.isEmpty() || postDescription.isEmpty() || postIngredients.isEmpty() || postDirections.isEmpty()) {
-                logger.warning("Please complete all fields.");
-                return;
-            }
-
-            // Update the post object
-            currentPost.title = postTitle;
-            currentPost.description = postDescription;
-            currentPost.ingredients = postIngredients;
-            currentPost.directions = postDirections;
-
-            // Handle image update if new image was selected
-            if (selectedImage != null) {
-                try {
-                    String storedPath = copyImageToUserDir(selectedImage);
-                    currentPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    currentPost.image = selectedImage.getAbsolutePath();
-                }
-            }
-
-            // Save the updated post
-            try {
-                List<Post> posts = repository.loadPosts();
-                for (int i = 0; i < posts.size(); i++) {
-                    Post post = posts.get(i);
-                    if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
-                        posts.set(i, currentPost);
-                        break;
-                    }
-                }
-                repository.savePosts(posts);
-
-                success = true;
-                logger.info("Post updated successfully");
-
-                // Close the dialog first
-                Stage stage = (Stage) submit.getScene().getWindow();
-                stage.close();
-                
-                // Show success message
-                showResultDialog("post_updated_success");
-                
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to update post: " + e.getMessage(), e);
-                
-                // Show failure message
-                showResultDialog("post_update_failed");
-                
-                // Still close the dialog
-                Stage stage = (Stage) submit.getScene().getWindow();
-                stage.close();
-            }
-        });
-
-        // Cancel button logic
-        cancel.setOnAction(event -> {
-            // Close the dialog without saving
-            Stage stage = (Stage) cancel.getScene().getWindow();
-            stage.close();
-        });
+    /** Sets up cancel button to simply close the dialog. */
+    private void setupCancelHandler() {
+        cancel.setOnAction(event -> closeDialog());
     }
     
     /**
@@ -247,7 +269,8 @@ public class EditPostController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show result dialog: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
         }
     }
 }

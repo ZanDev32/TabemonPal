@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class PostItemController {
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(PostItemController.class.getName());
+    private static final String HAND_CURSOR_STYLE = "-fx-cursor: hand;";
 
     @FXML
     private VBox postTemplate;
@@ -226,23 +227,23 @@ public class PostItemController {
             });
             
             // Set cursor to indicate clickable area
-            postTemplate.setStyle("-fx-cursor: hand;");
+            postTemplate.setStyle(HAND_CURSOR_STYLE);
         }
         
         // Also make the image and text content explicitly clickable
         if (recentphoto1 != null) {
             recentphoto1.setOnMouseClicked(event -> handlePostClick());
-            recentphoto1.setStyle("-fx-cursor: hand;");
+            recentphoto1.setStyle(HAND_CURSOR_STYLE);
         }
         
         if (title != null) {
             title.setOnMouseClicked(event -> handlePostClick());
-            title.setStyle("-fx-cursor: hand;");
+            title.setStyle(HAND_CURSOR_STYLE);
         }
         
         if (description != null) {
             description.setOnMouseClicked(event -> handlePostClick());
-            description.setStyle("-fx-cursor: hand;");
+            description.setStyle(HAND_CURSOR_STYLE);
         }
     }
     

@@ -14,6 +14,9 @@ import javafx.scene.shape.Rectangle;
  */
 public class ImageUtils {
     
+    /** Default path to the missing image placeholder */
+    public static final String DEFAULT_MISSING_IMAGE = "/com/starlight/images/missing.png";
+    
     /**
      * Resizes and centers the given {@link ImageView} to fit inside the specified frame size
      * while preserving aspect ratio and applying rounded corners.
@@ -132,12 +135,12 @@ public class ImageUtils {
 
     /**
      * Loads an image from a given path into an ImageView with a default fallback.
-     * Convenience method that uses "/com/starlight/images/missing.png" as the fallback.
+     * Convenience method that uses the default missing image as the fallback.
      *
      * @param imageView the ImageView to load the image into
      * @param path the path to the image (can be classpath-relative or absolute)
      */
     public static void loadImage(ImageView imageView, String path) {
-        loadImage(imageView, path, "/com/starlight/images/missing.png");
+        loadImage(imageView, path, DEFAULT_MISSING_IMAGE);
     }
 }

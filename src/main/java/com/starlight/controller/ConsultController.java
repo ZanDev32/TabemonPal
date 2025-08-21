@@ -71,7 +71,9 @@ public class ConsultController implements Initializable {
     private ChatbotAPI chatbotAPI;
     private User currentUser;
     private ChatHistoryManager historyManager;
-    
+    private final java.util.Random random = new java.util.Random();
+    private static final String BOT_ICON = "src/main/resources/com/starlight/images/botIcon.png";
+
     // Properties for FXML binding
     private final BooleanProperty isProcessing = new SimpleBooleanProperty(false);
     private final BooleanProperty hasTextInput = new SimpleBooleanProperty(false);
@@ -86,7 +88,7 @@ public class ConsultController implements Initializable {
             this.historyManager = new ChatHistoryManager();
             loadCurrentUser();
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to initialize chatbot: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, e, () -> "Failed to initialize chatbot: " + e.getMessage());
         }
     }
     
@@ -101,7 +103,7 @@ public class ConsultController implements Initializable {
                 logger.warning("No current user found in session");
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load current user: " + e.getMessage(), e);
+            logger.log(Level.WARNING, e, () -> "Failed to load current user: " + e.getMessage());
         }
     }
 
@@ -144,14 +146,14 @@ public class ConsultController implements Initializable {
                     addBubble("Sorry, I'm having trouble connecting right now. Please try again later.", false);
                     isProcessing.set(false);
                 });
-                logger.log(Level.WARNING, "Chatbot error: " + e.getMessage(), e);
+                logger.log(Level.WARNING, e, () -> "Chatbot error: " + e.getMessage());
             } catch (Exception e) {
                 Platform.runLater(() -> {
                     hideLoadingBubble();
                     addBubble("An unexpected error occurred. Please try again.", false);
                     isProcessing.set(false);
                 });
-                logger.log(Level.SEVERE, "Unexpected error: " + e.getMessage(), e);
+                logger.log(Level.SEVERE, e, () -> "Unexpected error: " + e.getMessage());
             }
         }).start();
     }
@@ -179,12 +181,10 @@ public class ConsultController implements Initializable {
         }
 
         // Save to chat history if enabled and not a welcome message
-        if (saveToHistory && historyManager != null && currentUser != null) {
-            // Skip saving welcome messages (messages that contain "Welcome Pal!")
-            if (!message.contains("Welcome Pal!")) {
+        if (saveToHistory && historyManager != null && currentUser != null && !message.contains("Welcome Pal!")) {
                 historyManager.addMessage(message, isUser, currentUser.username);
             }
-        }
+        
 
         // Create main container for the bubble row
         HBox bubble = new HBox(18);
@@ -229,7 +229,7 @@ public class ConsultController implements Initializable {
         String avatarPath = isUser ? getUserAvatarPath() : getBotAvatarPath();
         
         // Load image with fallback, using the same format as UserData.xml
-        ImageUtils.loadImage(avatar, avatarPath, "src/main/resources/com/starlight/images/missing.png");
+        ImageUtils.loadImage(avatar, avatarPath, ImageUtils.DEFAULT_MISSING_IMAGE);
         
         // Apply scaling and styling
         ImageUtils.scaleToFit(avatar, 32, 32, 40);
@@ -327,7 +327,7 @@ public class ConsultController implements Initializable {
      */
     private String getBotAvatarPath() {
         // Return the same format as used in UserData.xml
-        return "src/main/resources/com/starlight/images/botIcon.png";
+        return BOT_ICON;
     }
     
     /**
@@ -428,14 +428,13 @@ public class ConsultController implements Initializable {
         // Update quick message buttons with new random questions after sending
         Platform.runLater(this::updateQuickMessageButtons);
     }
-    
     /**
      * Updates quick message buttons with random questions from the predefined list
      */
     private void updateQuickMessageButtons() {
-        java.util.Random random = new java.util.Random();
         java.util.List<String> availableQuestions = new java.util.ArrayList<>(java.util.Arrays.asList(QUICK_QUESTIONS));
         
+        // Remove current button texts to avoid duplicates
         // Remove current button texts to avoid duplicates
         availableQuestions.remove(quickMessage1.getText());
         availableQuestions.remove(quickMessage2.getText());
@@ -449,7 +448,7 @@ public class ConsultController implements Initializable {
         } else {
             // Fallback to shuffling all questions if we don't have enough unique ones left
             java.util.Collections.shuffle(availableQuestions);
-            if (availableQuestions.size() > 0) quickMessage1.setText(availableQuestions.get(0));
+            if (!availableQuestions.isEmpty()) quickMessage1.setText(availableQuestions.get(0));
             if (availableQuestions.size() > 1) quickMessage2.setText(availableQuestions.get(1));
             if (availableQuestions.size() > 2) quickMessage3.setText(availableQuestions.get(2));
         }
@@ -463,35 +462,25 @@ public class ConsultController implements Initializable {
         // Bind send button disable property to processing state and text input
         send.disableProperty().bind(isProcessing.or(hasTextInput.not()));
         
-        // Bind attachment button disable property to processing state
-        attachImage.disableProperty().bind(isProcessing);
-        
-        // Set up event handlers
-        send.setOnAction(e -> handleUserMessage());
-        attachImage.setOnAction(e -> handleAttachImage());
-        prompt.setOnKeyPressed(this::handlePromptKeyPress);
-        
-        // Make the TextArea transparent
-        prompt.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
-        
-        // Add welcome message (don't save to history)
-        addBubble("**Welcome Pal!** 🌱\n" + 
-                  "\n" + 
-                  "**I'm here to help you with:** \n" + 
-                  "🍏 Nutrition advice (meal planning, healthy eating) \n" + 
-                  "🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) \n" + 
-                  "💪 Healthy lifestyle habits (exercise, sleep, stress management) \n" + 
-                  "🔍 Tips & tricks (meal prep, portion control, eating out) \n" + 
-                  "🚀 Motivation & mindset (staying consistent, goal-setting) \n" + 
-                  "\n" + 
-                  "**Ask me anything!** Examples:  \n" + 
-                  "• \"What's a quick healthy breakfast?\" \n" + 
-                  "• \"How can I reduce sugar cravings?\" \n" + 
-                  "\n" + 
-                  "Let's make healthy living simple and fun! 😊\n" + 
-                  "\n" + 
-                  "**What's your question today?**", 
-            false, false);
+            addBubble("""
+                **Welcome Pal!** 🌱
+                
+                **I'm here to help you with:** 
+                🍏 Nutrition advice (meal planning, healthy eating) 
+                🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) 
+                💪 Healthy lifestyle habits (exercise, sleep, stress management) 
+                🔍 Tips & tricks (meal prep, portion control, eating out) 
+                🚀 Motivation & mindset (staying consistent, goal-setting) 
+                
+                **Ask me anything!** Examples:  
+                • "What's a quick healthy breakfast?" 
+                • "How can I reduce sugar cravings?" 
+                
+                Let's make healthy living simple and fun! 😊
+                
+                **What's your question today?**
+                """, 
+                false, false);
             
         // Initialize quick message buttons with random questions
         updateQuickMessageButtons();
@@ -610,53 +599,58 @@ public class ConsultController implements Initializable {
      * to show conversation continuity.
      */
     private void loadRecentChatHistory() {
-        if (currentUser == null || historyManager == null) {
-            return;
-        }
-        
+        if (!canLoadHistory()) return;
         try {
             var histories = historyManager.loadUserHistory(currentUser.username);
-            
-            // Skip the first history if it's the current session
-            int startIndex = 0;
-            if (!histories.isEmpty() && historyManager.hasActiveSession()) {
-                var currentSession = historyManager.getCurrentSession();
-                if (currentSession != null && 
-                    histories.get(0).sessionId.equals(currentSession.sessionId)) {
-                    startIndex = 1;
-                }
-            }
-            
-            // Load messages from the most recent completed session (limit to avoid UI overload)
-            if (histories.size() > startIndex) {
-                var recentHistory = histories.get(startIndex);
-                if (recentHistory.messages != null && !recentHistory.messages.isEmpty()) {
-                    
-                    // Add a separator message to show this is from previous session
-                    addBubble("─── *Previous conversation from " + 
-                             recentHistory.sessionStart.substring(0, 10) + "* ───", 
-                             false, false);
-                    
-                    // Load up to 10 most recent messages to avoid overwhelming the UI
-                    var messages = recentHistory.messages;
-                    int startMessageIndex = Math.max(0, messages.size() - 10);
-                    
-                    for (int i = startMessageIndex; i < messages.size(); i++) {
-                        var msg = messages.get(i);
-                        if (msg != null && msg.content != null && !msg.content.trim().isEmpty()) {
-                            addBubble(msg.content, msg.isUser, false);
-                        }
-                    }
-                    
-                    // Add another separator to distinguish from new conversation
-                    addBubble("─── *New conversation* ───", false, false);
-                    
-                    logger.info("Loaded " + (messages.size() - startMessageIndex) + 
-                               " messages from previous session: " + recentHistory.sessionId);
-                }
-            }
+            int startIndex = computeHistoryStartIndex(histories);
+            if (histories.size() <= startIndex) return; // Nothing to show
+
+            var recentHistory = histories.get(startIndex);
+            var messages = recentHistory.getMessages();
+            if (messages == null || messages.isEmpty()) return;
+
+            showPreviousSessionHeader(recentHistory);
+            int startMessageIndex = Math.max(0, messages.size() - MAX_RECENT_MESSAGES);
+            appendRecentMessages(messages, startMessageIndex);
+            addBubble("─── *New conversation* ───", false, false);
+
+            int loadedCount = messages.size() - startMessageIndex;
+            logger.log(Level.INFO, "Loaded {0} messages from previous session: {1}",
+                new Object[]{loadedCount, recentHistory.getSessionId()});
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load recent chat history: " + e.getMessage(), e);
+            logger.log(Level.WARNING, e, () -> "Failed to load recent chat history: " + e.getMessage());
+        }
+    }
+
+    // --- History loading helpers ---
+    private static final int MAX_RECENT_MESSAGES = 10;
+
+    private boolean canLoadHistory() {
+        return currentUser != null && historyManager != null;
+    }
+
+    private int computeHistoryStartIndex(java.util.List<com.starlight.model.ChatHistory> histories) {
+        if (histories.isEmpty() || !historyManager.hasActiveSession()) return 0;
+        var currentSession = historyManager.getCurrentSession();
+        if (currentSession == null) return 0;
+        return histories.get(0).getSessionId().equals(currentSession.getSessionId()) ? 1 : 0;
+    }
+
+    private void showPreviousSessionHeader(com.starlight.model.ChatHistory history) {
+        String sessionStart = history.getSessionStart();
+        String datePart = (sessionStart != null && sessionStart.length() >= 10) ? sessionStart.substring(0, 10) : "unknown";
+        addBubble("─── *Previous conversation from " + datePart + "* ───", false, false);
+    }
+
+    private void appendRecentMessages(java.util.List<com.starlight.model.ChatMessage> messages, int startIndex) {
+        for (int i = startIndex; i < messages.size(); i++) {
+            var msg = messages.get(i);
+            if (msg != null && msg.content != null) {
+                String content = msg.content.trim();
+                if (!content.isEmpty()) {
+                    addBubble(content, msg.isUser, false);
+                }
+            }
         }
     }
     
@@ -723,22 +717,24 @@ public class ConsultController implements Initializable {
         bubblelist.getChildren().clear();
         
         // Add welcome message
-        addBubble("**Welcome Pal!** 🌱\n" + 
-                  "\n" + 
-                  "**I'm here to help you with:** \n" + 
-                  "🍏 Nutrition advice (meal planning, healthy eating) \n" + 
-                  "🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) \n" + 
-                  "💪 Healthy lifestyle habits (exercise, sleep, stress management) \n" + 
-                  "🔍 Tips & tricks (meal prep, portion control, eating out) \n" + 
-                  "🚀 Motivation & mindset (staying consistent, goal-setting) \n" + 
-                  "\n" + 
-                  "**Ask me anything!** Examples:  \n" + 
-                  "• \"What's a quick healthy breakfast?\" \n" + 
-                  "• \"How can I reduce sugar cravings?\" \n" + 
-                  "\n" + 
-                  "Let's make healthy living simple and fun! 😊\n" + 
-                  "\n" + 
-                  "**What's your question today?**", 
+        addBubble("""
+            **Welcome Pal!** 🌱
+
+            **I'm here to help you with:** 
+            🍏 Nutrition advice (meal planning, healthy eating) 
+            🍎 Nutritious food choices (e.g., balanced meals, superfoods, recipes) 
+            💪 Healthy lifestyle habits (exercise, sleep, stress management) 
+            🔍 Tips & tricks (meal prep, portion control, eating out) 
+            🚀 Motivation & mindset (staying consistent, goal-setting) 
+
+            **Ask me anything!** Examples:  
+            • "What's a quick healthy breakfast?" 
+            • "How can I reduce sugar cravings?" 
+
+            Let's make healthy living simple and fun! 😊
+
+            **What's your question today?**
+            """, 
             false, false);
         
         if (startNewSession) {

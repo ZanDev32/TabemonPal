@@ -53,7 +53,7 @@ public class ChatbotAPI {
         try {
             loadApiKey();
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not load API key: " + e.getMessage(), e);
+            logger.log(Level.WARNING, () -> "Could not load API key: " + e.getMessage());
             logger.warning("Chatbot functionality will be disabled.");
         }
     }
@@ -74,10 +74,10 @@ public class ChatbotAPI {
                 this.apiKey = null;
             }
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Could not load API key from " + secretKeyPath + ": " + e.getMessage(), e);
+            logger.log(Level.WARNING, () -> "Could not load API key from " + secretKeyPath + ": " + e.getMessage());
             this.apiKey = null;
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Error parsing SECRET_KEY.xml: " + e.getMessage(), e);
+            logger.log(Level.WARNING, () -> "Error parsing SECRET_KEY.xml: " + e.getMessage());
             this.apiKey = null;
         }
     }
@@ -129,15 +129,18 @@ public class ChatbotAPI {
             } else {
                 String errorMessage = "API request failed with status " + response.statusCode() + 
                                     ": " + response.body();
-                logger.severe("OpenAI API Error: " + errorMessage);
+                logger.severe(() -> "OpenAI API Error: " + errorMessage);
                 throw new ChatbotException(errorMessage);
             }
             
         } catch (ChatbotException e) {
             throw e; // Re-throw our custom exceptions
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt(); // Re-interrupt the current thread
+            throw new ChatbotException("Request was interrupted: " + e.getMessage(), e);
         } catch (Exception e) {
             String errorMessage = "Failed to get response from ChatGPT: " + e.getMessage();
-            logger.log(Level.SEVERE, "ChatGPT Request Error: " + errorMessage, e);
+            logger.log(Level.SEVERE, () -> "ChatGPT Request Error: " + errorMessage);
             throw new ChatbotException(errorMessage, e);
         }
     }
@@ -150,7 +153,7 @@ public class ChatbotAPI {
      * @throws ChatbotException if the API call fails
      */
     public String askNutritionQuestion(String question) throws ChatbotException {
-        String systemMessage = "You are Kuro , a helpful nutrition assistant for the TabemonPal app. " +
+        String systemMessage = "You are Tabebot , a helpful nutrition assistant for the TabemonPal app. " +
                 "Provide accurate, helpful nutrition advice and food recommendations. " +
                 "Keep your responses concise but informative. " +
                 "you may use rich text formatting to enhance readability." +
@@ -168,19 +171,37 @@ public class ChatbotAPI {
      * @throws ChatbotException if the API call fails
      */
     public String analyzeNutritionFacts(String ingredients) throws ChatbotException {
-        // Check if we're in demo mode (no API key)
+        validateApiKeyForNutritionAnalysis();
+        validateIngredients(ingredients);
+        
+        String prompt = buildNutritionAnalysisPrompt(ingredients);
+        String systemMessage = buildNutritionSystemMessage();
+        
+        try {
+            String response = sendMessage(prompt, systemMessage);
+            return validateAndRepairNutritionResponse(response);
+        } catch (ChatbotException e) {
+            throw new ChatbotException("Nutrition analysis failed: " + e.getMessage(), e);
+        }
+    }
+    
+    private void validateApiKeyForNutritionAnalysis() throws ChatbotException {
         if (apiKey == null) {
             logger.warning("Cannot perform nutrition analysis - no API key configured");
             throw new ChatbotException("Nutrition analysis is not available. Please configure your OpenAI API key in ~/.tabemonpal/Database/.SECRET_KEY.xml to enable this feature.");
         }
-        
+    }
+    
+    private void validateIngredients(String ingredients) throws ChatbotException {
         if (ingredients == null || ingredients.trim().isEmpty()) {
             throw new ChatbotException("Cannot analyze nutrition facts for empty ingredients list");
         }
-        
+    }
+    
+    private String buildNutritionAnalysisPrompt(String ingredients) {
         String ingredientsList = ingredients.replace("|", "\n");
         
-        String prompt = "Do an prediction analysis from this recipe's ingredients for nutrition facts using USDA then send the result in xml called nutrition:\n\n" +
+        return "Do an prediction analysis from this recipe's ingredients for nutrition facts using USDA then send the result in xml called nutrition:\n\n" +
                 "format:\n" +
                 "<nutrition verdict=\"Healthy|Moderate|Unhealthy|Junk Food|Unknown\">\n" +
                 "  <ingredient name=\"\" amount=\"\">\n" +
@@ -194,8 +215,10 @@ public class ChatbotAPI {
                 "  </ingredient>\n" +
                 "</nutrition>\n\n" +
                 "Ingredients: " + ingredientsList;
-        
-        String systemMessage = "You are a nutrition analysis assistant. " +
+    }
+    
+    private String buildNutritionSystemMessage() {
+        return "You are a nutrition analysis assistant. " +
                 "Provide ONLY the XML nutrition data as requested, without any additional text or formatting. " +
                 "Use USDA nutritional database for accurate values. " +
                 "If exact amounts are not specified in ingredients, estimate reasonable serving sizes. " +
@@ -206,56 +229,65 @@ public class ChatbotAPI {
                 "- 'Junk Food': Very high sugar/fat/salt, minimal nutritional value " +
                 "- 'Unknown': When nutritional analysis cannot be determined " +
                 "Return only valid XML that matches the exact format requested.";
-        
-        try {
-            String response = sendMessage(prompt, systemMessage);
-            
-            // Basic validation that we got something that looks like XML
-            if (response == null || response.trim().isEmpty()) {
-                throw new ChatbotException("Received empty response from nutrition analysis API");
-            }
-            
-            // Log the response length for monitoring
-            logger.info("Nutrition analysis API response length: " + response.length() + " characters");
-            
-            // Check for nutrition XML tags with more detailed error reporting
-            boolean hasNutritionStart = response.contains("<nutrition");
-            boolean hasNutritionEnd = response.contains("</nutrition>");
-            
-            if (!hasNutritionStart && !hasNutritionEnd) {
-                throw new ChatbotException("API response does not contain nutrition XML tags. Response: " + response);
-            } else if (!hasNutritionStart) {
-                throw new ChatbotException("API response missing <nutrition> opening tag. Response: " + response);
-            } else if (!hasNutritionEnd) {
-                // Try to repair incomplete XML by adding closing tag
-                logger.warning("API response missing closing tag, attempting to repair XML");
-                String repairedResponse = response.trim();
-                if (!repairedResponse.endsWith("</nutrition>")) {
-                    // If the response looks like it was cut off, add the closing tag
-                    if (repairedResponse.contains("<ingredient") && !repairedResponse.endsWith(">")) {
-                        // Find the last complete ingredient and add closing tags
-                        int lastCompleteIngredient = repairedResponse.lastIndexOf("</ingredient>");
-                        if (lastCompleteIngredient > 0) {
-                            repairedResponse = repairedResponse.substring(0, lastCompleteIngredient + "</ingredient>".length()) + "\n</nutrition>";
-                            logger.info("Repaired XML response: " + repairedResponse);
-                            return repairedResponse;
-                        }
-                    }
-                    // Simple repair: just add the closing tag
-                    repairedResponse += "\n</nutrition>";
-                    logger.info("Repaired XML by adding closing tag: " + repairedResponse);
-                    return repairedResponse;
-                } else {
-                    throw new ChatbotException("API response missing </nutrition> closing tag. Response: " + response);
-                }
-            }
-            
-            return response;
-            
-        } catch (ChatbotException e) {
-            // Add more context to the error
-            throw new ChatbotException("Nutrition analysis failed: " + e.getMessage(), e);
+    }
+    
+    private String validateAndRepairNutritionResponse(String response) throws ChatbotException {
+        if (response == null || response.trim().isEmpty()) {
+            throw new ChatbotException("Received empty response from nutrition analysis API");
         }
+        
+        logger.info(() -> "Nutrition analysis API response length: " + response.length() + " characters");
+        
+        boolean hasNutritionStart = response.contains("<nutrition");
+        boolean hasNutritionEnd = response.contains("</nutrition>");
+        
+        if (!hasNutritionStart && !hasNutritionEnd) {
+            throw new ChatbotException("API response does not contain nutrition XML tags. Response: " + response);
+        }
+        
+        if (!hasNutritionStart) {
+            throw new ChatbotException("API response missing <nutrition> opening tag. Response: " + response);
+        }
+        
+        if (!hasNutritionEnd) {
+            return repairIncompleteNutritionXml(response);
+        }
+        
+        return response;
+    }
+    
+    private String repairIncompleteNutritionXml(String response) throws ChatbotException {
+        logger.warning("API response missing closing tag, attempting to repair XML");
+        String repairedResponse = response.trim();
+        
+        if (repairedResponse.endsWith("</nutrition>")) {
+            throw new ChatbotException("API response missing </nutrition> closing tag. Response: " + response);
+        }
+        
+        // Try to repair by finding last complete ingredient
+        if (repairedResponse.contains("<ingredient") && !repairedResponse.endsWith(">")) {
+            String repaired = repairFromLastCompleteIngredient(repairedResponse);
+            if (repaired != null) {
+                return repaired;
+            }
+        }
+        
+        // Simple repair: just add the closing tag
+        repairedResponse += "\n</nutrition>";
+        final String finalRepaired = repairedResponse;
+        logger.info(() -> "Repaired XML by adding closing tag: " + finalRepaired);
+        return repairedResponse;
+    }
+    
+    private String repairFromLastCompleteIngredient(String repairedResponse) {
+        int lastCompleteIngredient = repairedResponse.lastIndexOf("</ingredient>");
+        if (lastCompleteIngredient > 0) {
+            String repaired = repairedResponse.substring(0, lastCompleteIngredient + "</ingredient>".length()) + "\n</nutrition>";
+            final String finalRepaired = repaired;
+            logger.info(() -> "Repaired XML response: " + finalRepaired);
+            return repaired;
+        }
+        return null;
     }
     
     /**
@@ -291,7 +323,7 @@ public class ChatbotAPI {
      */
     String parseResponse(String jsonResponse) throws ChatbotException {
         try {
-            // OpenAI API response format: {"choices":[{"message":{"content":"..."}}]}
+            // OpenAI API response format: {"choices":[{"message":{"content":"..."}}]}.
             // Look for the choices array first (more flexible with whitespace)
             String choicesPattern = "\"choices\"";
             int choicesIndex = jsonResponse.indexOf(choicesPattern);

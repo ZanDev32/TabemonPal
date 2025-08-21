@@ -136,7 +136,7 @@ public class ProfileController implements Initializable {
             
             // Load profile picture using ImageUtils
             if (profile != null) {
-                ImageUtils.loadImage(profile, currentUser.profilepicture, "/com/starlight/images/missing.png");
+                ImageUtils.loadImage(profile, currentUser.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
                 ImageUtils.scaleToFit(profile, 170, 170, 200); // Adjust size as needed
             }
             
@@ -224,7 +224,7 @@ public class ProfileController implements Initializable {
                 // Load recipe image using ImageUtils
                 ImageView recipeImageView = controller.getImageView();
                 if (recipeImageView != null) {
-                    ImageUtils.loadImage(recipeImageView, image, "/com/starlight/images/missing.png");
+                    ImageUtils.loadImage(recipeImageView, image, ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
                 }
 

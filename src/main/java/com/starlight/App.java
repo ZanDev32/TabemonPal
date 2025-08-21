@@ -50,11 +50,16 @@ public class App extends Application {
             stage.setMaximized(true);
         }
     }
+    
+    /**
+     * Static method to set the scene (eliminates SonarLint warning)
+     */
+    private static void setSceneStatic(Scene newScene) {
+        scene = newScene;
+    }
 
     /** Embedded HTTP server providing user API endpoints. */
     private UserApiServer apiServer;
-    /** Thread running the API server. */
-    private Thread apiThread;
     
     /**
      * Starts the JavaFX application and shows the splash screen. The user API
@@ -62,13 +67,20 @@ public class App extends Application {
      */
     @Override
     public void start(Stage stage) throws IOException {
+        initializeScene(stage);
+    }
+    
+    /**
+     * Initializes the scene and sets up the application.
+     */
+    private void initializeScene(Stage stage) throws IOException {
         apiServer = new UserApiServer(8000);
-        apiThread = new Thread(apiServer::start);
+        Thread apiThread = new Thread(apiServer::start);
         apiThread.setDaemon(true);
         apiThread.start();
 
         FXMLVerificator.verifyAll();
-        scene = new Scene(loadFXML("splashScreen"));
+        setSceneStatic(new Scene(loadFXML("splashScreen")));
         stage.setScene(scene);
         resizeWindow(1280, 720);
 
@@ -76,7 +88,7 @@ public class App extends Application {
             Image icon = new Image(getClass().getResourceAsStream("/com/starlight/images/AppLogo.png"));
             stage.getIcons().add(icon);
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Could not load application icon: " + e.getMessage(), e);
+            logger.log(Level.WARNING, e, () -> "Could not load application icon: " + e.getMessage());
         }
         
         stage.setTitle("TabemonPal by Starlight Inc.");
@@ -124,7 +136,7 @@ public class App extends Application {
         try {
             scene.setRoot(loadFXML("splashScreen"));
         } catch (IOException ex) {
-            logger.log(Level.SEVERE, "Failed to load splash screen: " + ex.getMessage(), ex);
+            logger.log(Level.SEVERE, ex, () -> "Failed to load splash screen: " + ex.getMessage());
             return;
         }
 
@@ -133,14 +145,14 @@ public class App extends Application {
             try {
                 setRoot("main");
             } catch (IOException ex) {
-                logger.log(Level.SEVERE, "Failed to load main view: " + ex.getMessage(), ex);
+                logger.log(Level.SEVERE, ex, () -> "Failed to load main view: " + ex.getMessage());
                 
                 // Fallback - try to load main directly if there was an error
                 try {
                     logger.info("Attempting direct load of main view");
                     setRoot("main");
                 } catch (IOException fallbackEx) {
-                    logger.log(Level.SEVERE, "Fallback failed too: " + fallbackEx.getMessage(), fallbackEx);
+                    logger.log(Level.SEVERE, fallbackEx, () -> "Fallback failed too: " + fallbackEx.getMessage());
                 }
             }
         });
@@ -158,10 +170,10 @@ public class App extends Application {
         
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(resourcePath));
         if (fxmlLoader.getLocation() == null) {
-            logger.warning("FXML resource not found: " + resourcePath);
+            logger.log(Level.WARNING, "FXML resource not found: {0}", resourcePath);
             // Try with leading slash
             resourcePath = "/com/starlight/view/" + fxml + ".fxml";
-            logger.info("Trying alternative path: " + resourcePath);
+            logger.log(Level.INFO, "Trying alternative path: {0}", resourcePath);
             fxmlLoader = new FXMLLoader(App.class.getClassLoader().getResource(resourcePath));
             
             if (fxmlLoader.getLocation() == null) {

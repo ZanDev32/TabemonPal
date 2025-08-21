@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Unit tests for ChatHistoryManager.
  */
-public class ChatHistoryManagerTest {
+class ChatHistoryManagerTest {
     
     private ChatHistoryManager historyManager;
     private final String testUsername = "testuser";
@@ -30,10 +30,10 @@ public class ChatHistoryManagerTest {
         
         ChatHistory currentSession = historyManager.getCurrentSession();
         assertNotNull(currentSession);
-        assertEquals(testUsername, currentSession.username);
-        assertNotNull(currentSession.sessionId);
-        assertNotNull(currentSession.sessionStart);
-        assertNull(currentSession.sessionEnd);
+        assertEquals(testUsername, currentSession.getUsername());
+        assertNotNull(currentSession.getSessionId());
+        assertNotNull(currentSession.getSessionStart());
+        assertNull(currentSession.getSessionEnd());
         
         // End the session
         historyManager.endSession();
@@ -50,9 +50,9 @@ public class ChatHistoryManagerTest {
         
         ChatHistory currentSession = historyManager.getCurrentSession();
         assertNotNull(currentSession);
-        assertEquals(1, currentSession.messages.size());
+        assertEquals(1, currentSession.getMessages().size());
         
-        ChatMessage message = currentSession.messages.get(0);
+    ChatMessage message = currentSession.getMessages().get(0);
         assertEquals("Hello, TabemonPal!", message.content);
         assertTrue(message.isUser);
         assertEquals(testUsername, message.username);
@@ -61,8 +61,8 @@ public class ChatHistoryManagerTest {
         // Add an AI response
         historyManager.addMessage("Hello! How can I help you today?", false, "TabemonPal AI");
         
-        assertEquals(2, currentSession.messages.size());
-        ChatMessage aiMessage = currentSession.messages.get(1);
+        assertEquals(2, currentSession.getMessages().size());
+        ChatMessage aiMessage = currentSession.getMessages().get(1);
         assertEquals("Hello! How can I help you today?", aiMessage.content);
         assertFalse(aiMessage.isUser);
         assertEquals("TabemonPal AI", aiMessage.username);
@@ -78,7 +78,7 @@ public class ChatHistoryManagerTest {
         assertTrue(historyManager.hasActiveSession());
         ChatHistory currentSession = historyManager.getCurrentSession();
         assertNotNull(currentSession);
-        assertEquals(1, currentSession.messages.size());
+        assertEquals(1, currentSession.getMessages().size());
     }
     
     @Test
@@ -100,15 +100,15 @@ public class ChatHistoryManagerTest {
     void testChatHistoryMethods() {
         ChatHistory history = new ChatHistory(testUsername);
         
-        assertEquals(testUsername, history.username);
-        assertNotNull(history.sessionStart);
-        assertNull(history.sessionEnd);
-        assertNotNull(history.sessionId);
-        assertTrue(history.sessionId.contains(testUsername));
+        assertEquals(testUsername, history.getUsername());
+        assertNotNull(history.getSessionStart());
+        assertNull(history.getSessionEnd());
+        assertNotNull(history.getSessionId());
+        assertTrue(history.getSessionId().contains(testUsername));
         
         // Test session ending
         history.endSession();
-        assertNotNull(history.sessionEnd);
+        assertNotNull(history.getSessionEnd());
         assertNotNull(history.getSessionDuration());
         
         // Test session summary

@@ -6,12 +6,15 @@ import com.starlight.model.ChatMessage;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Utility class for chat history operations and display formatting.
  */
 public class ChatHistoryUtils {
-    
+
+    private ChatHistoryUtils() {}
+
     /**
      * Generates a text summary of all chat sessions for a user.
      * 
@@ -33,13 +36,13 @@ public class ChatHistoryUtils {
         int totalMessages = 0;
         for (int i = 0; i < histories.size(); i++) {
             ChatHistory history = histories.get(i);
-            int messageCount = history.messages != null ? history.messages.size() : 0;
+            int messageCount = history.getMessages() != null ? history.getMessages().size() : 0;
             totalMessages += messageCount;
             
-            summary.append("Session ").append(i + 1).append(": ").append(history.sessionId).append("\n");
-            summary.append("Started: ").append(formatTimestamp(history.sessionStart)).append("\n");
-            if (history.sessionEnd != null) {
-                summary.append("Ended: ").append(formatTimestamp(history.sessionEnd)).append("\n");
+            summary.append("Session ").append(i + 1).append(": ").append(history.getSessionId()).append("\n");
+            summary.append("Started: ").append(formatTimestamp(history.getSessionStart())).append("\n");
+            if (history.getSessionEnd() != null) {
+                summary.append("Ended: ").append(formatTimestamp(history.getSessionEnd())).append("\n");
                 summary.append("Duration: ").append(history.getSessionDuration()).append("\n");
             } else {
                 summary.append("Status: Active\n");
@@ -48,7 +51,7 @@ public class ChatHistoryUtils {
             
             // Show first message as preview
             if (messageCount > 0) {
-                ChatMessage firstMessage = history.messages.get(0);
+                ChatMessage firstMessage = history.getMessages().get(0);
                 String preview = firstMessage.content.length() > 50 ? 
                     firstMessage.content.substring(0, 50) + "..." : 
                     firstMessage.content;
@@ -75,7 +78,7 @@ public class ChatHistoryUtils {
         List<ChatHistory> histories = manager.loadUserHistory(username);
         
         ChatHistory targetHistory = histories.stream()
-            .filter(h -> h.sessionId.equals(sessionId))
+            .filter(h -> h.getSessionId().equals(sessionId))
             .findFirst()
             .orElse(null);
             
@@ -86,18 +89,18 @@ public class ChatHistoryUtils {
         StringBuilder export = new StringBuilder();
         export.append("TabemonPal Chat Export\n");
         export.append("=".repeat(30)).append("\n");
-        export.append("User: ").append(targetHistory.username).append("\n");
-        export.append("Session: ").append(targetHistory.sessionId).append("\n");
-        export.append("Date: ").append(formatTimestamp(targetHistory.sessionStart)).append("\n");
-        if (targetHistory.sessionEnd != null) {
+        export.append("User: ").append(targetHistory.getUsername()).append("\n");
+        export.append("Session: ").append(targetHistory.getSessionId()).append("\n");
+        export.append("Date: ").append(formatTimestamp(targetHistory.getSessionStart())).append("\n");
+        if (targetHistory.getSessionEnd() != null) {
             export.append("Duration: ").append(targetHistory.getSessionDuration()).append("\n");
         }
         export.append("\n").append("Conversation:\n");
         export.append("-".repeat(30)).append("\n");
         
-        if (targetHistory.messages != null) {
-            for (ChatMessage message : targetHistory.messages) {
-                String sender = message.isUser ? targetHistory.username : "TabemonPal AI";
+        if (targetHistory.getMessages() != null) {
+            for (ChatMessage message : targetHistory.getMessages()) {
+                String sender = message.isUser ? targetHistory.getUsername() : "TabemonPal AI";
                 export.append("[").append(message.getFormattedTimestamp()).append("] ");
                 export.append(sender).append(": ");
                 export.append(message.content).append("\n\n");
@@ -149,52 +152,46 @@ public class ChatHistoryUtils {
         
         public ChatHistoryStats(List<ChatHistory> histories) {
             this.totalSessions = histories.size();
-            
-            int totalMsgs = 0;
-            int userMsgs = 0;
-            int aiMsgs = 0;
-            String oldest = null;
-            String newest = null;
-            
-            for (ChatHistory history : histories) {
-                if (history.messages != null) {
-                    totalMsgs += history.messages.size();
-                    for (ChatMessage msg : history.messages) {
-                        if (msg.isUser) userMsgs++;
-                        else aiMsgs++;
-                    }
-                }
-                
-                if (newest == null || (history.sessionStart != null && 
-                    history.sessionStart.compareTo(newest) > 0)) {
-                    newest = history.sessionStart;
-                }
-                
-                if (oldest == null || (history.sessionStart != null && 
-                    history.sessionStart.compareTo(oldest) < 0)) {
-                    oldest = history.sessionStart;
-                }
-            }
-            
-            this.totalMessages = totalMsgs;
-            this.userMessages = userMsgs;
-            this.aiMessages = aiMsgs;
-            this.oldestSession = oldest;
-            this.newestSession = newest;
-            this.averageMessagesPerSession = totalSessions > 0 ? 
-                (double) totalMessages / totalSessions : 0;
+
+            this.totalMessages = histories.stream()
+                .mapToInt(h -> h.getMessages().size())
+                .sum();
+
+            this.userMessages = histories.stream()
+                .flatMap(h -> h.getMessages().stream())
+                .mapToInt(m -> m.isUser ? 1 : 0)
+                .sum();
+
+            this.aiMessages = totalMessages - userMessages;
+
+            // Determine oldest and newest session start times
+            this.oldestSession = histories.stream()
+                .map(ChatHistory::getSessionStart)
+                .filter(Objects::nonNull)
+                .min(String::compareTo)
+                .orElse(null);
+
+            this.newestSession = histories.stream()
+                .map(ChatHistory::getSessionStart)
+                .filter(Objects::nonNull)
+                .max(String::compareTo)
+                .orElse(null);
+
+            this.averageMessagesPerSession = totalSessions > 0 ?
+                (double) totalMessages / totalSessions : 0.0;
         }
         
         @Override
         public String toString() {
-            return String.format(
-                "Chat History Statistics:\n" +
-                "Total Sessions: %d\n" +
-                "Total Messages: %d\n" +
-                "User Messages: %d\n" +
-                "AI Messages: %d\n" +
-                "Average Messages/Session: %.1f\n" +
-                "Date Range: %s to %s",
+            return String.format("""
+                    Chat History Statistics:
+                    Total Sessions: %d
+                    Total Messages: %d
+                    User Messages: %d
+                    AI Messages: %d
+                    Average Messages/Session: %.1f
+                    Date Range: %s to %s
+                    """,
                 totalSessions, totalMessages, userMessages, aiMessages,
                 averageMessagesPerSession,
                 formatTimestamp(oldestSession),

@@ -217,13 +217,13 @@ public class PostController implements Initializable {
         // Load profile picture
         if (profile1 != null) {
             String profilePicture = getProfilePictureForUser(currentPost.username);
-            ImageUtils.loadImage(profile1, profilePicture, "/com/starlight/images/missing.png");
+            ImageUtils.loadImage(profile1, profilePicture, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(profile1, 80, 80, 500);
         }
         
         // Load post image
         if (recentphoto1 != null) {
-            ImageUtils.loadImage(recentphoto1, currentPost.image, "/com/starlight/images/missing.png");
+            ImageUtils.loadImage(recentphoto1, currentPost.image, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(recentphoto1, 1270, 990, 20);
         }
         

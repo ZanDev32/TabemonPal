@@ -103,7 +103,7 @@ public class ChatHistoryManager {
             Files.createDirectories(historyDir);
             
             // Create filename based on session ID
-            String filename = currentSession.sessionId + FILE_EXTENSION;
+            String filename = currentSession.getSessionId() + FILE_EXTENSION;
             Path historyFile = historyDir.resolve(filename);
             
             // Save to XML file
@@ -153,7 +153,7 @@ public class ChatHistoryManager {
                 });
             
             // Sort by session start time (newest first)
-            histories.sort(Comparator.comparing((ChatHistory h) -> h.sessionStart).reversed());
+            histories.sort(Comparator.comparing(ChatHistory::getSessionStart).reversed());
             
         } catch (Exception e) {
             logger.log(Level.WARNING, "Failed to load chat histories: " + e.getMessage(), e);
@@ -207,7 +207,7 @@ public class ChatHistoryManager {
         List<ChatHistory> histories = loadUserHistory(username);
         
         for (ChatHistory history : histories) {
-            if (deleteHistory(history.sessionId)) {
+            if (deleteHistory(history.getSessionId())) {
                 deletedCount++;
             }
         }

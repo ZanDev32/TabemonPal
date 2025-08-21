@@ -17,6 +17,8 @@ import java.util.logging.Logger;
  */
 public class FileSystemManager {
 
+    private FileSystemManager() {}
+
     private static final Logger LOGGER = Logger.getLogger(FileSystemManager.class.getName());
 
     /** Application data directory path */

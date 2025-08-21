@@ -17,9 +17,6 @@ public class DoughnutChart extends PieChart {
         super();
         
         innerCircle = new Circle();
-
-        // just styled in code for demo purposes,
-        // use a style class instead to style via css.
         innerCircle.setFill(Color.WHITESMOKE);
         innerCircle.setStroke(Color.WHITE);
         innerCircle.setStrokeWidth(3);
@@ -29,9 +26,6 @@ public class DoughnutChart extends PieChart {
         super(pieData);
 
         innerCircle = new Circle();
-
-        // just styled in code for demo purposes,
-        // use a style class instead to style via css.
         innerCircle.setFill(Color.WHITESMOKE);
         innerCircle.setStroke(Color.WHITE);
         innerCircle.setStrokeWidth(3);
@@ -77,15 +71,12 @@ public class DoughnutChart extends PieChart {
             if (pie != null && pie.getParent() instanceof Pane) {
                 Pane parent = (Pane) pie.getParent();
 
-                // Remove any existing inner circle first to avoid duplicates
                 parent.getChildren().remove(innerCircle);
                 
-                // Ensure inner circle styling is correct
                 innerCircle.setFill(Color.WHITESMOKE);
                 innerCircle.setStroke(Color.WHITE);
                 innerCircle.setStrokeWidth(3);
                 
-                // Add the inner circle and bring it to front
                 parent.getChildren().add(innerCircle);
                 innerCircle.toFront();
             }
@@ -97,8 +88,10 @@ public class DoughnutChart extends PieChart {
             return;
         }
         
-        double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE;
-        double maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
+        double minX = Double.MAX_VALUE; 
+        double minY = Double.MAX_VALUE;
+        double maxX = Double.MIN_VALUE; 
+        double maxY = Double.MIN_VALUE;
         for (PieChart.Data data: getData()) {
             Node node = data.getNode();
             if (node == null) continue;
@@ -120,7 +113,6 @@ public class DoughnutChart extends PieChart {
 
         innerCircle.setCenterX(minX + (maxX - minX) / 2);
         innerCircle.setCenterY(minY + (maxY - minY) / 2);
-
         innerCircle.setRadius((maxX - minX) / 4);
     }
 }

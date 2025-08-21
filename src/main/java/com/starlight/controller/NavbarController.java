@@ -70,7 +70,7 @@ public class NavbarController {
             }
             ImageUtils.scaleToFit(photoprofile, 40, 40, 80);
         } else {
-            ImageUtils.loadImage(photoprofile, "/com/starlight/images/missing.png");
+            ImageUtils.loadImage(photoprofile, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(photoprofile, 40, 40, 80);
         }
     }

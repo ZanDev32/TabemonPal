@@ -18,6 +18,9 @@ import com.starlight.model.Post;
 
 public class RecipeItemController {
     private static final Logger logger = Logger.getLogger(RecipeItemController.class.getName());
+    
+    // Reused CSS style for showing a hand cursor on clickable nodes
+    private static final String FX_CURSOR_HAND = "-fx-cursor: hand;";
 
     @FXML
     private ImageView image;
@@ -209,23 +212,23 @@ public class RecipeItemController {
             });
             
             // Set cursor to indicate clickable area
-            rootContainer.setStyle("-fx-cursor: hand;");
+            rootContainer.setStyle(FX_CURSOR_HAND);
         }
         
         // Also make the image and title explicitly clickable
         if (image != null) {
             image.setOnMouseClicked(event -> handleRecipeClick());
-            image.setStyle("-fx-cursor: hand;");
+            image.setStyle(FX_CURSOR_HAND);
         }
         
         if (title != null) {
             title.setOnMouseClicked(event -> handleRecipeClick());
-            title.setStyle("-fx-cursor: hand;");
+            title.setStyle(FX_CURSOR_HAND);
         }
         
         if (rating != null) {
             rating.setOnMouseClicked(event -> handleRecipeClick());
-            rating.setStyle("-fx-cursor: hand;");
+            rating.setStyle(FX_CURSOR_HAND);
         }
     }
     

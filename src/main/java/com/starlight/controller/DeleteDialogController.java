@@ -23,15 +23,20 @@ public class DeleteDialogController {
     @FXML
     private MFXButton cancel;
 
-    private Post postToDelete;
     private boolean confirmed = false;
     private final PostDataRepository repository = new PostDataRepository();
 
     /**
-     * Sets the post to be deleted
+     * Sets the post to be deleted and configures the delete button action
      */
     public void setPost(Post post) {
-        this.postToDelete = post;
+        if (post == null) {
+            logger.warning("Cannot set null post for deletion");
+            return;
+        }
+        
+        // Configure delete button with the specific post
+        delete.setOnAction(event -> handleDeletePost(post));
     }
 
     /**
@@ -43,41 +48,6 @@ public class DeleteDialogController {
 
     @FXML
     private void initialize() {
-        // Delete button logic
-        delete.setOnAction(event -> {
-            if (postToDelete == null) {
-                logger.warning("No post to delete");
-                return;
-            }
-
-            // Remove the post from the repository
-            try {
-                List<Post> posts = repository.loadPosts();
-                posts.removeIf(post -> post.uuid != null && post.uuid.equals(postToDelete.uuid));
-                repository.savePosts(posts);
-
-                confirmed = true;
-                logger.info("Post deleted successfully");
-
-                // Close the dialog first
-                Stage stage = (Stage) delete.getScene().getWindow();
-                stage.close();
-                
-                // Show success message
-                showResultDialog("post_deleted_success");
-                
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to delete post: " + e.getMessage(), e);
-                
-                // Show failure message
-                showResultDialog("post_deletion_failed");
-                
-                // Still close the dialog
-                Stage stage = (Stage) delete.getScene().getWindow();
-                stage.close();
-            }
-        });
-
         // Cancel button logic
         cancel.setOnAction(event -> {
             confirmed = false;
@@ -85,6 +55,44 @@ public class DeleteDialogController {
             Stage stage = (Stage) cancel.getScene().getWindow();
             stage.close();
         });
+    }
+    
+    /**
+     * Handles the deletion of a specific post
+     */
+    private void handleDeletePost(Post postToDelete) {
+        if (postToDelete == null) {
+            logger.warning("No post to delete");
+            return;
+        }
+
+        // Remove the post from the repository
+        try {
+            List<Post> posts = repository.loadPosts();
+            posts.removeIf(post -> post.uuid != null && post.uuid.equals(postToDelete.uuid));
+            repository.savePosts(posts);
+
+            confirmed = true;
+            logger.info("Post deleted successfully");
+
+            // Close the dialog first
+            Stage stage = (Stage) delete.getScene().getWindow();
+            stage.close();
+            
+            // Show success message
+            showResultDialog("post_deleted_success");
+            
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to delete post: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, "Exception details", e);
+            
+            // Show failure message
+            showResultDialog("post_deletion_failed");
+            
+            // Still close the dialog
+            Stage stage = (Stage) delete.getScene().getWindow();
+            stage.close();
+        }
     }
     
     /**
@@ -123,7 +131,8 @@ public class DeleteDialogController {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show result dialog: {0}", new Object[]{e.getMessage()});
+            logger.log(Level.SEVERE, "Exception details", e);
         }
     }
 }

@@ -48,6 +48,16 @@ Follow these steps to set up the project locally:
    mvn javafx:run
    ```
 
+### Data Storage Location
+
+TabemonPal stores all user data (XML files, uploaded images, and application settings) in a directory called `.tabemonpal` located in your user's home directory:
+
+- **Windows**: `C:\Users\[username]\.tabemonpal\`
+- **macOS**: `/Users/[username]/.tabemonpal/`
+- **Linux**: `/home/[username]/.tabemonpal/`
+
+This ensures that your data persists across application updates and remains separate from the installation directory.
+
 ## 📂 Project Structure
 
 ```

@@ -30,7 +30,7 @@ public class LoginViewController implements Initializable {
     private VBox loginView;
 
     @FXML
-    private ImageView AppLogo;
+    private ImageView appLogo;
 
     @FXML
     private Label username;
