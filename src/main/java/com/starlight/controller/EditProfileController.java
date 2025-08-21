@@ -38,8 +38,15 @@ import com.starlight.util.ImageUtils;
  */
 public class EditProfileController implements Initializable {
     private static final Logger logger = Logger.getLogger(EditProfileController.class.getName());
+    
+    // Dialog result type constants
+    private static final String ACCOUNT_UPDATED_SUCCESS = "account_updated_success";
+    private static final String ACCOUNT_UPDATE_FAILED = "account_update_failed";
+    private static final String ACCOUNT_DELETED_SUCCESS = "account_deleted_success";
+    private static final String ACCOUNT_DELETION_FAILED = "account_deletion_failed";
+    
     @FXML
-    private ImageView Image;
+    private ImageView image;
 
     @FXML
     private MFXButton imagepicker;
@@ -76,9 +83,9 @@ public class EditProfileController implements Initializable {
         }
         
         // Load and scale profile image using ImageUtils
-        if (Image != null) {
-            ImageUtils.loadImage(Image, user.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
-            ImageUtils.scaleToFit(Image, 170, 170, 200);
+        if (image != null) {
+            ImageUtils.loadImage(image, user.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.scaleToFit(image, 170, 170, 200);
         }
     }
 
@@ -100,10 +107,10 @@ public class EditProfileController implements Initializable {
      */
     private void loadCurrentUserProfileImage() {
         User currentSessionUser = Session.getCurrentUser();
-        if (currentSessionUser != null && Image != null) {
+        if (currentSessionUser != null && image != null) {
             // Load profile image using ImageUtils
-            ImageUtils.loadImage(Image, currentSessionUser.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
-            ImageUtils.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
+            ImageUtils.loadImage(image, currentSessionUser.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.scaleToFit(image, 170, 170, 85); // Circular profile image with rounded corners
         }
     }
     
@@ -172,9 +179,9 @@ public class EditProfileController implements Initializable {
             // Refresh the profile image display
             loadCurrentUserProfileImage();
             
-            logger.info("Profile image updated successfully: " + copiedFilePath);
+            logger.info(() -> "Profile image updated successfully: " + copiedFilePath);
         } catch (Exception e) {
-            logger.warning("Failed to update profile image: " + e.getMessage());
+            logger.warning(() -> "Failed to update profile image: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -207,14 +214,15 @@ public class EditProfileController implements Initializable {
                 }
                 if (conn.getResponseCode() == 200) {
                     logger.info("User updated successfully");
-                    showResultDialog("account_updated_success");
+                    showResultDialog(ACCOUNT_UPDATED_SUCCESS);
                 } else {
-                    logger.info("Update failed: " + conn.getResponseCode());
-                    showResultDialog("account_update_failed");
+                    int responseCode = conn.getResponseCode();
+                    logger.info(() -> "Update failed: " + responseCode);
+                    showResultDialog(ACCOUNT_UPDATE_FAILED);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to update user: " + e.getMessage(), e);
-                showResultDialog("account_update_failed");
+                logger.log(Level.SEVERE, "Failed to update user: {0}", e.getMessage());
+                showResultDialog(ACCOUNT_UPDATE_FAILED);
             }
         });
 
@@ -268,7 +276,7 @@ public class EditProfileController implements Initializable {
             
             if (!userDeleted) {
                 logger.warning("User could not be deleted.");
-                showResultDialog("account_deletion_failed");
+                showResultDialog(ACCOUNT_DELETION_FAILED);
                 return;
             }
             
@@ -281,7 +289,7 @@ public class EditProfileController implements Initializable {
             }
             
             // Show success message first
-            showResultDialog("account_deleted_success");
+            showResultDialog(ACCOUNT_DELETED_SUCCESS);
             
             // Load the authorization view
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/Authorization.fxml"));
@@ -300,8 +308,8 @@ public class EditProfileController implements Initializable {
             logger.info("User account deleted successfully");
             
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load authorization view: " + e.getMessage(), e);
-            showResultDialog("account_deletion_failed");
+            logger.log(Level.WARNING, "Failed to load authorization view: {0}", e.getMessage());
+            showResultDialog(ACCOUNT_DELETION_FAILED);
             
             // Fallback to previous behavior if authorization view can't be loaded
             Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
@@ -313,8 +321,8 @@ public class EditProfileController implements Initializable {
                 previousStage.requestFocus();
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to delete account: " + e.getMessage(), e);
-            showResultDialog("account_deletion_failed");
+            logger.log(Level.SEVERE, "Failed to delete account: {0}", e.getMessage());
+            showResultDialog(ACCOUNT_DELETION_FAILED);
         }
     }
     
@@ -330,16 +338,16 @@ public class EditProfileController implements Initializable {
             
             // Set appropriate message based on result type
             switch (resultType) {
-                case "account_updated_success":
+                case ACCOUNT_UPDATED_SUCCESS:
                     controller.setAccountUpdatedSuccess();
                     break;
-                case "account_update_failed":
+                case ACCOUNT_UPDATE_FAILED:
                     controller.setAccountUpdateFailed();
                     break;
-                case "account_deleted_success":
+                case ACCOUNT_DELETED_SUCCESS:
                     controller.setAccountDeletedSuccess();
                     break;
-                case "account_deletion_failed":
+                case ACCOUNT_DELETION_FAILED:
                     controller.setAccountDeletionFailed();
                     break;
                 default:
@@ -360,7 +368,7 @@ public class EditProfileController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show result dialog: {0}", e.getMessage());
         }
     }
 

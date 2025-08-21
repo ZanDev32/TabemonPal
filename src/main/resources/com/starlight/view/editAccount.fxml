@@ -30,7 +30,7 @@
             <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="325.5" vgrow="ALWAYS" />
         </rowConstraints>
          <children>
-            <ImageView fx:id="Image" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fx:id="image" fitHeight="150.0" fitWidth="150.0" pickOnBounds="true" preserveRatio="true">
                <viewport>
                   <Rectangle2D height="150.0" width="150.0" />
                </viewport>

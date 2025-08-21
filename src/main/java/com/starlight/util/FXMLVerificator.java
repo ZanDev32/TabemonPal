@@ -16,6 +16,12 @@ public class FXMLVerificator {
 
     private static final Logger logger = Logger.getLogger(FXMLVerificator.class.getName());
 
+    // Dedicated exception for FXML verification issues
+    private static class FXMLVerificationException extends RuntimeException {
+        FXMLVerificationException(String message) { super(message); }
+        FXMLVerificationException(String message, Throwable cause) { super(message, cause); }
+    }
+
     // You can customize these
     private static final String EXPECTED_NAMESPACE = "http://javafx.com/javafx/19";
     private static final String FXML_DIR = "src/main/resources";
@@ -33,7 +39,7 @@ public class FXMLVerificator {
             files.filter(path -> path.toString().endsWith(".fxml"))
                  .forEach(FXMLVerificator::verifyOneFile);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to walk FXML directory: " + FXML_DIR, e);
+            throw new FXMLVerificationException("Failed to walk FXML directory: " + FXML_DIR, e);
         }
     }
 
@@ -46,19 +52,19 @@ public class FXMLVerificator {
             String original = content;
 
             // Downgrade xmlns version
-            content = content.replaceAll("http://javafx.com/javafx/\\d+(?:\\.\\d+)*", EXPECTED_NAMESPACE);
+            content = content.replaceAll("http://javafx.com/javafx/\\d[\\d.]*", EXPECTED_NAMESPACE);
 
             // Detect illegal fx attributes
             for (String attr : ILLEGAL_ATTRIBUTES) {
                 if (content.contains(attr)) {
-                    throw new RuntimeException("FXML contains unsupported attribute: " + attr + " in " + fxmlPath);
+                    throw new FXMLVerificationException("FXML contains unsupported attribute: " + attr + " in " + fxmlPath);
                 }
             }
 
             // Detect unsupported tags
             for (String tag : UNSUPPORTED_TAGS) {
                 if (content.contains(tag)) {
-                    throw new RuntimeException("FXML uses possibly unsupported tag: " + tag + " in " + fxmlPath);
+                    throw new FXMLVerificationException("FXML uses possibly unsupported tag: " + tag + " in " + fxmlPath);
                 }
             }
 
@@ -69,7 +75,7 @@ public class FXMLVerificator {
             }
 
         } catch (IOException e) {
-            throw new RuntimeException("Failed to verify FXML file: " + fxmlPath, e);
+            throw new FXMLVerificationException("Failed to verify FXML file: " + fxmlPath, e);
         }
     }
 }
