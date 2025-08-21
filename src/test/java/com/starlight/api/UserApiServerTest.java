@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link UserApiServer}.
  */
-public class UserApiServerTest {
+class UserApiServerTest {
     
     private UserApiServer server;
     private static final int TEST_PORT = 9000; // Use a different port range to avoid conflicts

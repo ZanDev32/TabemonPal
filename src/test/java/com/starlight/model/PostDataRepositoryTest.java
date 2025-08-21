@@ -17,7 +17,7 @@ import com.starlight.repository.PostDataRepository;
 /**
  * Unit tests for {@link PostDataRepository}.
  */
-public class PostDataRepositoryTest {
+class PostDataRepositoryTest {
     private Path tempFile;
     private PostDataRepository repository;
 

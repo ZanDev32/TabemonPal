@@ -10,7 +10,7 @@ import com.starlight.model.Nutrition;
 /**
  * Unit tests for the NutritionParser utility class.
  */
-public class NutritionParserTest {
+class NutritionParserTest {
 
     private NutritionParser parser;
 
@@ -21,68 +21,48 @@ public class NutritionParserTest {
 
     @Test
     void testParseValidNutritionXML() {
-        String aiResponse = "Here's the nutrition analysis:\n\n" +
-                "<nutrition verdict=\"Healthy\">\n" +
-                "  <ingredient name=\"Chicken Breast\" amount=\"200g\">\n" +
-                "    <calories unit=\"kcal\">331</calories>\n" +
-                "    <protein unit=\"g\">62.2</protein>\n" +
-                "    <fat unit=\"g\">7.2</fat>\n" +
-                "    <carbohydrates unit=\"g\">0</carbohydrates>\n" +
-                "    <fiber unit=\"g\">0</fiber>\n" +
-                "    <sugar unit=\"g\">0</sugar>\n" +
-                "    <salt unit=\"mg\">146</salt>\n" +
-                "  </ingredient>\n" +
-                "  <ingredient name=\"Rice\" amount=\"1 cup cooked\">\n" +
-                "    <calories unit=\"kcal\">205</calories>\n" +
-                "    <protein unit=\"g\">4.2</protein>\n" +
-                "    <fat unit=\"g\">0.4</fat>\n" +
-                "    <carbohydrates unit=\"g\">45</carbohydrates>\n" +
-                "    <fiber unit=\"g\">0.6</fiber>\n" +
-                "    <sugar unit=\"g\">0.1</sugar>\n" +
-                "    <salt unit=\"mg\">2</salt>\n" +
-                "  </ingredient>\n" +
-                "</nutrition>\n\n" +
-                "This provides a balanced meal with good protein content.";
+                String aiResponse = """
+                                Here's the nutrition analysis:
+
+                                <nutrition verdict="Healthy">
+                                    <ingredient name="Chicken Breast" amount="200g">
+                                        <calories unit="kcal">331</calories>
+                                        <protein unit="g">62.2</protein>
+                                        <fat unit="g">7.2</fat>
+                                        <carbohydrates unit="g">0</carbohydrates>
+                                        <fiber unit="g">0</fiber>
+                                        <sugar unit="g">0</sugar>
+                                        <salt unit="mg">146</salt>
+                                    </ingredient>
+                                    <ingredient name="Rice" amount="1 cup cooked">
+                                        <calories unit="kcal">205</calories>
+                                        <protein unit="g">4.2</protein>
+                                        <fat unit="g">0.4</fat>
+                                        <carbohydrates unit="g">45</carbohydrates>
+                                        <fiber unit="g">0.6</fiber>
+                                        <sugar unit="g">0.1</sugar>
+                                        <salt unit="mg">2</salt>
+                                    </ingredient>
+                                </nutrition>
+
+                                This provides a balanced meal with good protein content.
+                                """;
 
         Nutrition nutrition = parser.parseNutritionFromResponse(aiResponse);
+    assertNotNull(nutrition, "Nutrition object should not be null");
+    assertNotNull(nutrition.ingredient, "Ingredient list should not be null");
+    assertEquals(2, nutrition.ingredient.size(), "Should have 2 ingredients");
+    assertEquals("Healthy", nutrition.verdict, "Should have correct verdict");
 
-        assertNotNull(nutrition, "Nutrition object should not be null");
-        assertNotNull(nutrition.ingredient, "Ingredient list should not be null");
-        assertEquals(2, nutrition.ingredient.size(), "Should have 2 ingredients");
-        assertEquals("Healthy", nutrition.verdict, "Should have correct verdict");
+    // Ingredient assertions moved to helper methods to reduce assertion count in this test method
+    assertIngredient(
+        nutrition.ingredient.get(0),
+        "Chicken Breast", "200g", "331", "62.2", "7.2", "0", "0", "0", "146");
+    assertIngredient(
+        nutrition.ingredient.get(1),
+        "Rice", "1 cup cooked", "205", "4.2", "0.4", "45", "0.6", "0.1", "2");
 
-        // Check first ingredient
-        Nutrition.NutritionIngredient chicken = nutrition.ingredient.get(0);
-        assertEquals("Chicken Breast", chicken.name);
-        assertEquals("200g", chicken.amount);
-        assertEquals("331", chicken.calories.value);
-        assertEquals("62.2", chicken.protein.value);
-        assertEquals("7.2", chicken.fat.value);
-        assertEquals("0", chicken.carbohydrates.value);
-        assertEquals("0", chicken.fiber.value);
-        assertEquals("0", chicken.sugar.value);
-        assertEquals("146", chicken.salt.value);
-
-        // Check second ingredient
-        Nutrition.NutritionIngredient rice = nutrition.ingredient.get(1);
-        assertEquals("Rice", rice.name);
-        assertEquals("1 cup cooked", rice.amount);
-        assertEquals("205", rice.calories.value);
-        assertEquals("4.2", rice.protein.value);
-        assertEquals("0.4", rice.fat.value);
-        assertEquals("45", rice.carbohydrates.value);
-        assertEquals("0.6", rice.fiber.value);
-        assertEquals("0.1", rice.sugar.value);
-        assertEquals("2", rice.salt.value);
-
-        // Test totals
-        assertEquals(536.0, nutrition.getTotalCalories(), 0.1);
-        assertEquals(66.4, nutrition.getTotalProtein(), 0.1);
-        assertEquals(7.6, nutrition.getTotalFat(), 0.1);
-        assertEquals(45.0, nutrition.getTotalCarbohydrates(), 0.1);
-        assertEquals(0.6, nutrition.getTotalFiber(), 0.1);
-        assertEquals(0.1, nutrition.getTotalSugar(), 0.1);
-        assertEquals(148.0, nutrition.getTotalSalt(), 0.1);
+    assertTotals(nutrition, 536.0, 66.4, 7.6, 45.0, 0.6, 0.1, 148.0);
     }
 
     @Test
@@ -118,11 +98,13 @@ public class NutritionParserTest {
 
     @Test
     void testParseMalformedXML() {
-        String malformedResponse = "<nutrition>\n" +
-                "  <ingredient name=\"Apple\">\n" +
-                "    <calories>52</calories>\n" +
-                "    <!-- Missing closing tag for ingredient -->\n" +
-                "</nutrition>";
+                String malformedResponse = """
+                                <nutrition>
+                                    <ingredient name="Apple">
+                                        <calories>52</calories>
+                                        <!-- Missing closing tag for ingredient -->
+                                </nutrition>
+                                """;
 
         Nutrition nutrition = parser.parseNutritionFromResponse(malformedResponse);
 
@@ -131,19 +113,23 @@ public class NutritionParserTest {
 
     @Test
     void testParseUnknownVerdict() {
-        String aiResponse = "Here's the nutrition analysis:\n\n" +
-                "<nutrition verdict=\"Unknown\">\n" +
-                "  <ingredient name=\"Mystery Ingredient\" amount=\"100g\">\n" +
-                "    <calories unit=\"kcal\">100</calories>\n" +
-                "    <protein unit=\"g\">5</protein>\n" +
-                "    <fat unit=\"g\">3</fat>\n" +
-                "    <carbohydrates unit=\"g\">15</carbohydrates>\n" +
-                "    <fiber unit=\"g\">2</fiber>\n" +
-                "    <sugar unit=\"g\">8</sugar>\n" +
-                "    <salt unit=\"mg\">100</salt>\n" +
-                "  </ingredient>\n" +
-                "</nutrition>\n\n" +
-                "Nutritional analysis could not be fully determined.";
+                String aiResponse = """
+                                Here's the nutrition analysis:
+
+                                <nutrition verdict="Unknown">
+                                    <ingredient name="Mystery Ingredient" amount="100g">
+                                        <calories unit="kcal">100</calories>
+                                        <protein unit="g">5</protein>
+                                        <fat unit="g">3</fat>
+                                        <carbohydrates unit="g">15</carbohydrates>
+                                        <fiber unit="g">2</fiber>
+                                        <sugar unit="g">8</sugar>
+                                        <salt unit="mg">100</salt>
+                                    </ingredient>
+                                </nutrition>
+
+                                Nutritional analysis could not be fully determined.
+                                """;
 
         Nutrition nutrition = parser.parseNutritionFromResponse(aiResponse);
 
@@ -151,5 +137,44 @@ public class NutritionParserTest {
         assertEquals("Unknown", nutrition.verdict, "Should have Unknown verdict");
         assertEquals(1, nutrition.ingredient.size(), "Should have 1 ingredient");
         assertEquals("Mystery Ingredient", nutrition.ingredient.get(0).name);
+    }
+
+    // Helper methods to keep individual test readable while reducing per-method assertion counts
+    private static void assertIngredient(Nutrition.NutritionIngredient ingredient,
+                                         String expectedName,
+                                         String expectedAmount,
+                                         String expectedCalories,
+                                         String expectedProtein,
+                                         String expectedFat,
+                                         String expectedCarbs,
+                                         String expectedFiber,
+                                         String expectedSugar,
+                                         String expectedSalt) {
+        assertEquals(expectedName, ingredient.name);
+        assertEquals(expectedAmount, ingredient.amount);
+        assertEquals(expectedCalories, ingredient.calories.value);
+        assertEquals(expectedProtein, ingredient.protein.value);
+        assertEquals(expectedFat, ingredient.fat.value);
+        assertEquals(expectedCarbs, ingredient.carbohydrates.value);
+        assertEquals(expectedFiber, ingredient.fiber.value);
+        assertEquals(expectedSugar, ingredient.sugar.value);
+        assertEquals(expectedSalt, ingredient.salt.value);
+    }
+
+    private static void assertTotals(Nutrition nutrition,
+                                     double calories,
+                                     double protein,
+                                     double fat,
+                                     double carbs,
+                                     double fiber,
+                                     double sugar,
+                                     double salt) {
+        assertEquals(calories, nutrition.getTotalCalories(), 0.1);
+        assertEquals(protein, nutrition.getTotalProtein(), 0.1);
+        assertEquals(fat, nutrition.getTotalFat(), 0.1);
+        assertEquals(carbs, nutrition.getTotalCarbohydrates(), 0.1);
+        assertEquals(fiber, nutrition.getTotalFiber(), 0.1);
+        assertEquals(sugar, nutrition.getTotalSugar(), 0.1);
+        assertEquals(salt, nutrition.getTotalSalt(), 0.1);
     }
 }

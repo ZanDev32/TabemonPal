@@ -11,6 +11,9 @@ import java.util.logging.Logger;
  * by JavaFX.
  */
 public class FXMLVerificator {
+
+    private FXMLVerificator() {}
+
     private static final Logger logger = Logger.getLogger(FXMLVerificator.class.getName());
 
     // You can customize these

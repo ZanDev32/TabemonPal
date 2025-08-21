@@ -17,7 +17,7 @@ import com.starlight.repository.UserDataRepository;
 /**
  * Unit tests for {@link UserDataRepository}.
  */
-public class UserDataRepositoryTest {
+class UserDataRepositoryTest {
     private Path tempFile;
     private Path tempDummyFile;
     private UserDataRepository repository;

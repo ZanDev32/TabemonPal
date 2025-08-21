@@ -9,10 +9,10 @@ import java.nio.file.Path;
 /**
  * Test class for ConsultController avatar path resolution.
  */
-public class ConsultControllerTest {
+class ConsultControllerTest {
     
     @Test
-    public void testAvatarPathResolution() {
+    void testAvatarPathResolution() {
         // Test that the avatar paths can be resolved by FileSystemManager
         String botAvatarPath = "src/main/resources/com/starlight/images/dummy/profilewoman.jpg";
         String userAvatarPath = "src/main/resources/com/starlight/images/dummy/profilewoman.jpg";
@@ -32,7 +32,7 @@ public class ConsultControllerTest {
     }
     
     @Test
-    public void testResourcePathFormat() {
+    void testResourcePathFormat() {
         // Test that our path format works with the FileSystemManager
         String resourcePath = "src/main/resources/com/starlight/images/dummy/profilewoman.jpg";
         

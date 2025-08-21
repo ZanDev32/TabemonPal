@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 /**
  * Unit tests for {@link AuthorizationController}.
  */
-public class AuthorizationControllerTest extends ApplicationTest {
+class AuthorizationControllerTest extends ApplicationTest {
     
     private AuthorizationController controller;
     private BorderPane testPane;

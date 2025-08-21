@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link Post} data model.
  */
-public class PostTest {
+class PostTest {
     private Post post;
 
     @BeforeEach

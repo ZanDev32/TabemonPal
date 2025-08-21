@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link User} data model.
  */
-public class UserTest {
+class UserTest {
     private User user;
 
     @BeforeEach

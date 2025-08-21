@@ -66,38 +66,53 @@ public class PostDataRepository {
         return loadPosts(useDummy, false);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Post> loadPosts(boolean useDummy, boolean fallbackToDummyIfMissing) {
+        File xmlFile = resolveXmlFile(useDummy, fallbackToDummyIfMissing);
+        if (xmlFile == null) return new ArrayList<>();
+
+        List<Post> posts = readPostsFromFile(xmlFile);
+        if (posts == null) return new ArrayList<>();
+
+        initializeMissingFields(posts);
+        return posts;
+    }
+
+    /** Resolve which XML file to read based on flags; returns null if none available. */
+    private File resolveXmlFile(boolean useDummy, boolean fallbackToDummyIfMissing) {
         File xmlFile = new File(useDummy ? DUMMY_XML_PATH : xmlPath);
-        if (!xmlFile.exists() || xmlFile.length() == 0) {
-            if (!useDummy && fallbackToDummyIfMissing) {
-                xmlFile = new File(DUMMY_XML_PATH);
-                if (!xmlFile.exists()) {
-                    return new ArrayList<>();
-                }
-            } else {
-                return new ArrayList<>();
+        if (xmlFile.exists() && xmlFile.length() > 0) {
+            return xmlFile;
+        }
+
+        if (!useDummy && fallbackToDummyIfMissing) {
+            File dummy = new File(DUMMY_XML_PATH);
+            if (dummy.exists() && dummy.length() > 0) {
+                return dummy;
             }
         }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Post> readPostsFromFile(File xmlFile) {
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
-                List<Post> posts = (List<Post>) obj;
-                // Initialize missing fields for existing posts
-                for (Post post : posts) {
-                    if (post.commentcount == null) {
-                        post.commentcount = "0";
-                    }
-                    if (post.isLiked == null) {
-                        post.isLiked = "false";
-                    }
-                }
-                return posts;
+                return (List<Post>) obj;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return null;
+    }
+
+    /** Ensure required fields are present on loaded posts. */
+    private void initializeMissingFields(List<Post> posts) {
+        for (Post post : posts) {
+            if (post.commentcount == null) post.commentcount = "0";
+            if (post.isLiked == null) post.isLiked = "false";
+        }
     }
 
     /**

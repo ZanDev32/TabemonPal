@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Test class to verify that liked state is properly saved and loaded from XML.
  */
-public class PostLikedStateTest {
+class PostLikedStateTest {
     
     private Path tempFile;
     private PostDataRepository repository;

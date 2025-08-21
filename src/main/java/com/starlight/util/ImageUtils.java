@@ -13,6 +13,8 @@ import javafx.scene.shape.Rectangle;
  * Contains methods for loading and scaling images with proper fallback handling.
  */
 public class ImageUtils {
+
+    private ImageUtils() {}
     
     /** Default path to the missing image placeholder */
     public static final String DEFAULT_MISSING_IMAGE = "/com/starlight/images/missing.png";
@@ -42,8 +44,10 @@ public class ImageUtils {
         double imageAspect = imageWidth / imageHeight;
         double frameAspect = frameWidth / frameHeight;
 
-        double newWidth, newHeight;
-        double xOffset = 0, yOffset = 0;
+        double newWidth; 
+        double newHeight;
+        double xOffset = 0; 
+        double yOffset = 0;
 
         // Determine the cropping area
         if (imageAspect > frameAspect) {

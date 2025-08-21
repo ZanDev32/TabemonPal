@@ -11,7 +11,7 @@ import com.starlight.model.User;
 /**
  * Unit tests for {@link Session} utility class.
  */
-public class SessionTest {
+class SessionTest {
     private User testUser;
 
     @BeforeEach

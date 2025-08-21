@@ -20,6 +20,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 public class LocalUserDataRepository {
     private static final Logger logger = Logger.getLogger(LocalUserDataRepository.class.getName());
     private static final String LOCAL_XML_PATH = "src/main/java/com/starlight/data/LocalUserData.xml";
+    // Reused default admin username literal
+    private static final String ADMIN_USERNAME = "admin";
     
     private final XStream xstream;
     private List<User> cachedUsers;
@@ -84,9 +86,9 @@ public class LocalUserDataRepository {
     private List<User> createDefaultUsers() {
         List<User> defaultUsers = new ArrayList<>();
         
-        // Create admin user
-        User admin = new User();
-        admin.username = "admin";
+    // Create admin user
+    User admin = new User();
+    admin.username = ADMIN_USERNAME;
         admin.email = "admin@tabemonpal.local";
         admin.fullname = "Administrator";
         admin.password = "admin123";
@@ -163,7 +165,7 @@ public class LocalUserDataRepository {
      * @return true if user is admin, false otherwise
      */
     public boolean isAdmin(User user) {
-        return user != null && user.username != null && user.username.toLowerCase().equals("admin");
+    return user != null && user.username != null && user.username.toLowerCase().equals(ADMIN_USERNAME);
     }
 
     /**
@@ -171,7 +173,7 @@ public class LocalUserDataRepository {
      * @return Admin user or null if not found
      */
     public User getAdminUser() {
-        return findUser("admin");
+    return findUser(ADMIN_USERNAME);
     }
 
     /**

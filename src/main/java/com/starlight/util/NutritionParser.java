@@ -165,7 +165,7 @@ public class NutritionParser {
     /**
      * Parses fat values from XML content.
      */
-    private Nutrition.Fat parseFatValue(String content, String tagName, String defaultUnit) {
+    private Nutrition.Fat parseFatValue(String content, String tagName) {
         Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
@@ -184,7 +184,7 @@ public class NutritionParser {
     /**
      * Parses carbohydrates values from XML content.
      */
-    private Nutrition.Carbohydrates parseCarbohydratesValue(String content, String tagName, String defaultUnit) {
+    private Nutrition.Carbohydrates parseCarbohydratesValue(String content, String tagName) {
         Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
@@ -203,7 +203,7 @@ public class NutritionParser {
     /**
      * Parses fiber values from XML content.
      */
-    private Nutrition.Fiber parseFiberValue(String content, String tagName, String defaultUnit) {
+    private Nutrition.Fiber parseFiberValue(String content, String tagName) {
         Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
@@ -241,7 +241,7 @@ public class NutritionParser {
     /**
      * Parses salt values from XML content.
      */
-    private Nutrition.Salt parseSaltValue(String content, String tagName, String defaultUnit) {
+    private Nutrition.Salt parseSaltValue(String content, String tagName) {
         Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
