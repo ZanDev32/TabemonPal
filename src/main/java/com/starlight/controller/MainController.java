@@ -179,9 +179,9 @@ public class MainController implements Initializable {
         if (Session.getCurrentUser() == null) {
             return false;
         }
-        
-        String username = Session.getCurrentUser().username;
-        return username != null && username.toLowerCase().equals("admin");
+
+        String username = Session.getCurrentUser().getUsername();
+        return username != null && username.equalsIgnoreCase("admin");
     }
     
     /**

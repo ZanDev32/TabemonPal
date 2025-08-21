@@ -87,13 +87,13 @@ public class RecipeManagerController implements Initializable {
 
         public PostTableData(Post post) {
             this.originalPost = post;
-            this.uuid = new SimpleStringProperty(post.uuid != null ? post.uuid : "");
-            this.title = new SimpleStringProperty(post.title != null ? post.title : "");
-            this.username = new SimpleStringProperty(post.username != null ? post.username : "");
-            this.rating = new SimpleStringProperty(post.rating != null ? post.rating : "0.0");
-            this.likeCount = new SimpleStringProperty(post.likecount != null ? post.likecount : "0");
-            this.uploadTime = new SimpleStringProperty(formatDateTime(post.uploadtime));
-            this.description = new SimpleStringProperty(post.description != null ? post.description : "");
+            this.uuid = new SimpleStringProperty(post.getUuid() != null ? post.getUuid() : "");
+            this.title = new SimpleStringProperty(post.getTitle() != null ? post.getTitle() : "");
+            this.username = new SimpleStringProperty(post.getUsername() != null ? post.getUsername() : "");
+            this.rating = new SimpleStringProperty(post.getRating() != null ? post.getRating() : "0.0");
+            this.likeCount = new SimpleStringProperty(post.getLikecount() != null ? post.getLikecount() : "0");
+            this.uploadTime = new SimpleStringProperty(formatDateTime(post.getUploadtime()));
+            this.description = new SimpleStringProperty(post.getDescription() != null ? post.getDescription() : "");
         }
 
         private static String formatDateTime(String uploadTime) {
@@ -176,8 +176,8 @@ public class RecipeManagerController implements Initializable {
         }
         
         // Only allow access for users with exact username "admin"
-        return currentUser.username != null && 
-               currentUser.username.toLowerCase().equals("admin");
+    return currentUser.getUsername() != null && 
+           currentUser.getUsername().equalsIgnoreCase("admin");
     }
     
     /**
@@ -637,7 +637,7 @@ public class RecipeManagerController implements Initializable {
             
             // Find and update the post
             for (int i = 0; i < allPosts.size(); i++) {
-                if (allPosts.get(i).uuid != null && allPosts.get(i).uuid.equals(post.uuid)) {
+                if (allPosts.get(i).getUuid() != null && allPosts.get(i).getUuid().equals(post.getUuid())) {
                     allPosts.set(i, post);
                     break;
                 }
@@ -679,18 +679,18 @@ public class RecipeManagerController implements Initializable {
         
         // Create dummy posts for testing
         Post testPost1 = new Post();
-        testPost1.uuid = "test-1";
+    testPost1.setUuid("test-1");
         testPost1.title = "Test Post 1";
-        testPost1.username = "TestUser1";
+    testPost1.setUsername("TestUser1");
         testPost1.rating = "4.5";
         testPost1.likecount = "10";
         testPost1.uploadtime = "2025-07-20T19:00:00";
         testPost1.description = "This is a test post to verify table functionality";
         
         Post testPost2 = new Post();
-        testPost2.uuid = "test-2";
+    testPost2.setUuid("test-2");
         testPost2.title = "Test Post 2";
-        testPost2.username = "TestUser2";
+    testPost2.setUsername("TestUser2");
         testPost2.rating = "3.8";
         testPost2.likecount = "5";
         testPost2.uploadtime = "2025-07-20T18:30:00";

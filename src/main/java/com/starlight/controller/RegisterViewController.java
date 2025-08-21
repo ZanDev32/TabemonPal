@@ -112,7 +112,7 @@ public class RegisterViewController implements Initializable {
         
         try {
             User registered = apiClient.register(user, em, pass);
-            logger.info("Register success for user: " + registered.username);
+            logger.info("Register success for user: " + registered.getUsername());
             
             // Show success message before switching view
             showSuccess("Account created successfully! Please log in.");

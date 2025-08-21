@@ -150,8 +150,8 @@ public class UserDataRepository {
         List<User> users = loadUsers(false); // Load only real users, not dummy ones
         int initialSize = users.size();
         
-        // Remove all instances of the user (in case of duplicates)
-        users.removeIf(user -> user.username.equals(username));
+    // Remove all instances of the user (in case of duplicates)
+    users.removeIf(user -> user.getUsername() != null && user.getUsername().equals(username));
         
         // Check if any users were removed
         if (users.size() < initialSize) {

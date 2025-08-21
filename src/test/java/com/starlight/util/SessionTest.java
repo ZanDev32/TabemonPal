@@ -21,11 +21,11 @@ class SessionTest {
         
         // Create a test user
         testUser = new User();
-        testUser.username = "testuser";
-        testUser.email = "test@example.com";
-        testUser.fullname = "Test User";
-        testUser.password = "password123";
-        testUser.birthDay = "1990-01-01";
+        testUser.setUsername("testuser");
+        testUser.setEmail("test@example.com");
+        testUser.setFullname("Test User");
+        testUser.setPassword("password123");
+        testUser.setBirthDay("1990-01-01");
     }
 
     @AfterEach
@@ -47,11 +47,11 @@ class SessionTest {
         
         assertNotNull(currentUser);
         assertEquals(testUser, currentUser);
-        assertEquals("testuser", currentUser.username);
-        assertEquals("test@example.com", currentUser.email);
-        assertEquals("Test User", currentUser.fullname);
-        assertEquals("password123", currentUser.password);
-        assertEquals("1990-01-01", currentUser.birthDay);
+        assertEquals("testuser", currentUser.getUsername());
+        assertEquals("test@example.com", currentUser.getEmail());
+        assertEquals("Test User", currentUser.getFullname());
+        assertEquals("password123", currentUser.getPassword());
+        assertEquals("1990-01-01", currentUser.getBirthDay());
     }
 
     @Test
@@ -69,15 +69,15 @@ class SessionTest {
     void testUpdateCurrentUser() {
         // Set initial user
         Session.setCurrentUser(testUser);
-        assertEquals("testuser", Session.getCurrentUser().username);
+        assertEquals("testuser", Session.getCurrentUser().getUsername());
         
         // Create a different user
         User newUser = new User();
-        newUser.username = "newuser";
-        newUser.email = "new@example.com";
-        newUser.fullname = "New User";
-        newUser.password = "newpassword";
-        newUser.birthDay = "1985-05-15";
+        newUser.setUsername("newuser");
+        newUser.setEmail("new@example.com");
+        newUser.setFullname("New User");
+        newUser.setPassword("newpassword");
+        newUser.setBirthDay("1985-05-15");
         
         // Update current user
         Session.setCurrentUser(newUser);
@@ -85,11 +85,11 @@ class SessionTest {
         
         assertNotNull(currentUser);
         assertEquals(newUser, currentUser);
-        assertEquals("newuser", currentUser.username);
-        assertEquals("new@example.com", currentUser.email);
-        assertEquals("New User", currentUser.fullname);
-        assertEquals("newpassword", currentUser.password);
-        assertEquals("1985-05-15", currentUser.birthDay);
+        assertEquals("newuser", currentUser.getUsername());
+        assertEquals("new@example.com", currentUser.getEmail());
+        assertEquals("New User", currentUser.getFullname());
+        assertEquals("newpassword", currentUser.getPassword());
+        assertEquals("1985-05-15", currentUser.getBirthDay());
     }
 
     @Test
@@ -118,46 +118,46 @@ class SessionTest {
         
         // Modify user through session reference
         User sessionUser = Session.getCurrentUser();
-        sessionUser.fullname = "Modified Name";
+        sessionUser.setFullname("Modified Name");
         
         // The change should be reflected when getting the user again
-        assertEquals("Modified Name", Session.getCurrentUser().fullname);
+        assertEquals("Modified Name", Session.getCurrentUser().getFullname());
     }
 
     @Test
     void testSetCurrentUserWithPartiallyPopulatedUser() {
         User partialUser = new User();
-        partialUser.username = "partial";
+        partialUser.setUsername("partial");
         // Leave other fields null
         
         Session.setCurrentUser(partialUser);
         User currentUser = Session.getCurrentUser();
         
         assertNotNull(currentUser);
-        assertEquals("partial", currentUser.username);
-        assertNull(currentUser.email);
-        assertNull(currentUser.fullname);
-        assertNull(currentUser.password);
-        assertNull(currentUser.birthDay);
+        assertEquals("partial", currentUser.getUsername());
+        assertNull(currentUser.getEmail());
+        assertNull(currentUser.getFullname());
+        assertNull(currentUser.getPassword());
+        assertNull(currentUser.getBirthDay());
     }
 
     @Test
     void testSetCurrentUserWithEmptyFieldsUser() {
         User emptyUser = new User();
-        emptyUser.username = "";
-        emptyUser.email = "";
-        emptyUser.fullname = "";
-        emptyUser.password = "";
-        emptyUser.birthDay = "";
+        emptyUser.setUsername("");
+        emptyUser.setEmail("");
+        emptyUser.setFullname("");
+        emptyUser.setPassword("");
+        emptyUser.setBirthDay("");
         
         Session.setCurrentUser(emptyUser);
         User currentUser = Session.getCurrentUser();
         
         assertNotNull(currentUser);
-        assertEquals("", currentUser.username);
-        assertEquals("", currentUser.email);
-        assertEquals("", currentUser.fullname);
-        assertEquals("", currentUser.password);
-        assertEquals("", currentUser.birthDay);
+    assertEquals("", currentUser.getUsername());
+    assertEquals("", currentUser.getEmail());
+    assertEquals("", currentUser.getFullname());
+    assertEquals("", currentUser.getPassword());
+    assertEquals("", currentUser.getBirthDay());
     }
 }

@@ -52,9 +52,9 @@ public class ChatHistoryUtils {
             // Show first message as preview
             if (messageCount > 0) {
                 ChatMessage firstMessage = history.getMessages().get(0);
-                String preview = firstMessage.content.length() > 50 ? 
-                    firstMessage.content.substring(0, 50) + "..." : 
-                    firstMessage.content;
+                String preview = firstMessage.getContent().length() > 50 ? 
+                    firstMessage.getContent().substring(0, 50) + "..." : 
+                    firstMessage.getContent();
                 summary.append("Preview: \"").append(preview).append("\"\n");
             }
             summary.append("\n");
@@ -100,10 +100,10 @@ public class ChatHistoryUtils {
         
         if (targetHistory.getMessages() != null) {
             for (ChatMessage message : targetHistory.getMessages()) {
-                String sender = message.isUser ? targetHistory.getUsername() : "TabemonPal AI";
+                String sender = message.isUser() ? targetHistory.getUsername() : "TabemonPal AI";
                 export.append("[").append(message.getFormattedTimestamp()).append("] ");
                 export.append(sender).append(": ");
-                export.append(message.content).append("\n\n");
+                export.append(message.getContent()).append("\n\n");
             }
         }
         
@@ -159,7 +159,7 @@ public class ChatHistoryUtils {
 
             this.userMessages = histories.stream()
                 .flatMap(h -> h.getMessages().stream())
-                .mapToInt(m -> m.isUser ? 1 : 0)
+                .mapToInt(m -> m.isUser() ? 1 : 0)
                 .sum();
 
             this.aiMessages = totalMessages - userMessages;

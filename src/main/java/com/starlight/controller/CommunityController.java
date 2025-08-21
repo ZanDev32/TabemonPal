@@ -127,8 +127,8 @@ public class CommunityController implements Initializable {
         
         List<User> users = userRepository.loadUsers();
         for (User user : users) {
-            if (username.equals(user.username)) {
-                return user.profilepicture;
+            if (username.equals(user.getUsername())) {
+                return user.getProfilepicture();
             }
         }
         return null;
@@ -142,10 +142,10 @@ public class CommunityController implements Initializable {
         
         List<User> users = userRepository.loadUsers();
         for (User user : users) {
-            if (username.equals(user.username)) {
+            if (username.equals(user.getUsername())) {
                 // Return fullname if available, otherwise return username
-                return user.fullname != null && !user.fullname.trim().isEmpty() 
-                    ? user.fullname : user.username;
+                return user.getFullname() != null && !user.getFullname().trim().isEmpty() 
+                    ? user.getFullname() : user.getUsername();
             }
         }
         return username; // fallback to original username if not found
@@ -170,12 +170,12 @@ public class CommunityController implements Initializable {
 
         for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
-            String tits = p.title;
-            String usr = p.username;
-            String desc = p.description;
-            String image = p.image;
-            String time = p.uploadtime;
-            String likes = p.likecount;
+            String tits = p.getTitle();
+            String usr = p.getUsername();
+            String desc = p.getDescription();
+            String image = p.getImage();
+            String time = p.getUploadtime();
+            String likes = p.getLikecount();
             
             // Get profile picture and display username from UserData.xml instead of Post data
             String pp = getProfilePictureForUser(usr);
@@ -193,7 +193,7 @@ public class CommunityController implements Initializable {
                 c.likecounter.setText(likes);
                 
                 // Set comment count (default to 0 if not set)
-                String commentCount = p.commentcount != null ? p.commentcount : "0";
+                String commentCount = p.getCommentcount() != null ? p.getCommentcount() : "0";
                 c.commentcounter.setText(commentCount);
                 
                 // Set the post data for the controller
@@ -203,8 +203,8 @@ public class CommunityController implements Initializable {
                 c.setMainController(main);
                 
                 // Initialize isLiked field if not set
-                if (p.isLiked == null) {
-                    p.isLiked = "false";
+                if (p.getIsLiked() == null) {
+                    p.setIsLiked("false");
                 }
 
                 // Load profile picture
@@ -250,31 +250,31 @@ public class CommunityController implements Initializable {
             Post post = shuffledPosts.get(i);
             switch (i) {
                 case 0:
-                    dailytitle1.setText(post.title);
-                    starrating.setText(post.rating);
-                    dailylikecounter.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto1, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+                    dailytitle1.setText(post.getTitle());
+                    starrating.setText(post.getRating());
+                    dailylikecounter.setText(post.getLikecount());
+                    ImageUtils.loadImage(dailyphoto1, post.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto1, 280, 174, 30);
                     break;
                 case 1:
-                    dailytitle2.setText(post.title);
-                    starrating2.setText(post.rating);
-                    dailylikecounter2.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto2, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+                    dailytitle2.setText(post.getTitle());
+                    starrating2.setText(post.getRating());
+                    dailylikecounter2.setText(post.getLikecount());
+                    ImageUtils.loadImage(dailyphoto2, post.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto2, 280, 174, 30);
                     break;
                 case 2:
-                    dailytitle3.setText(post.title);
-                    starrating3.setText(post.rating);
-                    dailylikecounter3.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto3, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+                    dailytitle3.setText(post.getTitle());
+                    starrating3.setText(post.getRating());
+                    dailylikecounter3.setText(post.getLikecount());
+                    ImageUtils.loadImage(dailyphoto3, post.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto3, 280, 174, 30);
                     break;
                 case 3:
-                    dailytitle4.setText(post.title);
-                    starrating4.setText(post.rating);
-                    dailylikecounter4.setText(post.likecount);
-                    ImageUtils.loadImage(dailyphoto4, post.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+                    dailytitle4.setText(post.getTitle());
+                    starrating4.setText(post.getRating());
+                    dailylikecounter4.setText(post.getLikecount());
+                    ImageUtils.loadImage(dailyphoto4, post.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
                     ImageUtils.scaleToFit(dailyphoto4, 280, 174, 30);
                     break;
                 default:

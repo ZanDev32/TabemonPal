@@ -43,9 +43,9 @@ class PostDataRepositoryTest {
         p.image = "img";
         p.rating = "5";
         p.uploadtime = "now";
-        p.likecount = "0";
-        p.commentcount = "0";
-        p.isLiked = "false";
+    p.setLikecount("0");
+    p.setCommentcount("0");
+    p.setIsLiked("false");
         posts.add(p);
 
         repository.savePosts(posts);
@@ -61,8 +61,8 @@ class PostDataRepositoryTest {
         assertEquals(p.image, lp.image);
         assertEquals(p.rating, lp.rating);
         assertEquals(p.uploadtime, lp.uploadtime);
-        assertEquals(p.likecount, lp.likecount);
-        assertEquals(p.commentcount, lp.commentcount);
-        assertEquals(p.isLiked, lp.isLiked);
+    assertEquals(p.getLikecount(), lp.getLikecount());
+    assertEquals(p.getCommentcount(), lp.getCommentcount());
+    assertEquals(p.getIsLiked(), lp.getIsLiked());
     }
 }

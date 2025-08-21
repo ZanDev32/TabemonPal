@@ -63,8 +63,8 @@ public class NavbarController {
     private void initialize() {
         User currentUser = Session.getCurrentUser();
         if (currentUser != null) {
-            if (currentUser.profilepicture != null && !currentUser.profilepicture.isEmpty()) {
-                ImageUtils.loadImage(photoprofile, currentUser.profilepicture, "/com/starlight/images/default-profile.png");
+            if (currentUser.getProfilepicture() != null && !currentUser.getProfilepicture().isEmpty()) {
+                ImageUtils.loadImage(photoprofile, currentUser.getProfilepicture(), "/com/starlight/images/default-profile.png");
             } else {
                 ImageUtils.loadImage(photoprofile, "/com/starlight/images/default-profile.png");
             }

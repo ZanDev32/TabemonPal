@@ -110,7 +110,7 @@ public class PostController implements Initializable {
             return;
         }
         
-        if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
+    if (currentPost.getIngredients() == null || currentPost.getIngredients().trim().isEmpty()) {
             logger.warning("Cannot perform analysis - no ingredients available");
             showAnalysisErrorDialog("No ingredients found in this recipe to analyze.");
             return;
@@ -144,25 +144,25 @@ public class PostController implements Initializable {
      */
     private void updateUIFromPost() {
         if (currentPost == null) return;
-        
+
         if (description != null) {
-            description.setText(currentPost.description != null ? currentPost.description : "");
+            description.setText(currentPost.getDescription() != null ? currentPost.getDescription() : "");
         }
-        
+
         if (uploadtime != null) {
-            uploadtime.setText(formatRelativeTime(currentPost.uploadtime));
+            uploadtime.setText(formatRelativeTime(currentPost.getUploadtime()));
         }
         
         // Update username with display name from UserData
         if (username != null) {
-            String displayUsername = getDisplayUsernameForUser(currentPost.username);
-            username.setText(displayUsername != null ? displayUsername : currentPost.username);
+            String displayUsername = getDisplayUsernameForUser(currentPost.getUsername());
+            username.setText(displayUsername != null ? displayUsername : currentPost.getUsername());
         }
         
         // Update verdict button if available
-        if (verdict != null && currentPost.nutrition != null) {
-            String verdictText = currentPost.nutrition.verdict != null ? 
-                currentPost.nutrition.verdict : "Unknown";
+        if (verdict != null && currentPost.getNutrition() != null) {
+            String verdictText = currentPost.getNutrition().getVerdict() != null ? 
+                currentPost.getNutrition().getVerdict() : "Unknown";
             verdict.setText(verdictText);
             
             // Apply different styling based on verdict
@@ -197,7 +197,7 @@ public class PostController implements Initializable {
         
         // Update doAnalysis button state based on current nutrition status
         if (doAnalysis != null) {
-            if (currentPost.nutrition != null && currentPost.nutrition.verdict != null && !currentPost.nutrition.verdict.equals("Unknown")) {
+            if (currentPost.getNutrition() != null && currentPost.getNutrition().getVerdict() != null && !currentPost.getNutrition().getVerdict().equals("Unknown")) {
                 // Recipe has been analyzed - button can re-analyze
                 doAnalysis.setText("Re-analyze");
                 doAnalysis.setDisable(false);
@@ -208,7 +208,7 @@ public class PostController implements Initializable {
             }
             
             // Disable if no ingredients available
-            if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
+            if (currentPost.getIngredients() == null || currentPost.getIngredients().trim().isEmpty()) {
                 doAnalysis.setText("No Ingredients");
                 doAnalysis.setDisable(true);
             }
@@ -216,19 +216,19 @@ public class PostController implements Initializable {
         
         // Load profile picture
         if (profile1 != null) {
-            String profilePicture = getProfilePictureForUser(currentPost.username);
+            String profilePicture = getProfilePictureForUser(currentPost.getUsername());
             ImageUtils.loadImage(profile1, profilePicture, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(profile1, 80, 80, 500);
         }
         
         // Load post image
         if (recentphoto1 != null) {
-            ImageUtils.loadImage(recentphoto1, currentPost.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.loadImage(recentphoto1, currentPost.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(recentphoto1, 1270, 990, 20);
         }
         
-        // Populate recipe container with formatted text
-        populateRecipeContainer();
+    // Populate recipe container with formatted text
+    populateRecipeContainer();
         
         // Populate nutrition facts chart
         populateNutritionFacts();
@@ -245,27 +245,27 @@ public class PostController implements Initializable {
         textFlow.getStyleClass().add("post-recipe");
         
         // Add title section
-        if (currentPost.title != null && !currentPost.title.trim().isEmpty()) {
-            addSectionTitle(textFlow, currentPost.title);
+        if (currentPost.getTitle() != null && !currentPost.getTitle().trim().isEmpty()) {
+            addSectionTitle(textFlow, currentPost.getTitle());
             addNewLine(textFlow, 2);
         }
         
         // Add ingredients section
-        if (currentPost.ingredients != null && !currentPost.ingredients.trim().isEmpty()) {
+        if (currentPost.getIngredients() != null && !currentPost.getIngredients().trim().isEmpty()) {
             addSectionTitle(textFlow, "Ingredients :");
             addNewLine(textFlow, 1);
             // Parse vertical line-separated ingredients as newlines
-            String ingredientsWithNewlines = currentPost.ingredients.replace("|", "\n");
+            String ingredientsWithNewlines = currentPost.getIngredients().replace("|", "\n");
             addBulletList(textFlow, ingredientsWithNewlines);
             addNewLine(textFlow, 1);
         }
         
         // Add directions section
-        if (currentPost.directions != null && !currentPost.directions.trim().isEmpty()) {
+        if (currentPost.getDirections() != null && !currentPost.getDirections().trim().isEmpty()) {
             addSectionTitle(textFlow, "Directions :");
             addNewLine(textFlow, 1);
             // Parse vertical line-separated directions as newlines
-            String directionsWithNewlines = currentPost.directions.replace("|", "\n");
+            String directionsWithNewlines = currentPost.getDirections().replace("|", "\n");
             addNumberedList(textFlow, directionsWithNewlines);
         }
         
@@ -373,8 +373,8 @@ public class PostController implements Initializable {
         
         var users = userRepository.loadUsers();
         for (var user : users) {
-            if (username.equals(user.username)) {
-                return user.profilepicture;
+            if (username.equals(user.getUsername())) {
+                return user.getProfilepicture();
             }
         }
         return null;
@@ -389,10 +389,10 @@ public class PostController implements Initializable {
         
         var users = userRepository.loadUsers();
         for (var user : users) {
-            if (username.equals(user.username)) {
+            if (username.equals(user.getUsername())) {
                 // Return fullname if available, otherwise return username
-                return user.fullname != null && !user.fullname.trim().isEmpty() 
-                    ? user.fullname : user.username;
+                return user.getFullname() != null && !user.getFullname().trim().isEmpty()
+                    ? user.getFullname() : user.getUsername();
             }
         }
         return username; // fallback to original username if not found
@@ -558,9 +558,9 @@ public class PostController implements Initializable {
                     dialogStage.close();
                     
                     Nutrition newNutrition = nutritionTask.getValue();
-                    if (newNutrition != null && !newNutrition.ingredient.isEmpty()) {
+                    if (newNutrition != null && !newNutrition.getIngredient().isEmpty()) {
                         // Update the current post's nutrition
-                        currentPost.nutrition = newNutrition;
+                        currentPost.setNutrition(newNutrition);
                         
                         // Save the updated post to XML
                         saveUpdatedPost();
@@ -613,7 +613,7 @@ public class PostController implements Initializable {
         return new Task<Nutrition>() {
             @Override
             protected Nutrition call() throws Exception {
-                String ingredients = currentPost.ingredients;
+                String ingredients = currentPost.getIngredients();
                 Exception lastException = null;
                 
                 // Try analysis up to MAX_RETRIES times
@@ -630,8 +630,8 @@ public class PostController implements Initializable {
                         // Parse the AI response into Nutrition object
                         Nutrition nutrition = nutritionParser.parseNutritionFromResponse(nutritionResponse);
                         
-                        if (nutrition != null && !nutrition.ingredient.isEmpty()) {
-                            logger.info("Nutrition analysis completed successfully on attempt " + currentAttempt);
+                        if (nutrition != null && !nutrition.getIngredient().isEmpty()) {
+                            logger.info(() -> "Nutrition analysis completed successfully on attempt " + currentAttempt);
                             Platform.runLater(() -> 
                                 processingController.updateStatus("Analysis completed successfully!")
                             );
@@ -674,7 +674,7 @@ public class PostController implements Initializable {
             boolean updated = false;
             for (int i = 0; i < allPosts.size(); i++) {
                 Post post = allPosts.get(i);
-                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                        if (post.getUuid() != null && post.getUuid().equals(currentPost.getUuid())) {
                     // Update the post in the list
                     allPosts.set(i, currentPost);
                     updated = true;

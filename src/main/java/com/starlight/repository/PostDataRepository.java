@@ -110,8 +110,8 @@ public class PostDataRepository {
     /** Ensure required fields are present on loaded posts. */
     private void initializeMissingFields(List<Post> posts) {
         for (Post post : posts) {
-            if (post.commentcount == null) post.commentcount = "0";
-            if (post.isLiked == null) post.isLiked = "false";
+            if (post.getCommentcount() == null) post.setCommentcount("0");
+            if (post.getIsLiked() == null) post.setIsLiked("false");
         }
     }
 
@@ -141,11 +141,11 @@ public class PostDataRepository {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             // Ensure all posts have the required fields before saving
             for (Post post : posts) {
-                if (post.commentcount == null) {
-                    post.commentcount = "0";
+                if (post.getCommentcount() == null) {
+                    post.setCommentcount("0");
                 }
-                if (post.isLiked == null) {
-                    post.isLiked = "false";
+                if (post.getIsLiked() == null) {
+                    post.setIsLiked("false");
                 }
             }
             xstream.toXML(posts, fos);
@@ -163,8 +163,8 @@ public class PostDataRepository {
         List<Post> posts = loadPosts();
         int initialSize = posts.size();
         
-        // Remove the post with the specified UUID
-        posts.removeIf(post -> post.uuid != null && post.uuid.equals(uuid));
+    // Remove the post with the specified UUID
+    posts.removeIf(post -> post.getUuid() != null && post.getUuid().equals(uuid));
         
         // Check if any posts were removed
         if (posts.size() < initialSize) {

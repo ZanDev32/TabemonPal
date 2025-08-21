@@ -79,15 +79,14 @@ public class EditPostController implements Initializable {
      */
     private void populateFields() {
         if (currentPost == null) return;
+        title.setText(currentPost.getTitle() != null ? currentPost.getTitle() : "");
+        description.setText(currentPost.getDescription() != null ? currentPost.getDescription() : "");
+        ingredients.setText(currentPost.getIngredients() != null ? currentPost.getIngredients() : "");
+        directions.setText(currentPost.getDirections() != null ? currentPost.getDirections() : "");
 
-        title.setText(currentPost.title != null ? currentPost.title : "");
-        description.setText(currentPost.description != null ? currentPost.description : "");
-        ingredients.setText(currentPost.ingredients != null ? currentPost.ingredients : "");
-        directions.setText(currentPost.directions != null ? currentPost.directions : "");
-        
         // Set image status
-        if (currentPost.image != null && !currentPost.image.isEmpty()) {
-            pickerstatus.setText("Current: " + new File(currentPost.image).getName());
+        if (currentPost.getImage() != null && !currentPost.getImage().isEmpty()) {
+            pickerstatus.setText("Current: " + new File(currentPost.getImage()).getName());
         } else {
             pickerstatus.setText(NO_IMAGE_SELECTED);
         }
@@ -98,7 +97,7 @@ public class EditPostController implements Initializable {
      */
     private String copyImageToUserDir(File image) {
         try {
-            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
+            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().getUsername() : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to copy image to user directory: {0}", new Object[]{e.getMessage()});
@@ -141,8 +140,8 @@ public class EditPostController implements Initializable {
 
     /** If current post has an image keep showing it, else show no image message. */
     private void restoreOrShowNoImage() {
-        if (currentPost != null && currentPost.image != null && !currentPost.image.isEmpty()) {
-            pickerstatus.setText("Current: " + new File(currentPost.image).getName());
+        if (currentPost != null && currentPost.getImage() != null && !currentPost.getImage().isEmpty()) {
+            pickerstatus.setText("Current: " + new File(currentPost.getImage()).getName());
         } else {
             pickerstatus.setText(NO_IMAGE_SELECTED);
         }
@@ -179,20 +178,20 @@ public class EditPostController implements Initializable {
     private boolean isEmpty(TextArea area) { return area.getText() == null || area.getText().isEmpty(); }
 
     private void applyFormToPost() {
-        currentPost.title = title.getText();
-        currentPost.description = description.getText();
-        currentPost.ingredients = ingredients.getText();
-        currentPost.directions = directions.getText();
+    currentPost.setTitle(title.getText());
+    currentPost.setDescription(description.getText());
+    currentPost.setIngredients(ingredients.getText());
+    currentPost.setDirections(directions.getText());
     }
 
     private void handleImageUpdate() {
         if (selectedImage == null) return;
         try {
             String storedPath = copyImageToUserDir(selectedImage);
-            currentPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
+            currentPost.setImage(storedPath != null ? storedPath : selectedImage.getAbsolutePath());
         } catch (Exception e) {
             logger.log(Level.WARNING, "Image copy failed, using original path: {0}", new Object[]{e.getMessage()});
-            currentPost.image = selectedImage.getAbsolutePath();
+            currentPost.setImage(selectedImage.getAbsolutePath());
         }
     }
 
@@ -216,7 +215,7 @@ public class EditPostController implements Initializable {
     private void replacePostInList(List<Post> posts, Post updated) {
         for (int i = 0; i < posts.size(); i++) {
             Post p = posts.get(i);
-            if (p.uuid != null && p.uuid.equals(updated.uuid)) {
+            if (p.getUuid() != null && p.getUuid().equals(updated.getUuid())) {
                 posts.set(i, updated);
                 return;
             }

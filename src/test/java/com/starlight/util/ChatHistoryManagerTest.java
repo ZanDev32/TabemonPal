@@ -53,19 +53,19 @@ class ChatHistoryManagerTest {
         assertEquals(1, currentSession.getMessages().size());
         
     ChatMessage message = currentSession.getMessages().get(0);
-        assertEquals("Hello, TabemonPal!", message.content);
-        assertTrue(message.isUser);
-        assertEquals(testUsername, message.username);
-        assertNotNull(message.timestamp);
+    assertEquals("Hello, TabemonPal!", message.getContent());
+    assertTrue(message.isUser());
+    assertEquals(testUsername, message.getUsername());
+    assertNotNull(message.getTimestamp());
         
         // Add an AI response
         historyManager.addMessage("Hello! How can I help you today?", false, "TabemonPal AI");
         
         assertEquals(2, currentSession.getMessages().size());
-        ChatMessage aiMessage = currentSession.getMessages().get(1);
-        assertEquals("Hello! How can I help you today?", aiMessage.content);
-        assertFalse(aiMessage.isUser);
-        assertEquals("TabemonPal AI", aiMessage.username);
+    ChatMessage aiMessage = currentSession.getMessages().get(1);
+    assertEquals("Hello! How can I help you today?", aiMessage.getContent());
+    assertFalse(aiMessage.isUser());
+    assertEquals("TabemonPal AI", aiMessage.getUsername());
     }
     
     @Test
@@ -85,15 +85,15 @@ class ChatHistoryManagerTest {
     void testChatMessage() {
         ChatMessage userMessage = new ChatMessage("Test content", true, "testuser");
         
-        assertEquals("Test content", userMessage.content);
-        assertTrue(userMessage.isUser);
-        assertEquals("testuser", userMessage.username);
-        assertNotNull(userMessage.timestamp);
-        assertNotNull(userMessage.getFormattedTimestamp());
+    assertEquals("Test content", userMessage.getContent());
+    assertTrue(userMessage.isUser());
+    assertEquals("testuser", userMessage.getUsername());
+    assertNotNull(userMessage.getTimestamp());
+    assertNotNull(userMessage.getFormattedTimestamp());
         
         ChatMessage aiMessage = new ChatMessage("AI response", false, "TabemonPal AI");
-        assertFalse(aiMessage.isUser);
-        assertEquals("TabemonPal AI", aiMessage.username);
+    assertFalse(aiMessage.isUser());
+    assertEquals("TabemonPal AI", aiMessage.getUsername());
     }
     
     @Test

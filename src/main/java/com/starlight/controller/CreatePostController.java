@@ -126,25 +126,25 @@ public class CreatePostController implements Initializable {
 
             // Create a new Post object
             Post newPost = new Post();
-            newPost.uuid = UUID.randomUUID().toString();
-            newPost.username = Session.getCurrentUser().username;
-            newPost.profilepicture = "src/main/resources/com/starlight/images/dummy/2.png";
-            newPost.title = postTitle;
-            newPost.description = postDescription;
-            newPost.ingredients = postIngredients;
-            newPost.directions = postDirections;
-            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            newPost.setUuid(UUID.randomUUID().toString());
+            newPost.setUsername(Session.getCurrentUser().getUsername());
+            newPost.setProfilepicture("src/main/resources/com/starlight/images/dummy/2.png");
+            newPost.setTitle(postTitle);
+            newPost.setDescription(postDescription);
+            newPost.setIngredients(postIngredients);
+            newPost.setDirections(postDirections);
+            newPost.setUploadtime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             try {
                 String storedPath = copyImageToUserDir(selectedImage);
-                newPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
+                newPost.setImage(storedPath != null ? storedPath : selectedImage.getAbsolutePath());
             } catch (Exception e) {
                 e.printStackTrace();
                 newPost.image = selectedImage.getAbsolutePath();
             }
-            newPost.likecount = "0";
-            newPost.commentcount = "0";
-            newPost.isLiked = "false";
-            newPost.rating = "0.0";
+            newPost.setLikecount("0");
+            newPost.setCommentcount("0");
+            newPost.setIsLiked("false");
+            newPost.setRating("0.0");
 
             // Close the current dialog first
             Stage currentStage = (Stage) submit.getScene().getWindow();
@@ -189,7 +189,7 @@ public class CreatePostController implements Initializable {
      */
     private String copyImageToUserDir(File image) {
         try {
-            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
+            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().getUsername() : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to copy image to user directory: {0}", new Object[]{e.getMessage()});
@@ -260,10 +260,10 @@ public class CreatePostController implements Initializable {
                             });
                             
                             String nutritionResponse = chatbotAPI.analyzeNutritionFacts(ingredients);
-                            newPost.nutrition = nutritionParser.parseNutritionFromResponse(nutritionResponse);
+                            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(nutritionResponse));
                             
             // Check if we got valid nutrition data
-            if (newPost.nutrition != null && newPost.nutrition.ingredient != null && !newPost.nutrition.ingredient.isEmpty()) {
+            if (newPost.nutrition != null && newPost.nutrition.getIngredient() != null && !newPost.nutrition.getIngredient().isEmpty()) {
                 logger.info(java.text.MessageFormat.format(
                     "Nutrition analysis completed successfully on attempt {0}", currentAttempt));
                 
@@ -344,8 +344,8 @@ public class CreatePostController implements Initializable {
                         }
                     });
                     
-                    // Use fallback nutrition data
-                    newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
+                // Use fallback nutrition data
+                    newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null)); // Creates fallback nutrition
                     
                     return null;
                 }

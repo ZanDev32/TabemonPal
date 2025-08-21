@@ -65,19 +65,19 @@ class UserDataRepositoryTest {
         List<User> users = new ArrayList<>();
         
         User user1 = new User();
-        user1.username = "testuser1";
-        user1.email = "test1@example.com";
-        user1.fullname = "Test User 1";
-        user1.password = "password123";
-        user1.birthDay = "1995-03-10";
+    user1.setUsername("testuser1");
+    user1.setEmail("test1@example.com");
+    user1.setFullname("Test User 1");
+    user1.setPassword("password123");
+    user1.setBirthDay("1995-03-10");
         users.add(user1);
 
         User user2 = new User();
-        user2.username = "testuser2";
-        user2.email = "test2@example.com";
-        user2.fullname = "Test User 2";
-        user2.password = "password456";
-        user2.birthDay = "1992-07-20";
+    user2.setUsername("testuser2");
+    user2.setEmail("test2@example.com");
+    user2.setFullname("Test User 2");
+    user2.setPassword("password456");
+    user2.setBirthDay("1992-07-20");
         users.add(user2);
 
         repository.saveUsers(users);
@@ -87,18 +87,18 @@ class UserDataRepositoryTest {
         assertEquals(2, loaded.size());
         
         User loadedUser1 = loaded.get(0);
-        assertEquals(user1.username, loadedUser1.username);
-        assertEquals(user1.email, loadedUser1.email);
-        assertEquals(user1.fullname, loadedUser1.fullname);
-        assertEquals(user1.password, loadedUser1.password);
-        assertEquals(user1.birthDay, loadedUser1.birthDay);
+    assertEquals(user1.getUsername(), loadedUser1.getUsername());
+    assertEquals(user1.getEmail(), loadedUser1.getEmail());
+    assertEquals(user1.getFullname(), loadedUser1.getFullname());
+    assertEquals(user1.getPassword(), loadedUser1.getPassword());
+    assertEquals(user1.getBirthDay(), loadedUser1.getBirthDay());
         
         User loadedUser2 = loaded.get(1);
-        assertEquals(user2.username, loadedUser2.username);
-        assertEquals(user2.email, loadedUser2.email);
-        assertEquals(user2.fullname, loadedUser2.fullname);
-        assertEquals(user2.password, loadedUser2.password);
-        assertEquals(user2.birthDay, loadedUser2.birthDay);
+    assertEquals(user2.getUsername(), loadedUser2.getUsername());
+    assertEquals(user2.getEmail(), loadedUser2.getEmail());
+    assertEquals(user2.getFullname(), loadedUser2.getFullname());
+    assertEquals(user2.getPassword(), loadedUser2.getPassword());
+    assertEquals(user2.getBirthDay(), loadedUser2.getBirthDay());
     }
 
     @Test
@@ -131,19 +131,19 @@ class UserDataRepositoryTest {
         List<User> users = new ArrayList<>();
         
         User user1 = new User();
-        user1.username = "userToDelete";
-        user1.email = "delete@example.com";
-        user1.fullname = "Delete Me";
-        user1.password = "password";
-        user1.birthDay = "1990-01-01";
+    user1.setUsername("userToDelete");
+    user1.setEmail("delete@example.com");
+    user1.setFullname("Delete Me");
+    user1.setPassword("password");
+    user1.setBirthDay("1990-01-01");
         users.add(user1);
 
         User user2 = new User();
-        user2.username = "userToKeep";
-        user2.email = "keep@example.com";
-        user2.fullname = "Keep Me";
-        user2.password = "password";
-        user2.birthDay = "1990-01-01";
+    user2.setUsername("userToKeep");
+    user2.setEmail("keep@example.com");
+    user2.setFullname("Keep Me");
+    user2.setPassword("password");
+    user2.setBirthDay("1990-01-01");
         users.add(user2);
 
         repository.saveUsers(users);
@@ -155,7 +155,7 @@ class UserDataRepositoryTest {
         // Verify only one user remains
         List<User> remaining = repository.loadUsers(false);
         assertEquals(1, remaining.size());
-        assertEquals("userToKeep", remaining.get(0).username);
+    assertEquals("userToKeep", remaining.get(0).getUsername());
     }
 
     @Test
@@ -163,8 +163,8 @@ class UserDataRepositoryTest {
         // Save one user
         List<User> users = new ArrayList<>();
         User user = new User();
-        user.username = "existingUser";
-        user.email = "existing@example.com";
+    user.setUsername("existingUser");
+    user.setEmail("existing@example.com");
         users.add(user);
         repository.saveUsers(users);
 
@@ -175,7 +175,7 @@ class UserDataRepositoryTest {
         // Verify original user still exists
         List<User> remaining = repository.loadUsers(false);
         assertEquals(1, remaining.size());
-        assertEquals("existingUser", remaining.get(0).username);
+    assertEquals("existingUser", remaining.get(0).getUsername());
     }
 
     @Test
@@ -183,7 +183,7 @@ class UserDataRepositoryTest {
         UserDataRepository invalidRepo = new UserDataRepository("/invalid/path/that/does/not/exist.xml");
         List<User> users = new ArrayList<>();
         User user = new User();
-        user.username = "test";
+    user.setUsername("test");
         users.add(user);
 
         assertThrows(RuntimeException.class, () -> invalidRepo.saveUsers(users));

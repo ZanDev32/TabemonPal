@@ -130,13 +130,13 @@ public class ProfileController implements Initializable {
         if (currentUser != null) {
             // Set username using display name logic from CommunityController
             if (username != null) {
-                String displayName = communityController.getDisplayUsernameForUser(currentUser.username);
-                username.setText(displayName != null ? displayName : currentUser.username);
+                String displayName = communityController.getDisplayUsernameForUser(currentUser.getUsername());
+                username.setText(displayName != null ? displayName : currentUser.getUsername());
             }
             
             // Load profile picture using ImageUtils
             if (profile != null) {
-                ImageUtils.loadImage(profile, currentUser.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
+                ImageUtils.loadImage(profile, currentUser.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
                 ImageUtils.scaleToFit(profile, 170, 170, 200); // Adjust size as needed
             }
             
@@ -177,7 +177,7 @@ public class ProfileController implements Initializable {
         
         // Filter posts by current user
         List<Post> userPosts = allPosts.stream()
-            .filter(post -> currentUser.username.equals(post.username))
+            .filter(post -> currentUser.getUsername().equals(post.getUsername()))
             .toList();
             
         if (userPosts.isEmpty()) {
@@ -194,10 +194,10 @@ public class ProfileController implements Initializable {
         recipeContainer.setSpacing(20);
         
         for (Post post : userPosts) {
-            String title = post.title;
-            String image = post.image;
-            String likes = post.likecount;
-            String rating = post.rating;
+            String title = post.getTitle();
+            String image = post.getImage();
+            String likes = post.getLikecount();
+            String rating = post.getRating();
 
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/recipeItem.fxml"));

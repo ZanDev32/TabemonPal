@@ -7,121 +7,171 @@ import java.util.List;
  * Model for nutrition facts data from AI analysis.
  */
 public class Nutrition {
-    public List<NutritionIngredient> ingredient = new ArrayList<>();
+    public static final String VERDICT_UNKNOWN = "Unknown";
+    public static final String UNIT_CALORIES = "kcal";
+    public static final String UNIT_GRAMS = "g";
+    public static final String UNIT_MILLIGRAMS = "mg";
+    public static final String DEFAULT_NUMERIC = "0";
+
+    private final List<NutritionIngredient> ingredient = new ArrayList<>();
     /** Recipe health verdict: Healthy, Moderate, Unhealthy, Junk Food, or Unknown */
-    public String verdict = "Unknown";
+    private String verdict = VERDICT_UNKNOWN;
+
+    public List<NutritionIngredient> getIngredient() { return ingredient; }
+    public String getVerdict() { return verdict; }
+    public void setVerdict(String verdict) { this.verdict = verdict; }
     
     /**
      * Individual ingredient nutrition information.
      */
     public static class NutritionIngredient {
-        public String name;
-        public String amount;
-        public Calories calories = new Calories();
-        public Protein protein = new Protein();
-        public Fat fat = new Fat();
-        public Carbohydrates carbohydrates = new Carbohydrates();
-        public Fiber fiber = new Fiber();
-        public Sugar sugar = new Sugar();
-        public Salt salt = new Salt();
+    private String name;
+    private String amount;
+    private Calories calories = new Calories();
+    private Protein protein = new Protein();
+    private Fat fat = new Fat();
+    private Carbohydrates carbohydrates = new Carbohydrates();
+    private Fiber fiber = new Fiber();
+    private Sugar sugar = new Sugar();
+    private Salt salt = new Salt();
+
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    public String getAmount() { return amount; }
+    public void setAmount(String amount) { this.amount = amount; }
+    public Calories getCalories() { return calories; }
+    public Protein getProtein() { return protein; }
+    public Fat getFat() { return fat; }
+    public Carbohydrates getCarbohydrates() { return carbohydrates; }
+    public Fiber getFiber() { return fiber; }
+    public Sugar getSugar() { return sugar; }
+    public Salt getSalt() { return salt; }
     }
     
     /**
      * Calories information with unit.
      */
     public static class Calories {
-        public String unit = "kcal";
-        public String value = "0";
+    private String unit = UNIT_CALORIES;
+    private String value = DEFAULT_NUMERIC;
         
         public Calories() {}
         
         public Calories(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Protein information with unit.
      */
     public static class Protein {
-        public String unit = "g";
-        public String value = "0";
+    private String unit = UNIT_GRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Protein() {}
         
         public Protein(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Fat information with unit.
      */
     public static class Fat {
-        public String unit = "g";
-        public String value = "0";
+    private String unit = UNIT_GRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Fat() {}
         
         public Fat(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Carbohydrates information with unit.
      */
     public static class Carbohydrates {
-        public String unit = "g";
-        public String value = "0";
+    private String unit = UNIT_GRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Carbohydrates() {}
         
         public Carbohydrates(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Fiber information with unit.
      */
     public static class Fiber {
-        public String unit = "g";
-        public String value = "0";
+    private String unit = UNIT_GRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Fiber() {}
         
         public Fiber(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Sugar information with unit.
      */
     public static class Sugar {
-        public String unit = "g";
-        public String value = "0";
+    private String unit = UNIT_GRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Sugar() {}
         
         public Sugar(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**
      * Salt information with unit.
      */
     public static class Salt {
-        public String unit = "mg";
-        public String value = "0";
+    private String unit = UNIT_MILLIGRAMS;
+    private String value = DEFAULT_NUMERIC;
         
         public Salt() {}
         
         public Salt(String value) {
             this.value = value;
         }
+    public String getUnit() { return unit; }
+    public void setUnit(String unit) { this.unit = unit; }
+    public String getValue() { return value; }
+    public void setValue(String value) { this.value = value; }
     }
     
     /**

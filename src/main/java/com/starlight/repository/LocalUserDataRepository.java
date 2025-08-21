@@ -88,22 +88,22 @@ public class LocalUserDataRepository {
         
     // Create admin user
     User admin = new User();
-    admin.username = ADMIN_USERNAME;
-        admin.email = "admin@tabemonpal.local";
-        admin.fullname = "Administrator";
-        admin.password = "admin123";
-        admin.birthDay = "1990-01-01";
-        admin.profilepicture = "src/main/resources/com/starlight/images/dummy/profileman.jpg";
+    admin.setUsername(ADMIN_USERNAME);
+        admin.setEmail("admin@tabemonpal.local");
+        admin.setFullname("Administrator");
+        admin.setPassword("admin123");
+        admin.setBirthDay("1990-01-01");
+        admin.setProfilepicture("src/main/resources/com/starlight/images/dummy/profileman.jpg");
         defaultUsers.add(admin);
         
         // Create default user
         User user = new User();
-        user.username = "user";
-        user.email = "user@tabemonpal.local";
-        user.fullname = "Default User";
-        user.password = "user123";
-        user.birthDay = "1995-01-01";
-        user.profilepicture = "src/main/resources/com/starlight/images/dummy/profiledefault.png";
+    user.setUsername("user");
+    user.setEmail("user@tabemonpal.local");
+    user.setFullname("Default User");
+    user.setPassword("user123");
+    user.setBirthDay("1995-01-01");
+    user.setProfilepicture("src/main/resources/com/starlight/images/dummy/profiledefault.png");
         defaultUsers.add(user);
         
         cachedUsers = defaultUsers;
@@ -137,8 +137,8 @@ public class LocalUserDataRepository {
     public User findUser(String usernameOrEmail) {
         List<User> users = loadUsers();
         return users.stream()
-                .filter(u -> (u.username != null && u.username.equals(usernameOrEmail)) ||
-                           (u.email != null && u.email.equals(usernameOrEmail)))
+                .filter(u -> (u.getUsername() != null && u.getUsername().equals(usernameOrEmail)) ||
+                           (u.getEmail() != null && u.getEmail().equals(usernameOrEmail)))
                 .findFirst()
                 .orElse(null);
     }
@@ -152,9 +152,9 @@ public class LocalUserDataRepository {
     public User validateCredentials(String usernameOrEmail, String password) {
         List<User> users = loadUsers();
         return users.stream()
-                .filter(u -> ((u.username != null && u.username.equals(usernameOrEmail)) ||
-                            (u.email != null && u.email.equals(usernameOrEmail))) &&
-                            u.password != null && u.password.equals(password))
+                .filter(u -> ((u.getUsername() != null && u.getUsername().equals(usernameOrEmail)) ||
+                            (u.getEmail() != null && u.getEmail().equals(usernameOrEmail))) &&
+                            u.getPassword() != null && u.getPassword().equals(password))
                 .findFirst()
                 .orElse(null);
     }
@@ -165,7 +165,7 @@ public class LocalUserDataRepository {
      * @return true if user is admin, false otherwise
      */
     public boolean isAdmin(User user) {
-    return user != null && user.username != null && user.username.toLowerCase().equals(ADMIN_USERNAME);
+    return user != null && user.getUsername() != null && user.getUsername().equalsIgnoreCase(ADMIN_USERNAME);
     }
 
     /**

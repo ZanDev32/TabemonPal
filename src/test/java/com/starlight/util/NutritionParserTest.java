@@ -50,16 +50,16 @@ class NutritionParserTest {
 
         Nutrition nutrition = parser.parseNutritionFromResponse(aiResponse);
     assertNotNull(nutrition, "Nutrition object should not be null");
-    assertNotNull(nutrition.ingredient, "Ingredient list should not be null");
-    assertEquals(2, nutrition.ingredient.size(), "Should have 2 ingredients");
-    assertEquals("Healthy", nutrition.verdict, "Should have correct verdict");
+    assertNotNull(nutrition.getIngredient(), "Ingredient list should not be null");
+    assertEquals(2, nutrition.getIngredient().size(), "Should have 2 ingredients");
+    assertEquals("Healthy", nutrition.getVerdict(), "Should have correct verdict");
 
     // Ingredient assertions moved to helper methods to reduce assertion count in this test method
     assertIngredient(
-        nutrition.ingredient.get(0),
+        nutrition.getIngredient().get(0),
         "Chicken Breast", "200g", "331", "62.2", "7.2", "0", "0", "0", "146");
     assertIngredient(
-        nutrition.ingredient.get(1),
+        nutrition.getIngredient().get(1),
         "Rice", "1 cup cooked", "205", "4.2", "0.4", "45", "0.6", "0.1", "2");
 
     assertTotals(nutrition, 536.0, 66.4, 7.6, 45.0, 0.6, 0.1, 148.0);
@@ -71,20 +71,20 @@ class NutritionParserTest {
 
         Nutrition nutrition = parser.parseNutritionFromResponse(invalidResponse);
 
-        assertNotNull(nutrition, "Should return fallback nutrition object");
-        assertNotNull(nutrition.ingredient, "Should have fallback ingredient");
-        assertEquals(1, nutrition.ingredient.size(), "Should have one fallback ingredient");
-        assertEquals("Recipe", nutrition.ingredient.get(0).name);
-        assertEquals("Unknown", nutrition.verdict, "Should have Unknown verdict for fallback");
+    assertNotNull(nutrition, "Should return fallback nutrition object");
+    assertNotNull(nutrition.getIngredient(), "Should have fallback ingredient");
+    assertEquals(1, nutrition.getIngredient().size(), "Should have one fallback ingredient");
+    assertEquals("Recipe", nutrition.getIngredient().get(0).getName());
+    assertEquals("Unknown", nutrition.getVerdict(), "Should have Unknown verdict for fallback");
     }
 
     @Test
     void testParseNullResponse() {
         Nutrition nutrition = parser.parseNutritionFromResponse(null);
 
-        assertNotNull(nutrition, "Should return fallback nutrition object");
-        assertNotNull(nutrition.ingredient, "Should have fallback ingredient");
-        assertEquals(1, nutrition.ingredient.size(), "Should have one fallback ingredient");
+    assertNotNull(nutrition, "Should return fallback nutrition object");
+    assertNotNull(nutrition.getIngredient(), "Should have fallback ingredient");
+    assertEquals(1, nutrition.getIngredient().size(), "Should have one fallback ingredient");
     }
 
     @Test
@@ -92,8 +92,8 @@ class NutritionParserTest {
         Nutrition nutrition = parser.parseNutritionFromResponse("");
 
         assertNotNull(nutrition, "Should return fallback nutrition object");
-        assertNotNull(nutrition.ingredient, "Should have fallback ingredient");
-        assertEquals(1, nutrition.ingredient.size(), "Should have one fallback ingredient");
+    assertNotNull(nutrition.getIngredient(), "Should have fallback ingredient");
+    assertEquals(1, nutrition.getIngredient().size(), "Should have one fallback ingredient");
     }
 
     @Test
@@ -133,10 +133,10 @@ class NutritionParserTest {
 
         Nutrition nutrition = parser.parseNutritionFromResponse(aiResponse);
 
-        assertNotNull(nutrition, "Nutrition object should not be null");
-        assertEquals("Unknown", nutrition.verdict, "Should have Unknown verdict");
-        assertEquals(1, nutrition.ingredient.size(), "Should have 1 ingredient");
-        assertEquals("Mystery Ingredient", nutrition.ingredient.get(0).name);
+    assertNotNull(nutrition, "Nutrition object should not be null");
+    assertEquals("Unknown", nutrition.getVerdict(), "Should have Unknown verdict");
+    assertEquals(1, nutrition.getIngredient().size(), "Should have 1 ingredient");
+    assertEquals("Mystery Ingredient", nutrition.getIngredient().get(0).getName());
     }
 
     // Helper methods to keep individual test readable while reducing per-method assertion counts
@@ -150,15 +150,15 @@ class NutritionParserTest {
                                          String expectedFiber,
                                          String expectedSugar,
                                          String expectedSalt) {
-        assertEquals(expectedName, ingredient.name);
-        assertEquals(expectedAmount, ingredient.amount);
-        assertEquals(expectedCalories, ingredient.calories.value);
-        assertEquals(expectedProtein, ingredient.protein.value);
-        assertEquals(expectedFat, ingredient.fat.value);
-        assertEquals(expectedCarbs, ingredient.carbohydrates.value);
-        assertEquals(expectedFiber, ingredient.fiber.value);
-        assertEquals(expectedSugar, ingredient.sugar.value);
-        assertEquals(expectedSalt, ingredient.salt.value);
+    assertEquals(expectedName, ingredient.getName());
+    assertEquals(expectedAmount, ingredient.getAmount());
+    assertEquals(expectedCalories, ingredient.getCalories().getValue());
+    assertEquals(expectedProtein, ingredient.getProtein().getValue());
+    assertEquals(expectedFat, ingredient.getFat().getValue());
+    assertEquals(expectedCarbs, ingredient.getCarbohydrates().getValue());
+    assertEquals(expectedFiber, ingredient.getFiber().getValue());
+    assertEquals(expectedSugar, ingredient.getSugar().getValue());
+    assertEquals(expectedSalt, ingredient.getSalt().getValue());
     }
 
     private static void assertTotals(Nutrition nutrition,

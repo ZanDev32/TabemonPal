@@ -69,7 +69,7 @@ public class DeleteDialogController {
         // Remove the post from the repository
         try {
             List<Post> posts = repository.loadPosts();
-            posts.removeIf(post -> post.uuid != null && post.uuid.equals(postToDelete.uuid));
+            posts.removeIf(post -> post.getUuid() != null && post.getUuid().equals(postToDelete.getUuid()));
             repository.savePosts(posts);
 
             confirmed = true;

@@ -19,112 +19,112 @@ class UserTest {
     @Test
     void testUserCreation() {
         assertNotNull(user);
-        assertNull(user.username);
-        assertNull(user.email);
-        assertNull(user.fullname);
-        assertNull(user.password);
-        assertNull(user.birthDay);
+    assertNull(user.getUsername());
+    assertNull(user.getEmail());
+    assertNull(user.getFullname());
+    assertNull(user.getPassword());
+    assertNull(user.getBirthDay());
     }
 
     @Test
     void testSetAndGetUsername() {
         String testUsername = "testuser123";
-        user.username = testUsername;
-        assertEquals(testUsername, user.username);
+    user.setUsername(testUsername);
+    assertEquals(testUsername, user.getUsername());
     }
 
     @Test
     void testSetAndGetEmail() {
         String testEmail = "test@example.com";
-        user.email = testEmail;
-        assertEquals(testEmail, user.email);
+    user.setEmail(testEmail);
+    assertEquals(testEmail, user.getEmail());
     }
 
     @Test
     void testSetAndGetFullname() {
         String testFullname = "John Doe";
-        user.fullname = testFullname;
-        assertEquals(testFullname, user.fullname);
+    user.setFullname(testFullname);
+    assertEquals(testFullname, user.getFullname());
     }
 
     @Test
     void testSetAndGetPassword() {
         String testPassword = "securePassword123";
-        user.password = testPassword;
-        assertEquals(testPassword, user.password);
+    user.setPassword(testPassword);
+    assertEquals(testPassword, user.getPassword());
     }
 
     @Test
     void testSetAndGetBirthDay() {
         String testBirthDay = "1990-05-15";
-        user.birthDay = testBirthDay;
-        assertEquals(testBirthDay, user.birthDay);
+    user.setBirthDay(testBirthDay);
+    assertEquals(testBirthDay, user.getBirthDay());
     }
 
     @Test
     void testUserWithAllFieldsSet() {
-        user.username = "johndoe";
-        user.email = "john.doe@example.com";
-        user.fullname = "John Doe";
-        user.password = "myPassword123";
-        user.birthDay = "1985-12-25";
+    user.setUsername("johndoe");
+    user.setEmail("john.doe@example.com");
+    user.setFullname("John Doe");
+    user.setPassword("myPassword123");
+    user.setBirthDay("1985-12-25");
 
-        assertEquals("johndoe", user.username);
-        assertEquals("john.doe@example.com", user.email);
-        assertEquals("John Doe", user.fullname);
-        assertEquals("myPassword123", user.password);
-        assertEquals("1985-12-25", user.birthDay);
+    assertEquals("johndoe", user.getUsername());
+    assertEquals("john.doe@example.com", user.getEmail());
+    assertEquals("John Doe", user.getFullname());
+    assertEquals("myPassword123", user.getPassword());
+    assertEquals("1985-12-25", user.getBirthDay());
     }
 
     @Test
     void testUserFieldsCanBeNull() {
         // Ensure that setting fields to null works
-        user.username = "test";
-        user.email = "test@example.com";
-        user.fullname = "Test User";
-        user.password = "password";
-        user.birthDay = "1990-01-01";
+    user.setUsername("test");
+    user.setEmail("test@example.com");
+    user.setFullname("Test User");
+    user.setPassword("password");
+    user.setBirthDay("1990-01-01");
 
-        user.username = null;
-        user.email = null;
-        user.fullname = null;
-        user.password = null;
-        user.birthDay = null;
+    user.setUsername(null);
+    user.setEmail(null);
+    user.setFullname(null);
+    user.setPassword(null);
+    user.setBirthDay(null);
 
-        assertNull(user.username);
-        assertNull(user.email);
-        assertNull(user.fullname);
-        assertNull(user.password);
-        assertNull(user.birthDay);
+    assertNull(user.getUsername());
+    assertNull(user.getEmail());
+    assertNull(user.getFullname());
+    assertNull(user.getPassword());
+    assertNull(user.getBirthDay());
     }
 
     @Test
     void testUserFieldsCanBeEmpty() {
-        user.username = "";
-        user.email = "";
-        user.fullname = "";
-        user.password = "";
-        user.birthDay = "";
+    user.setUsername("");
+    user.setEmail("");
+    user.setFullname("");
+    user.setPassword("");
+    user.setBirthDay("");
 
-        assertEquals("", user.username);
-        assertEquals("", user.email);
-        assertEquals("", user.fullname);
-        assertEquals("", user.password);
-        assertEquals("", user.birthDay);
+    assertEquals("", user.getUsername());
+    assertEquals("", user.getEmail());
+    assertEquals("", user.getFullname());
+    assertEquals("", user.getPassword());
+    assertEquals("", user.getBirthDay());
     }
 
     @Test
     void testUserWithSpecialCharacters() {
-        user.username = "user_with-special.chars";
-        user.email = "test+tag@example-domain.co.uk";
-        user.fullname = "José María O'Connor";
-        user.password = "P@ssw0rd!#$";
-        user.birthDay = "2000-02-29"; // Leap year
+    user.setUsername("user_with-special.chars");
+    user.setEmail("test+tag@example-domain.co.uk");
+    user.setFullname("José María O'Connor");
+    user.setPassword("P@ssw0rd!#$");
+    user.setBirthDay("2000-02-29"); // Leap year
 
-        assertEquals("user_with-special.chars", user.username);
-        assertEquals("test+tag@example-domain.co.uk", user.email);
-        assertEquals("José María O'Connor", user.fullname);
-        assertEquals("P@ssw0rd!#$", user.password);
-        assertEquals("2000-02-29", user.birthDay);
+    assertEquals("user_with-special.chars", user.getUsername());
+    assertEquals("test+tag@example-domain.co.uk", user.getEmail());
+    assertEquals("José María O'Connor", user.getFullname());
+    assertEquals("P@ssw0rd!#$", user.getPassword());
+    assertEquals("2000-02-29", user.getBirthDay());
     }
 }

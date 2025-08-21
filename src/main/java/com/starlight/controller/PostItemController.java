@@ -73,14 +73,14 @@ public class PostItemController {
         if (currentPost == null) return;
         
         try {
-            int currentLikes = Integer.parseInt(currentPost.likecount != null ? currentPost.likecount : "0");
-            boolean wasLiked = "true".equals(currentPost.isLiked);
+            int currentLikes = Integer.parseInt(currentPost.getLikecount() != null ? currentPost.getLikecount() : "0");
+            boolean wasLiked = "true".equals(currentPost.getIsLiked());
             
             if (wasLiked) {
                 // Unlike the post
                 currentLikes = Math.max(0, currentLikes - 1);
-                currentPost.likecount = String.valueOf(currentLikes);
-                currentPost.isLiked = "false";
+                currentPost.setLikecount(String.valueOf(currentLikes));
+                currentPost.setIsLiked("false");
                 
                 // Change image back to normal like icon
                 if (likebutton != null) {
@@ -89,8 +89,8 @@ public class PostItemController {
             } else {
                 // Like the post
                 currentLikes++;
-                currentPost.likecount = String.valueOf(currentLikes);
-                currentPost.isLiked = "true";
+                currentPost.setLikecount(String.valueOf(currentLikes));
+                currentPost.setIsLiked("true");
                 
                 // Change image to liked icon
                 if (likebutton != null) {
@@ -106,10 +106,10 @@ public class PostItemController {
             
         } catch (NumberFormatException e) {
             // Handle invalid like count
-            logger.warning("Invalid like count for post: " + (currentPost != null ? currentPost.uuid : "unknown"));
+            logger.warning("Invalid like count for post: " + (currentPost != null ? currentPost.getUuid() : "unknown"));
             e.printStackTrace();
-            currentPost.likecount = "0";
-            currentPost.isLiked = "false";
+            currentPost.setLikecount("0");
+            currentPost.setIsLiked("false");
             likecounter.setText("0");
         }
     }
@@ -122,9 +122,9 @@ public class PostItemController {
         if (currentPost == null) return;
         
         try {
-            int currentComments = Integer.parseInt(currentPost.commentcount != null ? currentPost.commentcount : "0");
+            int currentComments = Integer.parseInt(currentPost.getCommentcount() != null ? currentPost.getCommentcount() : "0");
             currentComments++;
-            currentPost.commentcount = String.valueOf(currentComments);
+            currentPost.setCommentcount(String.valueOf(currentComments));
             
             // Update the button text
             commentcounter.setText(String.valueOf(currentComments));
@@ -134,7 +134,7 @@ public class PostItemController {
             
         } catch (NumberFormatException e) {
             // Handle invalid comment count
-            currentPost.commentcount = "0";
+            currentPost.setCommentcount("0");
             commentcounter.setText("0");
         }
     }
@@ -155,17 +155,17 @@ public class PostItemController {
         
         // Update like counter
         if (likecounter != null) {
-            likecounter.setText(currentPost.likecount != null ? currentPost.likecount : "0");
+            likecounter.setText(currentPost.getLikecount() != null ? currentPost.getLikecount() : "0");
         }
         
         // Update comment counter
         if (commentcounter != null) {
-            commentcounter.setText(currentPost.commentcount != null ? currentPost.commentcount : "0");
+            commentcounter.setText(currentPost.getCommentcount() != null ? currentPost.getCommentcount() : "0");
         }
         
         // Update like button image based on liked state
         if (likebutton != null) {
-            boolean isLiked = "true".equals(currentPost.isLiked);
+            boolean isLiked = "true".equals(currentPost.getIsLiked());
             if (isLiked) {
                 likebutton.setImage(new Image(getClass().getResourceAsStream("/com/starlight/icon/like_1.png")));
             } else {
@@ -186,7 +186,7 @@ public class PostItemController {
             // Find and update the current post in the list
             for (int i = 0; i < posts.size(); i++) {
                 Post post = posts.get(i);
-                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                if (post.getUuid() != null && post.getUuid().equals(currentPost.getUuid())) {
                     posts.set(i, currentPost);
                     break;
                 }
