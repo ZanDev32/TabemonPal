@@ -160,11 +160,11 @@ class UserDataRepositoryTest {
 
     @Test
     void testDeleteNonExistentUser() {
-        // Save one user
+       // Save one user
         List<User> users = new ArrayList<>();
         User user = new User();
-    user.setUsername("existingUser");
-    user.setEmail("existing@example.com");
+        user.setUsername("existingUser");
+        user.setEmail("existing@example.com");
         users.add(user);
         repository.saveUsers(users);
 

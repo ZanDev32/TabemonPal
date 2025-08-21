@@ -562,6 +562,7 @@ public class RecipeManagerController implements Initializable {
             case "Date (Oldest)":
                 comparator = Comparator.comparing((PostTableData data) -> parseDateTime(data.getOriginalPost().uploadtime));
                 break;
+            
         }
 
         if (comparator != null) {
