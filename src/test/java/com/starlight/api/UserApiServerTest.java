@@ -3,6 +3,7 @@ package com.starlight.api;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.util.Random;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,11 +16,12 @@ class UserApiServerTest {
     
     private UserApiServer server;
     private static final int TEST_PORT = 9000; // Use a different port range to avoid conflicts
+    private final Random rng = new Random();
     
     @BeforeEach
     void setUp() throws IOException {
         // Create server on a test port with some randomization to avoid conflicts
-        int basePort = TEST_PORT + (int)(Math.random() * 1000);
+    int basePort = TEST_PORT + rng.nextInt(1000);
         server = new UserApiServer(basePort);
     }
     
@@ -34,7 +36,7 @@ class UserApiServerTest {
     void testServerConstruction() throws IOException {
         // Test that server can be constructed without throwing
         assertDoesNotThrow(() -> {
-            int testPort = 9100 + (int)(Math.random() * 500);
+            int testPort = 9100 + rng.nextInt(500);
             UserApiServer testServer = new UserApiServer(testPort);
             assertNotNull(testServer);
             testServer.stop(); // Clean up
@@ -44,7 +46,7 @@ class UserApiServerTest {
     @Test
     void testServerConstructionWithPortInUse() throws IOException {
         // Start first server
-        int basePort = 9200 + (int)(Math.random() * 100);
+    int basePort = 9200 + rng.nextInt(100);
         UserApiServer firstServer = new UserApiServer(basePort);
         firstServer.start();
         
@@ -138,7 +140,7 @@ class UserApiServerTest {
     void testRestartWithNewInstance() throws IOException {
         // Test restart functionality by creating new server instances
         // (since HttpServer cannot be restarted once stopped)
-        int testPort = 9800 + (int)(Math.random() * 100);
+            int testPort = 9800 + rng.nextInt(100);
         
         assertDoesNotThrow(() -> {
             // First instance
@@ -156,8 +158,8 @@ class UserApiServerTest {
     @Test
     void testMultipleServerInstances() throws IOException {
         // Test that multiple server instances can coexist (on different ports)
-        int port1 = 9300 + (int)(Math.random() * 50);
-        int port2 = 9350 + (int)(Math.random() * 50);
+    int port1 = 9300 + rng.nextInt(50);
+    int port2 = 9350 + rng.nextInt(50);
         UserApiServer server1 = new UserApiServer(port1);
         UserApiServer server2 = new UserApiServer(port2);
         
@@ -183,7 +185,7 @@ class UserApiServerTest {
         // by trying multiple ports (this tests the port binding retry logic)
         assertDoesNotThrow(() -> {
             // This should work even if some ports are in use
-            int testPort = 9400 + (int)(Math.random() * 100);
+            int testPort = 9400 + rng.nextInt(100);
             UserApiServer testServer = new UserApiServer(testPort);
             testServer.stop();
         });
@@ -192,7 +194,7 @@ class UserApiServerTest {
     @Test
     void testServerResourceCleanup() throws IOException {
         // Test that server properly cleans up resources
-        int testPort = 9500 + (int)(Math.random() * 100);
+    int testPort = 9500 + rng.nextInt(100);
         UserApiServer testServer = new UserApiServer(testPort);
         
         testServer.start();
@@ -210,7 +212,7 @@ class UserApiServerTest {
         // Test that server can be started after handling construction exceptions
         try {
             // This should succeed since we handle port conflicts
-            int testPort = 9600 + (int)(Math.random() * 100);
+            int testPort = 9600 + rng.nextInt(100);
             UserApiServer testServer = new UserApiServer(testPort);
             testServer.start();
             testServer.stop();
@@ -228,7 +230,7 @@ class UserApiServerTest {
         // Test complete server lifecycle
         assertDoesNotThrow(() -> {
             // Construction phase
-            int testPort = 9700 + (int)(Math.random() * 100);
+            int testPort = 9700 + rng.nextInt(100);
             UserApiServer lifecycleServer = new UserApiServer(testPort);
             
             // Startup phase

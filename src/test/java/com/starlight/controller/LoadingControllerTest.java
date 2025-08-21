@@ -13,7 +13,7 @@ import javafx.stage.Stage;
 /**
  * Unit tests for {@link LoadingController}.
  */
-LoadingControllerTest extends ApplicationTest {
+class LoadingControllerTest extends ApplicationTest {
     
     private LoadingController controller;
     

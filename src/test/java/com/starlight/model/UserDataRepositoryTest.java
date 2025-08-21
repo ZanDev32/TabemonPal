@@ -39,22 +39,24 @@ class UserDataRepositoryTest {
     }
 
     private void createDummyData() throws IOException {
-        String dummyXml = "<users>\n" +
-                "  <user>\n" +
-                "    <username>dummy1</username>\n" +
-                "    <email>dummy1@example.com</email>\n" +
-                "    <fullname>Dummy User 1</fullname>\n" +
-                "    <password>password1</password>\n" +
-                "    <birthDay>1990-01-01</birthDay>\n" +
-                "  </user>\n" +
-                "  <user>\n" +
-                "    <username>dummy2</username>\n" +
-                "    <email>dummy2@example.com</email>\n" +
-                "    <fullname>Dummy User 2</fullname>\n" +
-                "    <password>password2</password>\n" +
-                "    <birthDay>1985-05-15</birthDay>\n" +
-                "  </user>\n" +
-                "</users>";
+                String dummyXml = """
+                                <users>
+                                    <user>
+                                        <username>dummy1</username>
+                                        <email>dummy1@example.com</email>
+                                        <fullname>Dummy User 1</fullname>
+                                        <password>password1</password>
+                                        <birthDay>1990-01-01</birthDay>
+                                    </user>
+                                    <user>
+                                        <username>dummy2</username>
+                                        <email>dummy2@example.com</email>
+                                        <fullname>Dummy User 2</fullname>
+                                        <password>password2</password>
+                                        <birthDay>1985-05-15</birthDay>
+                                    </user>
+                                </users>
+                                """;
         Files.writeString(tempDummyFile, dummyXml);
     }
 
