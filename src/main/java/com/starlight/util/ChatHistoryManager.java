@@ -22,6 +22,9 @@ public class ChatHistoryManager {
     private static final Logger logger = Logger.getLogger(ChatHistoryManager.class.getName());
     private static final String CHAT_HISTORY_DIR = "ChatHistory";
     private static final String FILE_EXTENSION = ".xml";
+    private static final String PROP_USER_HOME = "user.home";
+    private static final String DATABASE_DIR_NAME = "Database";
+    private static final String APP_DIR_NAME = ".tabemonpal";
     
     private final XStream xstream;
     private ChatHistory currentSession;
@@ -49,7 +52,7 @@ public class ChatHistoryManager {
         }
         
         currentSession = new ChatHistory(username);
-        logger.info("Started new chat session for user: " + username);
+    logger.log(Level.INFO, () -> "Started new chat session for user: " + username);
     }
     
     /**
@@ -61,7 +64,7 @@ public class ChatHistoryManager {
      */
     public void addMessage(String content, boolean isUser, String username) {
         if (currentSession == null) {
-            logger.warning("No active session. Starting new session for user: " + username);
+            logger.log(Level.WARNING, () -> "No active session. Starting new session for user: " + username);
             startSession(username);
         }
         
@@ -83,7 +86,7 @@ public class ChatHistoryManager {
         currentSession.endSession();
         saveCurrentSession();
         
-        logger.info("Ended chat session: " + currentSession.getSessionSummary());
+    logger.log(Level.INFO, () -> "Ended chat session: " + currentSession.getSessionSummary());
         currentSession = null;
     }
     
@@ -96,8 +99,8 @@ public class ChatHistoryManager {
         }
         
         try {
-            String userHome = System.getProperty("user.home");
-            Path historyDir = Paths.get(userHome, ".tabemonpal", "Database", CHAT_HISTORY_DIR);
+            String userHome = System.getProperty(PROP_USER_HOME);
+            Path historyDir = Paths.get(userHome, APP_DIR_NAME, DATABASE_DIR_NAME, CHAT_HISTORY_DIR);
             
             // Create directory if it doesn't exist
             Files.createDirectories(historyDir);
@@ -112,10 +115,11 @@ public class ChatHistoryManager {
                 fos.write(xml.getBytes());
             }
             
-            logger.fine("Saved chat history: " + historyFile);
+            logger.log(Level.FINE, () -> "Saved chat history: " + historyFile);
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to save chat history: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to save chat history: {0}", e.getMessage());
+            logger.log(Level.SEVERE, "Save chat history stacktrace", e);
         }
     }
     
@@ -129,8 +133,8 @@ public class ChatHistoryManager {
         List<ChatHistory> histories = new ArrayList<>();
         
         try {
-            String userHome = System.getProperty("user.home");
-            Path historyDir = Paths.get(userHome, ".tabemonpal", "Database", CHAT_HISTORY_DIR);
+            String userHome = System.getProperty(PROP_USER_HOME);
+            Path historyDir = Paths.get(userHome, APP_DIR_NAME, DATABASE_DIR_NAME, CHAT_HISTORY_DIR);
             
             if (!Files.exists(historyDir)) {
                 return histories; // Empty list if directory doesn't exist
@@ -148,7 +152,8 @@ public class ChatHistoryManager {
                             histories.add(history);
                         }
                     } catch (Exception e) {
-                        logger.log(Level.WARNING, "Failed to load chat history file: " + path, e);
+                        logger.log(Level.WARNING, () -> "Failed to load chat history file: " + path);
+                        logger.log(Level.WARNING, "Load chat history file stacktrace", e);
                     }
                 });
             
@@ -156,7 +161,8 @@ public class ChatHistoryManager {
             histories.sort(Comparator.comparing(ChatHistory::getSessionStart).reversed());
             
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to load chat histories: " + e.getMessage(), e);
+            logger.log(Level.WARNING, "Failed to load chat histories: {0}", e.getMessage());
+            logger.log(Level.WARNING, "Load chat histories stacktrace", e);
         }
         
         return histories;
@@ -181,16 +187,17 @@ public class ChatHistoryManager {
      */
     public boolean deleteHistory(String sessionId) {
         try {
-            String userHome = System.getProperty("user.home");
-            Path historyFile = Paths.get(userHome, ".tabemonpal", "Database", CHAT_HISTORY_DIR, sessionId + FILE_EXTENSION);
+            String userHome = System.getProperty(PROP_USER_HOME);
+            Path historyFile = Paths.get(userHome, APP_DIR_NAME, DATABASE_DIR_NAME, CHAT_HISTORY_DIR, sessionId + FILE_EXTENSION);
             
             if (Files.exists(historyFile)) {
                 Files.delete(historyFile);
-                logger.info("Deleted chat history: " + sessionId);
+                logger.log(Level.INFO, () -> "Deleted chat history: " + sessionId);
                 return true;
             }
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to delete chat history: " + sessionId, e);
+            logger.log(Level.WARNING, () -> "Failed to delete chat history: " + sessionId);
+            logger.log(Level.WARNING, "Delete chat history stacktrace", e);
         }
         
         return false;
@@ -212,7 +219,8 @@ public class ChatHistoryManager {
             }
         }
         
-        logger.info("Cleared " + deletedCount + " chat history files for user: " + username);
+    final int finalDeletedCount = deletedCount;
+    logger.log(Level.INFO, () -> "Cleared " + finalDeletedCount + " chat history files for user: " + username);
         return deletedCount;
     }
     

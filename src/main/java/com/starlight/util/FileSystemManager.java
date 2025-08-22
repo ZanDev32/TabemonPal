@@ -3,6 +3,7 @@ package com.starlight.util;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -53,18 +54,21 @@ public class FileSystemManager {
             // Create .SECRET_KEY.xml file if it doesn't exist
             Path secretKeyPath = databaseDir.resolve(".SECRET_KEY.xml");
             if (!Files.exists(secretKeyPath)) {
-                String secretKeyContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                                        "<config>\n" +
-                                        "    <openai-key>PASTE-YOUR-SECRET-KEY-HERE</openai-key>\n" +
-                                        "</config>";
-                Files.write(secretKeyPath, secretKeyContent.getBytes("UTF-8"));
-                LOGGER.info("Paste your secret key at: " + secretKeyPath);
+                String secretKeyContent = """
+                        <?xml version="1.0" encoding="UTF-8"?>
+                        <config>
+                            <openai-key>PASTE-YOUR-SECRET-KEY-HERE</openai-key>
+                        </config>
+                        """.stripIndent();
+                Files.write(secretKeyPath, secretKeyContent.getBytes(StandardCharsets.UTF_8));
+                LOGGER.log(Level.INFO, "Paste your secret key at: {0}", secretKeyPath);
             }
-            
-            LOGGER.info("App data directory initialized at: " + APP_DATA_DIR);
+
+            LOGGER.log(Level.INFO, () -> "App data directory initialized at: " + APP_DATA_DIR);
             
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to initialize app data directory: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Failed to initialize app data directory: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Initialization stacktrace", e);
         }
     }
 
@@ -103,7 +107,8 @@ public class FileSystemManager {
             Files.createDirectories(userDir);
             return userDir.toString();
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to create user directory for " + username + ": " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Failed to create user directory for {0}: {1}", new Object[]{username, e.getMessage()});
+            LOGGER.log(Level.SEVERE, "Create user directory stacktrace", e);
             return null;
         }
     }
@@ -130,11 +135,12 @@ public class FileSystemManager {
             // Copy file
             Files.copy(sourceFile.toPath(), targetPath, StandardCopyOption.REPLACE_EXISTING);
             
-            LOGGER.info("File copied to: " + targetPath.toString());
+            LOGGER.log(Level.INFO, () -> "File copied to: " + targetPath);
             return targetPath.toString();
             
         } catch (IOException e) {
-            LOGGER.log(Level.SEVERE, "Failed to copy file to user directory: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Failed to copy file to user directory: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Copy stacktrace", e);
             return null;
         }
     }
@@ -145,7 +151,7 @@ public class FileSystemManager {
      * @param username the username whose directory to copy to
      * @return the path to the copied file in the user directory
      */
-    public static String copyFileToUserDirectoryWithUniqueFilename(File sourceFile, String username) throws IOException {
+    public static String copyFileToUserDirectoryWithUniqueFilename(File sourceFile, String username) {
         try {
             // Get file extension
             String originalName = sourceFile.getName();
@@ -174,7 +180,8 @@ public class FileSystemManager {
             
             return copyFileToUserDirectory(sourceFile, username, uniqueFileName);
         } catch (SecurityException e) {
-            LOGGER.log(Level.SEVERE, "Failed to copy file with unique filename: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Failed to copy file with unique filename: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Unique filename copy stacktrace", e);
             return null;
         }
     }
@@ -198,108 +205,74 @@ public class FileSystemManager {
             
             // Try creating a test file
             Path testFile = appDir.resolve("test_access.tmp");
-            Files.write(testFile, "test".getBytes());
+            Files.write(testFile, "test".getBytes(StandardCharsets.UTF_8));
             Files.deleteIfExists(testFile);
             
             return true;
             
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "App data directory is not accessible: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "App data directory is not accessible: {0}", e.getMessage());
+            LOGGER.log(Level.SEVERE, "Accessibility stacktrace", e);
             return false;
         }
     }
+    // -------- Image path resolution (refactored to reduce complexity) --------
+    private static final String PROJECT_RESOURCES = "src/main/resources";
+    private static final String PROJECT_RESOURCES_PREFIX = PROJECT_RESOURCES + "/";
+    private static final String RESOURCE_MARKER = "resource:";
 
     /**
-     * Resolves an image path to an absolute path, handling various path formats
-     * @param imagePath The image path from XML (could be relative, absolute, or resource path)
-     * @return Resolved absolute path or null if not found
+     * Resolves an image path to an absolute path, handling various path formats.
      */
     public static Path resolveImagePath(String imagePath) {
-        if (imagePath == null || imagePath.trim().isEmpty()) {
-            return null;
+        if (isNullOrBlank(imagePath)) return null;
+        if (isProjectResourcePath(imagePath)) return resolveProjectResourcePath(imagePath);
+        if (isClasspathResourcePath(imagePath)) return resolveClasspathResourcePath(imagePath);
+        Path absolute = Paths.get(imagePath);
+        if (absolute.isAbsolute()) return validateAbsolute(absolute, imagePath);
+        return resolveRelativeImagePath(imagePath);
+    }
+
+    private static boolean isNullOrBlank(String s) { return s == null || s.trim().isEmpty(); }
+    private static boolean isProjectResourcePath(String p) { return p.startsWith(PROJECT_RESOURCES_PREFIX); }
+    private static boolean isClasspathResourcePath(String p) { return p.startsWith("/") && p.contains("com/starlight"); }
+
+    private static Path resolveProjectResourcePath(String imagePath) {
+        Path projectResourcesPath = Paths.get(imagePath);
+        if (Files.exists(projectResourcesPath)) return projectResourcesPath;
+        String resourcePath = imagePath.substring(PROJECT_RESOURCES.length());
+        URL resource = FileSystemManager.class.getResource(resourcePath);
+        if (resource != null) {
+            try { return Paths.get(resource.toURI()); } catch (Exception e) { return Paths.get(RESOURCE_MARKER + resourcePath); }
         }
-        
-        // Handle paths starting with "src/main/resources/" - these are project resource paths
-        if (imagePath.startsWith("src/main/resources/")) {
-            Path projectResourcesPath = Paths.get(imagePath);
-            if (Files.exists(projectResourcesPath)) {
-                return projectResourcesPath;
-            }
-            
-            // Try to convert to classpath resource path and resolve
-            String resourcePath = imagePath.substring("src/main/resources".length());
-            URL resource = FileSystemManager.class.getResource(resourcePath);
-            if (resource != null) {
-                try {
-                    return Paths.get(resource.toURI());
-                } catch (Exception e) {
-                    // Resource exists but cannot convert to path (might be in JAR)
-                    // Return a special marker indicating it's a valid resource
-                    return Paths.get("resource:" + resourcePath);
-                }
-            }
-            
-            LOGGER.warning("Could not resolve image path: " + imagePath);
-            return null;
+        LOGGER.log(Level.WARNING, () -> "Could not resolve project resource image path: " + imagePath);
+        return null;
+    }
+
+    private static Path resolveClasspathResourcePath(String imagePath) {
+        URL resource = FileSystemManager.class.getResource(imagePath);
+        if (resource != null) {
+            try { return Paths.get(resource.toURI()); } catch (Exception e) { return Paths.get(RESOURCE_MARKER + imagePath); }
         }
-        
-        // Handle resource paths (paths starting with /) - check this before absolute paths
-        if (imagePath.startsWith("/") && imagePath.contains("com/starlight")) {
-            // Try to resolve as resource from classpath first
-            URL resource = FileSystemManager.class.getResource(imagePath);
-            if (resource != null) {
-                try {
-                    return Paths.get(resource.toURI());
-                } catch (Exception e) {
-                    // Resource exists but cannot convert to path (might be in JAR)
-                    // Return a special marker indicating it's a valid resource
-                    return Paths.get("resource:" + imagePath);
-                }
-            }
-            
-            // If not found as resource, try relative to project src/main/resources
-            String resourcePath = imagePath.substring(1);
-            Path projectResourcesPath = Paths.get("src/main/resources").resolve(resourcePath);
-            if (Files.exists(projectResourcesPath)) {
-                return projectResourcesPath;
-            }
-            
-            LOGGER.warning("Could not resolve resource path: " + imagePath);
-            return null;
-        }
-        
-        // Handle absolute filesystem paths (but not resource paths)
-        Path absolutePath = Paths.get(imagePath);
-        if (absolutePath.isAbsolute()) {
-            if (Files.exists(absolutePath)) {
-                return absolutePath;
-            } else {
-                LOGGER.warning("Could not resolve absolute path: " + imagePath);
-                return null;
-            }
-        }
-        
-        // Handle relative paths - try different base directories
-        
-        // Try relative to user data directory
+        String resourcePath = imagePath.substring(1);
+        Path projectResourcesPath = Paths.get(PROJECT_RESOURCES).resolve(resourcePath);
+        if (Files.exists(projectResourcesPath)) return projectResourcesPath;
+        LOGGER.log(Level.WARNING, () -> "Could not resolve classpath resource path: " + imagePath);
+        return null;
+    }
+
+    private static Path validateAbsolute(Path absolute, String original) {
+        if (Files.exists(absolute)) return absolute;
+        LOGGER.log(Level.WARNING, () -> "Could not resolve absolute path: " + original);
+        return null;
+    }
+
+    private static Path resolveRelativeImagePath(String imagePath) {
         Path userDataPath = Paths.get(getUserDataDirectory()).resolve(imagePath);
-        if (Files.exists(userDataPath)) {
-            return userDataPath;
-        }
-        
-        // Try relative to user images directory (UserData subdirectory)
-        Path userImagesPath = Paths.get(getUserDataDirectory()).resolve(imagePath);
-        if (Files.exists(userImagesPath)) {
-            return userImagesPath;
-        }
-        
-        // Try relative to project resources
-        Path projectResourcesPath = Paths.get("src/main/resources").resolve(imagePath);
-        if (Files.exists(projectResourcesPath)) {
-            return projectResourcesPath;
-        }
-        
-        LOGGER.warning("Could not resolve image path: " + imagePath);
+        if (Files.exists(userDataPath)) return userDataPath;
+        Path projectResourcesPath = Paths.get(PROJECT_RESOURCES).resolve(imagePath);
+        if (Files.exists(projectResourcesPath)) return projectResourcesPath;
+        LOGGER.log(Level.WARNING, () -> "Could not resolve relative image path: " + imagePath);
         return null;
     }
 
@@ -308,12 +281,14 @@ public class FileSystemManager {
      * @param imageType type of image (e.g., "profile", "post", "default")
      * @return path to a fallback image, or null if no fallback available
      */
+    private static final String DEFAULT_MISSING_IMAGE = PROJECT_RESOURCES + "/com/starlight/images/missing.png";
+
     public static String getFallbackImagePath(String imageType) {
-        String fallbackPath = "src/main/resources/com/starlight/images/missing.png";
+        // Potential hook for different fallback images per type in future.
+        String fallbackPath = DEFAULT_MISSING_IMAGE;
         Path resolvedPath = resolveImagePath(fallbackPath);
-        if (resolvedPath != null) {
-            return resolvedPath.toString();
-        }
+        if (resolvedPath != null) return resolvedPath.toString();
+        LOGGER.log(Level.WARNING, () -> "No fallback image available for type: " + imageType);
         return null;
     }
 
@@ -331,11 +306,10 @@ public class FileSystemManager {
         
         String fallbackPath = getFallbackImagePath(imageType);
         if (fallbackPath != null) {
-            LOGGER.info("Using fallback image for: " + imagePath);
+            LOGGER.log(Level.INFO, () -> "Using fallback image for: " + imagePath);
             return fallbackPath;
         }
-        
-        LOGGER.severe("No image found for path: " + imagePath);
+        LOGGER.log(Level.SEVERE, () -> "No image found for path: " + imagePath);
         return null;
     }
 }

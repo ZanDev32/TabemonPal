@@ -268,8 +268,7 @@ public class PostItemController {
      */
     private void handlePostClick() {
         if (currentPost != null && mainController != null) {
-            mainController.setCurrentPost(currentPost);
-            mainController.loadPage("Post");
+            mainController.openPost(currentPost);
         } else {
             if (currentPost == null) {
                 logger.warning("Cannot navigate: currentPost is null");
