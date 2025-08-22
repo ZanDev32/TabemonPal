@@ -415,7 +415,7 @@ public class PostController implements Initializable {
         }
         
         // Show placeholder data when no nutrition analysis available
-        if (currentPost.nutrition == null) {
+        if (currentPost.getNutrition() == null) {
             ObservableList<PieChart.Data> placeholderData = FXCollections.observableArrayList(
                 new PieChart.Data("No nutrition analysis available", 1)
             );
@@ -430,7 +430,7 @@ public class PostController implements Initializable {
         }
         
         try {
-            Nutrition nutrition = currentPost.nutrition;
+            Nutrition nutrition = currentPost.getNutrition();
             ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
             
             // Get total values for all nutrients

@@ -5,33 +5,33 @@ package com.starlight.model;
  */
 public class Post {
     /** Unique identifier. */
-    public String uuid;
+    private String uuid;
     /** Username of the creator. */
-    public String username;
+    private String username;
     /** Path to the profile picture. */
-    public String profilepicture;
+    private String profilepicture;
     /** Title of the post. */
-    public String title;
+    private String title;
     /** Description of the recipe/post. */
-    public String description;
+    private String description;
     /** Ingredients text. */
-    public String ingredients;
+    private String ingredients;
     /** Preparation directions. */
-    public String directions;
+    private String directions;
     /** Path to the image of the dish. */
-    public String image;
+    private String image;
     /** Average rating. */
-    public String rating;
+    private String rating;
     /** Upload timestamp. */
-    public String uploadtime;
+    private String uploadtime;
     /** Like count. */
-    public String likecount;
+    private String likecount;
     /** Comment count. */
-    public String commentcount;
+    private String commentcount;
     /** Whether the current user has liked this post. */
-    public String isLiked;
+    private String isLiked;
     /** Nutrition facts data from AI analysis. */
-    public Nutrition nutrition;
+    private Nutrition nutrition;
 
     // Accessors - keep these to allow callers to use getters while preserving
     // the existing public fields for backwards compatibility.

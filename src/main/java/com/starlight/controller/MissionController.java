@@ -1,8 +1,12 @@
 package com.starlight.controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.layout.GridPane;
 
 public class MissionController {
+    @FXML
+    private GridPane tabestreakcounter;
+
     
 
     @FXML

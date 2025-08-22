@@ -108,7 +108,7 @@ public class ProfileController implements Initializable {
         // Since we can't easily access individual controllers after they're created,
         // the best approach is to reload recipes if they were loaded before MainController was set
         javafx.scene.Node content = myrepiceList.getContent();
-        if (content != null && content instanceof javafx.scene.Parent) {
+        if (content instanceof javafx.scene.Parent) {
             javafx.scene.Parent parentContent = (javafx.scene.Parent) content;
             if (parentContent.getChildrenUnmodifiable().size() > 0) {
                 logger.info("Reloading recipes with MainController reference");
@@ -165,80 +165,111 @@ public class ProfileController implements Initializable {
         User currentUser = Session.getCurrentUser();
         if (currentUser == null) return;
         
+        List<Post> userPosts = getUserPosts(currentUser);
+        if (userPosts.isEmpty()) {
+            clearRecipeContainer();
+            return;
+        }
+        
+        HBox recipeContainer = createRecipeContainer(userPosts);
+        myrepiceList.setContent(recipeContainer);
+        updateRecipeCount(userPosts.size());
+    }
+
+    /**
+     * Retrieves posts for the current user
+     */
+    private List<Post> getUserPosts(User currentUser) {
         List<Post> allPosts = repository.loadPosts();
         if (allPosts == null || allPosts.isEmpty()) {
-            // Clear the container if no posts
-            myrepiceList.setContent(new HBox());
-            if (recipes != null) {
-                recipes.setText("0");
-            }
-            return;
+            return List.of();
         }
         
-        // Filter posts by current user
-        List<Post> userPosts = allPosts.stream()
+        return allPosts.stream()
             .filter(post -> currentUser.getUsername().equals(post.getUsername()))
             .toList();
-            
-        if (userPosts.isEmpty()) {
-            // Clear the container if no posts
-            myrepiceList.setContent(new HBox());
-            if (recipes != null) {
-                recipes.setText("0");
-            }
-            return;
-        }
-        
-        // Create horizontal layout for recipes
+    }
+
+    /**
+     * Clears the recipe container and resets count
+     */
+    private void clearRecipeContainer() {
+        myrepiceList.setContent(new HBox());
+        updateRecipeCount(0);
+    }
+
+    /**
+     * Creates the recipe container with all user posts
+     */
+    private HBox createRecipeContainer(List<Post> userPosts) {
         HBox recipeContainer = new HBox();
         recipeContainer.setSpacing(20);
         
         for (Post post : userPosts) {
-            String title = post.getTitle();
-            String image = post.getImage();
-            String likes = post.getLikecount();
-            String rating = post.getRating();
-
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/recipeItem.fxml"));
-                GridPane recipeNode = loader.load();
-                RecipeItemController controller = loader.getController();
-
-                // Set the recipe data using the setter method
-                controller.setRecipeData(title, rating != null ? rating : "0.0", likes != null ? likes : "0");
-                
-                // Set the post data for edit/delete functionality
-                controller.setPost(post);
-                
-                // Set the main controller reference for navigation (check if available)
-                if (main != null) {
-                    controller.setMainController(main);
-                } else {
-                    // Log warning if main controller not available yet
-                    logger.warning("MainController not available for RecipeItemController - navigation will not work");
-                }
-                
-                // Set up callback to refresh the recipes when post is updated/deleted
-                controller.setOnPostUpdated(() -> loadUserRecipes());
-
-                // Load recipe image using ImageUtils
-                ImageView recipeImageView = controller.getImageView();
-                if (recipeImageView != null) {
-                    ImageUtils.loadImage(recipeImageView, image, ImageUtils.DEFAULT_MISSING_IMAGE);
-                    ImageUtils.scaleToFit(recipeImageView, 280, 174, 20); // Adjust size for recipe item
-                }
-
+            GridPane recipeNode = createRecipeNode(post);
+            if (recipeNode != null) {
                 recipeContainer.getChildren().add(recipeNode);
-            } catch (IOException e) {
-                e.printStackTrace();
             }
         }
         
-        myrepiceList.setContent(recipeContainer);
-        
-        // Update recipe count
+        return recipeContainer;
+    }
+
+    /**
+     * Creates a single recipe node for a post
+     */
+    private GridPane createRecipeNode(Post post) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/recipeItem.fxml"));
+            GridPane recipeNode = loader.load();
+            RecipeItemController controller = loader.getController();
+
+            configureRecipeController(controller, post);
+            loadRecipeImage(controller, post.getImage());
+
+            return recipeNode;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Configures the recipe item controller with post data
+     */
+    private void configureRecipeController(RecipeItemController controller, Post post) {
+        String title = post.getTitle();
+        String likes = post.getLikecount();
+        String rating = post.getRating();
+
+        controller.setRecipeData(title, rating != null ? rating : "0.0", likes != null ? likes : "0");
+        controller.setPost(post);
+        controller.setOnPostUpdated(() -> loadUserRecipes());
+
+        if (main != null) {
+            controller.setMainController(main);
+        } else {
+            logger.warning("MainController not available for RecipeItemController - navigation will not work");
+        }
+    }
+
+    /**
+     * Loads the recipe image for the controller
+     */
+    private void loadRecipeImage(RecipeItemController controller, String imagePath) {
+        ImageView recipeImageView = controller.getImageView();
+        if (recipeImageView != null) {
+            ImageUtils.loadImage(recipeImageView, imagePath, ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.scaleToFit(recipeImageView, 280, 174, 20);
+        }
+    }
+
+    /**
+     * Updates the recipe count display
+     */
+    private void updateRecipeCount(int count) {
         if (recipes != null) {
-            recipes.setText(String.valueOf(userPosts.size()));
+            recipes.setText(String.valueOf(count));
         }
     }
 

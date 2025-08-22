@@ -83,58 +83,84 @@ public class ImageUtils {
      * @param fallbackPath the classpath-relative path to a fallback image
      */
     public static void loadImage(ImageView imageView, String path, String fallbackPath) {
-        // Use FileSystemManager to resolve the image path
-        Path resolvedPath = FileSystemManager.resolveImagePath(path);
+        Image imageToLoad = tryLoadImageFromPath(path);
         
-        Image imageToLoad = null;
-        if (resolvedPath != null) {
-            // Check if it's a special resource marker
-            if (resolvedPath.toString().startsWith("resource:")) {
-                String resourcePath = resolvedPath.toString().substring("resource:".length());
-                URL resource = ImageUtils.class.getResource(resourcePath);
-                if (resource != null) {
-                    imageToLoad = new Image(resource.toExternalForm());
-                }
-            } else {
-                // Treat as a file path
-                File file = resolvedPath.toFile();
-                if (file.exists()) {
-                    imageToLoad = new Image(file.toURI().toString());
-                }
-            }
-        }
-
-        // If the image failed to load, try the fallback
         if (imageToLoad == null && fallbackPath != null) {
-            Path resolvedFallbackPath = FileSystemManager.resolveImagePath(fallbackPath);
-            if (resolvedFallbackPath != null) {
-                if (resolvedFallbackPath.toString().startsWith("resource:")) {
-                    String resourcePath = resolvedFallbackPath.toString().substring("resource:".length());
-                    URL fallbackResource = ImageUtils.class.getResource(resourcePath);
-                    if (fallbackResource != null) {
-                        imageToLoad = new Image(fallbackResource.toExternalForm());
-                    }
-                } else {
-                    File fallbackFile = resolvedFallbackPath.toFile();
-                    if (fallbackFile.exists()) {
-                        imageToLoad = new Image(fallbackFile.toURI().toString());
-                    }
-                }
-            }
+            imageToLoad = tryLoadImageFromPath(fallbackPath);
         }
         
-        // Final fallback - try to use FileSystemManager's fallback system
         if (imageToLoad == null) {
-            String defaultFallback = FileSystemManager.getFallbackImagePath("default");
-            if (defaultFallback != null) {
-                File defaultFile = new File(defaultFallback);
-                if (defaultFile.exists()) {
-                    imageToLoad = new Image(defaultFile.toURI().toString());
-                }
-            }
+            imageToLoad = loadDefaultFallbackImage();
         }
         
         imageView.setImage(imageToLoad);
+    }
+
+    /**
+     * Attempts to load an image from the given path.
+     * 
+     * @param path the path to load the image from
+     * @return the loaded Image, or null if loading failed
+     */
+    private static Image tryLoadImageFromPath(String path) {
+        Path resolvedPath = FileSystemManager.resolveImagePath(path);
+        if (resolvedPath == null) {
+            return null;
+        }
+        
+        if (isResourcePath(resolvedPath)) {
+            return loadImageFromResource(resolvedPath);
+        } else {
+            return loadImageFromFile(resolvedPath);
+        }
+    }
+    
+    /**
+     * Checks if the resolved path is a resource path.
+     * 
+     * @param resolvedPath the path to check
+     * @return true if it's a resource path, false otherwise
+     */
+    private static boolean isResourcePath(Path resolvedPath) {
+        return resolvedPath.toString().startsWith("resource:");
+    }
+    
+    /**
+     * Loads an image from a resource path.
+     * 
+     * @param resolvedPath the resource path
+     * @return the loaded Image, or null if loading failed
+     */
+    private static Image loadImageFromResource(Path resolvedPath) {
+        String resourcePath = resolvedPath.toString().substring("resource:".length());
+        URL resource = ImageUtils.class.getResource(resourcePath);
+        return resource != null ? new Image(resource.toExternalForm()) : null;
+    }
+    
+    /**
+     * Loads an image from a file path.
+     * 
+     * @param resolvedPath the file path
+     * @return the loaded Image, or null if loading failed
+     */
+    private static Image loadImageFromFile(Path resolvedPath) {
+        File file = resolvedPath.toFile();
+        return file.exists() ? new Image(file.toURI().toString()) : null;
+    }
+    
+    /**
+     * Loads the default fallback image from the system.
+     * 
+     * @return the default fallback Image, or null if loading failed
+     */
+    private static Image loadDefaultFallbackImage() {
+        String defaultFallback = FileSystemManager.getFallbackImagePath("default");
+        if (defaultFallback == null) {
+            return null;
+        }
+        
+        File defaultFile = new File(defaultFallback);
+        return defaultFile.exists() ? new Image(defaultFile.toURI().toString()) : null;
     }
 
     /**

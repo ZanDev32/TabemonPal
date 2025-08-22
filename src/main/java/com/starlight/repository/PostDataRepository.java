@@ -8,6 +8,7 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.model.Post;
+import com.starlight.repository.UserDataRepository.DataPersistenceException;
 import com.starlight.util.FileSystemManager;
 
 /**
@@ -150,7 +151,7 @@ public class PostDataRepository {
             }
             xstream.toXML(posts, fos);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
+            throw new DataPersistenceException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
         }
     }
 

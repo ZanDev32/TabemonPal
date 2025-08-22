@@ -15,6 +15,15 @@ import com.starlight.util.FileSystemManager;
  * Repository for persisting {@link User} objects to an XML file.
  */
 public class UserDataRepository {
+    
+    /**
+     * Exception thrown when data persistence operations fail.
+     */
+    public static class DataPersistenceException extends RuntimeException {
+        public DataPersistenceException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
     private static final String DEFAULT_XML_PATH = FileSystemManager.getDatabaseDirectory() + File.separator + "UserData.xml";
     private static final String DUMMY_XML_PATH = "src/main/java/com/starlight/data/UserDataDummy.xml";
 
@@ -137,7 +146,7 @@ public class UserDataRepository {
                 xstream.toXML(distinctUsers, fos);
             }
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save users", e);
+            throw new DataPersistenceException("Failed to save users", e);
         }
     }
 

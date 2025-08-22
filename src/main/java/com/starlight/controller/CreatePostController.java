@@ -139,7 +139,7 @@ public class CreatePostController implements Initializable {
                 newPost.setImage(storedPath != null ? storedPath : selectedImage.getAbsolutePath());
             } catch (Exception e) {
                 e.printStackTrace();
-                newPost.image = selectedImage.getAbsolutePath();
+                newPost.setImage(selectedImage.getAbsolutePath());
             }
             newPost.setLikecount("0");
             newPost.setCommentcount("0");
@@ -263,7 +263,7 @@ public class CreatePostController implements Initializable {
                             newPost.setNutrition(nutritionParser.parseNutritionFromResponse(nutritionResponse));
                             
             // Check if we got valid nutrition data
-            if (newPost.nutrition != null && newPost.nutrition.getIngredient() != null && !newPost.nutrition.getIngredient().isEmpty()) {
+            if (newPost.getNutrition() != null && newPost.getNutrition().getIngredient() != null && !newPost.getNutrition().getIngredient().isEmpty()) {
                 logger.info(java.text.MessageFormat.format(
                     "Nutrition analysis completed successfully on attempt {0}", currentAttempt));
                 
@@ -401,7 +401,7 @@ public class CreatePostController implements Initializable {
                         // Still try to save post without nutrition data
                         try {
                             processingController.updateStatus("Saving post with default values...");
-                            newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
+                            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null)); // Creates fallback nutrition
                             List<Post> posts = repository.loadPosts();
                             posts.add(0, newPost);
                             repository.savePosts(posts);
@@ -446,7 +446,7 @@ public class CreatePostController implements Initializable {
             
             // Fallback: try to save post and navigate directly
             try {
-                newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
+                newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null)); // Creates fallback nutrition
                 List<Post> posts = repository.loadPosts();
                 posts.add(0, newPost);
                 repository.savePosts(posts);
