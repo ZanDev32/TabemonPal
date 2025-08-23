@@ -12,7 +12,13 @@ import java.util.logging.Logger;
 public class SplashScreenController implements Initializable {
 	private static final Logger logger = Logger.getLogger(SplashScreenController.class.getName());
 
-	private SplashScreenController() {}
+	/**
+	 * Public no-arg constructor required by the JavaFX FXMLLoader to instantiate
+	 * the controller. (Was private causing IllegalAccessException in tests.)
+	 */
+	public SplashScreenController() {
+		// Intentionally empty
+	}
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {

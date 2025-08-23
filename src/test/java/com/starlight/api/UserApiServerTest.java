@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,7 +34,7 @@ class UserApiServerTest {
     }
     
     @Test
-    void testServerConstruction() throws IOException {
+    void testServerConstruction() {
         // Test that server can be constructed without throwing
         assertDoesNotThrow(() -> {
             int testPort = 9100 + rng.nextInt(500);
@@ -44,21 +45,25 @@ class UserApiServerTest {
     }
     
     @Test
-    void testServerConstructionWithPortInUse() throws IOException {
+    void testServerConstructionWithPortInUse() {
         // Start first server
-    int basePort = 9200 + rng.nextInt(100);
-        UserApiServer firstServer = new UserApiServer(basePort);
-        firstServer.start();
-        
+        int basePort = 9200 + rng.nextInt(100);
         try {
-            // Creating second server on same port should work (it will find next available port)
-            assertDoesNotThrow(() -> {
-                UserApiServer secondServer = new UserApiServer(basePort);
-                assertNotNull(secondServer);
-                secondServer.stop();
-            });
-        } finally {
-            firstServer.stop();
+            UserApiServer firstServer = new UserApiServer(basePort);
+            firstServer.start();
+            
+            try {
+                // Creating second server on same port should work (it will find next available port)
+                assertDoesNotThrow(() -> {
+                    UserApiServer secondServer = new UserApiServer(basePort);
+                    assertNotNull(secondServer);
+                    secondServer.stop();
+                });
+            } finally {
+                firstServer.stop();
+            }
+        } catch (IOException e) {
+            fail("Failed to create test server: " + e.getMessage());
         }
     }
     
@@ -82,9 +87,19 @@ class UserApiServerTest {
         // Test start/stop cycle (Note: HttpServer cannot be restarted once stopped)
         assertDoesNotThrow(() -> {
             server.start();
-            Thread.sleep(10); // Give server time to start
+            // Give server time to start - using a small wait
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             server.stop();
-            Thread.sleep(10); // Give server time to stop
+            // Give server time to stop
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             // Cannot restart the same HttpServer instance - this is a Java HttpServer limitation
         });
     }
@@ -125,11 +140,21 @@ class UserApiServerTest {
             
             // Start server
             server.start();
-            Thread.sleep(10); // Give server time to start
+            // Give server time to start
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             
             // Stop server
             server.stop();
-            Thread.sleep(10); // Give server time to stop
+            // Give server time to stop
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
             
             // Note: HttpServer cannot be restarted once stopped - this is a Java limitation
             // So we don't test restart here
@@ -137,10 +162,10 @@ class UserApiServerTest {
     }
     
     @Test
-    void testRestartWithNewInstance() throws IOException {
+    void testRestartWithNewInstance() {
         // Test restart functionality by creating new server instances
         // (since HttpServer cannot be restarted once stopped)
-            int testPort = 9800 + rng.nextInt(100);
+        int testPort = 9800 + rng.nextInt(100);
         
         assertDoesNotThrow(() -> {
             // First instance
@@ -156,26 +181,31 @@ class UserApiServerTest {
     }
     
     @Test
-    void testMultipleServerInstances() throws IOException {
+    void testMultipleServerInstances() {
         // Test that multiple server instances can coexist (on different ports)
-    int port1 = 9300 + rng.nextInt(50);
-    int port2 = 9350 + rng.nextInt(50);
-        UserApiServer server1 = new UserApiServer(port1);
-        UserApiServer server2 = new UserApiServer(port2);
+        int port1 = 9300 + rng.nextInt(50);
+        int port2 = 9350 + rng.nextInt(50);
         
         try {
-            assertDoesNotThrow(() -> {
-                server1.start();
-                server2.start();
-            });
+            UserApiServer server1 = new UserApiServer(port1);
+            UserApiServer server2 = new UserApiServer(port2);
             
-            assertDoesNotThrow(() -> {
+            try {
+                assertDoesNotThrow(() -> {
+                    server1.start();
+                    server2.start();
+                });
+                
+                assertDoesNotThrow(() -> {
+                    server1.stop();
+                    server2.stop();
+                });
+            } finally {
                 server1.stop();
                 server2.stop();
-            });
-        } finally {
-            server1.stop();
-            server2.stop();
+            }
+        } catch (IOException e) {
+            fail("Failed to create test servers: " + e.getMessage());
         }
     }
     
@@ -192,23 +222,28 @@ class UserApiServerTest {
     }
     
     @Test
-    void testServerResourceCleanup() throws IOException {
+    void testServerResourceCleanup() {
         // Test that server properly cleans up resources
-    int testPort = 9500 + rng.nextInt(100);
-        UserApiServer testServer = new UserApiServer(testPort);
+        int testPort = 9500 + rng.nextInt(100);
         
-        testServer.start();
-        testServer.stop();
-        
-        // Should be able to create another server on same port after proper cleanup
-        assertDoesNotThrow(() -> {
-            UserApiServer secondServer = new UserApiServer(testPort);
-            secondServer.stop();
-        });
+        try {
+            UserApiServer testServer = new UserApiServer(testPort);
+            
+            testServer.start();
+            testServer.stop();
+            
+            // Should be able to create another server on same port after proper cleanup
+            assertDoesNotThrow(() -> {
+                UserApiServer secondServer = new UserApiServer(testPort);
+                secondServer.stop();
+            });
+        } catch (IOException e) {
+            fail("Failed to create test server: " + e.getMessage());
+        }
     }
     
     @Test
-    void testServerStartAfterException() throws IOException {
+    void testServerStartAfterException() {
         // Test that server can be started after handling construction exceptions
         try {
             // This should succeed since we handle port conflicts

@@ -96,20 +96,22 @@ class ChatbotAPITest {
         // Test JSON parsing with escaped characters
         ChatbotAPI chatbot = new ChatbotAPI();
         
-                String mockResponse = """
+        // Note: In JSON, embedded quotes and newline must be escaped. In a Java text block
+        // we need to double the backslash so the generated JSON still contains the escape.
+        String mockResponse = """
+                {
+                    "choices": [
                         {
-                            "choices": [
-                                {
-                                    "message": {
-                                        "content": "Hello! I can help with \"nutrition\" and \n food advice."
-                                    }
-                                }
-                            ]
+                            "message": {
+                                "content": "Hello! I can help with \\\"nutrition\\\" and \\n food advice."
+                            }
                         }
-                        """;
+                    ]
+                }
+                """;
         
-        String result = chatbot.parseResponse(mockResponse);
-        assertEquals("Hello! I can help with \"nutrition\" and \n food advice.", result);
+    String result = chatbot.parseResponse(mockResponse);
+    assertEquals("Hello! I can help with \"nutrition\" and \n food advice.", result);
     }
     
     @Test
