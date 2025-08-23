@@ -19,7 +19,7 @@ import org.testfx.framework.junit5.ApplicationTest;
  * Tests that all FXML files in the view package can be loaded using FXMLLoader,
  * including their controllers (if declared), using TestFX in headless mode.
  */
-public class FXMLLoadingTest extends ApplicationTest {
+class FXMLLoadingTest extends ApplicationTest {
 
     static {
         // Enable TestFX headless mode so JavaFX doesn't require a display

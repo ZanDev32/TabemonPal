@@ -5,7 +5,6 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
-import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.geometry.Insets;
 import java.util.Optional;
@@ -42,16 +41,12 @@ import java.time.format.DateTimeParseException;
  */
 public class RecipeManagerController implements Initializable {
 
+    // Constants for error messages
+    private static final String VALIDATION_ERROR = "Validation Error";
+    private static final String ERROR = "Error";
+
     @FXML
     private MFXTableView<PostTableData> postsTable;
-
-    // Create table columns programmatically instead of FXML injection
-    private MFXTableColumn<PostTableData> titleColumn;
-    private MFXTableColumn<PostTableData> usernameColumn;
-    private MFXTableColumn<PostTableData> ratingColumn;
-    private MFXTableColumn<PostTableData> likeCountColumn;
-    private MFXTableColumn<PostTableData> uploadTimeColumn;
-    private MFXTableColumn<PostTableData> actionColumn;
 
     @FXML
     private MFXComboBox<String> sortComboBox;
@@ -87,13 +82,13 @@ public class RecipeManagerController implements Initializable {
 
         public PostTableData(Post post) {
             this.originalPost = post;
-            this.uuid = new SimpleStringProperty(post.uuid != null ? post.uuid : "");
-            this.title = new SimpleStringProperty(post.title != null ? post.title : "");
-            this.username = new SimpleStringProperty(post.username != null ? post.username : "");
-            this.rating = new SimpleStringProperty(post.rating != null ? post.rating : "0.0");
-            this.likeCount = new SimpleStringProperty(post.likecount != null ? post.likecount : "0");
-            this.uploadTime = new SimpleStringProperty(formatDateTime(post.uploadtime));
-            this.description = new SimpleStringProperty(post.description != null ? post.description : "");
+            this.uuid = new SimpleStringProperty(post.getUuid() != null ? post.getUuid() : "");
+            this.title = new SimpleStringProperty(post.getTitle() != null ? post.getTitle() : "");
+            this.username = new SimpleStringProperty(post.getUsername() != null ? post.getUsername() : "");
+            this.rating = new SimpleStringProperty(post.getRating() != null ? post.getRating() : "0.0");
+            this.likeCount = new SimpleStringProperty(post.getLikecount() != null ? post.getLikecount() : "0");
+            this.uploadTime = new SimpleStringProperty(formatDateTime(post.getUploadtime()));
+            this.description = new SimpleStringProperty(post.getDescription() != null ? post.getDescription() : "");
         }
 
         private static String formatDateTime(String uploadTime) {
@@ -176,8 +171,8 @@ public class RecipeManagerController implements Initializable {
         }
         
         // Only allow access for users with exact username "admin"
-        return currentUser.username != null && 
-               currentUser.username.toLowerCase().equals("admin");
+    return currentUser.getUsername() != null && 
+           currentUser.getUsername().equalsIgnoreCase("admin");
     }
     
     /**
@@ -203,12 +198,12 @@ public class RecipeManagerController implements Initializable {
         System.out.println("DEBUG: Setting up MFXTableView columns...");
         
         // Create table columns programmatically with simplified approach
-        titleColumn = new MFXTableColumn<>("Title");
-        usernameColumn = new MFXTableColumn<>("Author");
-        ratingColumn = new MFXTableColumn<>("Rating");
-        likeCountColumn = new MFXTableColumn<>("Likes");
-        uploadTimeColumn = new MFXTableColumn<>("Upload Date");
-        actionColumn = new MFXTableColumn<>("Actions");
+        MFXTableColumn<PostTableData> titleColumn = new MFXTableColumn<>("Title");
+        MFXTableColumn<PostTableData> usernameColumn = new MFXTableColumn<>("Author");
+        MFXTableColumn<PostTableData> ratingColumn = new MFXTableColumn<>("Rating");
+        MFXTableColumn<PostTableData> likeCountColumn = new MFXTableColumn<>("Likes");
+        MFXTableColumn<PostTableData> uploadTimeColumn = new MFXTableColumn<>("Upload Date");
+        MFXTableColumn<PostTableData> actionColumn = new MFXTableColumn<>("Actions");
 
         // Set preferred widths - make them larger for better visibility
         titleColumn.setPrefWidth(250.0);
@@ -291,15 +286,54 @@ public class RecipeManagerController implements Initializable {
      * Shows edit dialog for a post
      */
     private void showEditDialog(PostTableData data) {
-        Dialog<Post> dialog = new Dialog<>();
-        dialog.setTitle("Edit Post");
-        dialog.setHeaderText("Edit post details for: " + data.getTitle());
-
-        // Set the button types
+        Dialog<Post> dialog = createEditDialog(data);
         ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButtonType, ButtonType.CANCEL);
 
-        // Create form fields
+        EditFormFields formFields = createEditFormFields(data);
+        dialog.getDialogPane().setContent(formFields.gridPane);
+
+        dialog.setResultConverter(dialogButton -> 
+            dialogButton == saveButtonType ? validateAndCreateUpdatedPost(formFields, data) : null);
+
+        Optional<Post> result = dialog.showAndWait();
+        result.ifPresent(updatedPost -> handleEditDialogResult(updatedPost, data));
+    }
+
+    /**
+     * Creates the basic edit dialog structure
+     */
+    private Dialog<Post> createEditDialog(PostTableData data) {
+        Dialog<Post> dialog = new Dialog<>();
+        dialog.setTitle("Edit Post");
+        dialog.setHeaderText("Edit post details for: " + data.getTitle());
+        return dialog;
+    }
+
+    /**
+     * Container for form fields to reduce parameter passing
+     */
+    private static class EditFormFields {
+        final GridPane gridPane;
+        final TextField titleField;
+        final TextField ratingField;
+        final TextField likeCountField;
+        final TextArea descriptionArea;
+
+        EditFormFields(GridPane gridPane, TextField titleField, TextField ratingField, 
+                      TextField likeCountField, TextArea descriptionArea) {
+            this.gridPane = gridPane;
+            this.titleField = titleField;
+            this.ratingField = ratingField;
+            this.likeCountField = likeCountField;
+            this.descriptionArea = descriptionArea;
+        }
+    }
+
+    /**
+     * Creates and configures the form fields for the edit dialog
+     */
+    private EditFormFields createEditFormFields(PostTableData data) {
         GridPane grid = new GridPane();
         grid.setHgap(10);
         grid.setVgap(10);
@@ -332,71 +366,96 @@ public class RecipeManagerController implements Initializable {
         grid.add(new Label("Description:"), 0, 3);
         grid.add(descriptionArea, 1, 3);
 
-        dialog.getDialogPane().setContent(grid);
+        return new EditFormFields(grid, titleField, ratingField, likeCountField, descriptionArea);
+    }
 
-        // Enable/Disable save button depending on whether valid data was entered
-        Node saveButton = dialog.getDialogPane().lookupButton(saveButtonType);
-        saveButton.setDisable(false);
-
-        // Convert the result when the save button is clicked
-        dialog.setResultConverter(dialogButton -> {
-            if (dialogButton == saveButtonType) {
-                // Validate input
-                if (titleField.getText().trim().isEmpty()) {
-                    showErrorAlert("Validation Error", "Title cannot be empty.");
-                    return null;
-                }
-                
-                try {
-                    double rating = Double.parseDouble(ratingField.getText());
-                    if (rating < 0 || rating > 5) {
-                        showErrorAlert("Validation Error", "Rating must be between 0 and 5.");
-                        return null;
-                    }
-                } catch (NumberFormatException e) {
-                    showErrorAlert("Validation Error", "Rating must be a valid number.");
-                    return null;
-                }
-                
-                try {
-                    int likeCount = Integer.parseInt(likeCountField.getText());
-                    if (likeCount < 0) {
-                        showErrorAlert("Validation Error", "Like count cannot be negative.");
-                        return null;
-                    }
-                } catch (NumberFormatException e) {
-                    showErrorAlert("Validation Error", "Like count must be a valid number.");
-                    return null;
-                }
-
-                // Create updated post
-                Post updatedPost = data.getOriginalPost();
-                updatedPost.title = titleField.getText().trim();
-                updatedPost.rating = ratingField.getText().trim();
-                updatedPost.likecount = likeCountField.getText().trim();
-                updatedPost.description = descriptionArea.getText().trim();
-                
-                return updatedPost;
-            }
+    /**
+     * Validates form inputs and creates updated post if valid
+     */
+    private Post validateAndCreateUpdatedPost(EditFormFields fields, PostTableData data) {
+        if (!validateEditFormInputs(fields)) {
             return null;
-        });
+        }
 
-        Optional<Post> result = dialog.showAndWait();
-        result.ifPresent(updatedPost -> {
-            // Save changes
-            savePostChanges(updatedPost);
-            
-            // Update the table data
-            data.title.set(updatedPost.title);
-            data.rating.set(updatedPost.rating);
-            data.likeCount.set(updatedPost.likecount);
-            data.description.set(updatedPost.description);
-            
-            // Refresh the table
-            postsTable.update();
-            
-            showSuccessAlert("Success", "Post updated successfully!");
-        });
+        Post updatedPost = data.getOriginalPost();
+        updatedPost.setTitle(fields.titleField.getText().trim());
+        updatedPost.setRating(fields.ratingField.getText().trim());
+        updatedPost.setLikecount(fields.likeCountField.getText().trim());
+        updatedPost.setDescription(fields.descriptionArea.getText().trim());
+        
+        return updatedPost;
+    }
+
+    /**
+     * Validates all form inputs
+     */
+    private boolean validateEditFormInputs(EditFormFields fields) {
+        return validateTitle(fields.titleField) && 
+               validateRating(fields.ratingField) && 
+               validateLikeCount(fields.likeCountField);
+    }
+
+    /**
+     * Validates the title field
+     */
+    private boolean validateTitle(TextField titleField) {
+        if (titleField.getText().trim().isEmpty()) {
+            showErrorAlert(VALIDATION_ERROR, "Title cannot be empty.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validates the rating field
+     */
+    private boolean validateRating(TextField ratingField) {
+        try {
+            double rating = Double.parseDouble(ratingField.getText());
+            if (rating < 0 || rating > 5) {
+                showErrorAlert(VALIDATION_ERROR, "Rating must be between 0 and 5.");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showErrorAlert(VALIDATION_ERROR, "Rating must be a valid number.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Validates the like count field
+     */
+    private boolean validateLikeCount(TextField likeCountField) {
+        try {
+            int likeCount = Integer.parseInt(likeCountField.getText());
+            if (likeCount < 0) {
+                showErrorAlert(VALIDATION_ERROR, "Like count cannot be negative.");
+                return false;
+            }
+        } catch (NumberFormatException e) {
+            showErrorAlert(VALIDATION_ERROR, "Like count must be a valid number.");
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Handles the result of a successful edit dialog
+     */
+    private void handleEditDialogResult(Post updatedPost, PostTableData data) {
+        savePostChanges(updatedPost);
+        
+        // Update the table data
+        data.title.set(updatedPost.getTitle());
+        data.rating.set(updatedPost.getRating());
+        data.likeCount.set(updatedPost.getLikecount());
+        data.description.set(updatedPost.getDescription());
+        
+        // Refresh the table
+        postsTable.update();
+        
+        showSuccessAlert("Success", "Post updated successfully!");
     }
 
     /**
@@ -494,14 +553,12 @@ public class RecipeManagerController implements Initializable {
             }
         };
 
-        loadTask.setOnFailed(e -> {
-            Platform.runLater(() -> {
-                loadingIndicator.setVisible(false);
-                System.err.println("DEBUG: Failed to load data: " + e.getSource().getException());
-                e.getSource().getException().printStackTrace();
-                showErrorAlert("Error", "Failed to load data from XML files: " + e.getSource().getException().getMessage());
-            });
-        });
+        loadTask.setOnFailed(e -> Platform.runLater(() -> {
+            loadingIndicator.setVisible(false);
+            System.err.println("DEBUG: Failed to load data: " + e.getSource().getException());
+            e.getSource().getException().printStackTrace();
+            showErrorAlert(ERROR, "Failed to load data from XML files: " + e.getSource().getException().getMessage());
+        }));
 
         new Thread(loadTask).start();
     }
@@ -556,11 +613,14 @@ public class RecipeManagerController implements Initializable {
                 });
                 break;
             case "Date (Newest)":
-                comparator = Comparator.comparing((PostTableData data) -> parseDateTime(data.getOriginalPost().uploadtime))
+                comparator = Comparator.comparing((PostTableData data) -> parseDateTime(data.getOriginalPost().getUploadtime()))
                     .reversed();
                 break;
             case "Date (Oldest)":
-                comparator = Comparator.comparing((PostTableData data) -> parseDateTime(data.getOriginalPost().uploadtime));
+                comparator = Comparator.comparing((PostTableData data) -> parseDateTime(data.getOriginalPost().getUploadtime()));
+                break;
+            default:
+                // No sorting applied for unknown criteria
                 break;
         }
 
@@ -620,11 +680,11 @@ public class RecipeManagerController implements Initializable {
                 
                 showSuccessAlert("Success", "Post deleted successfully!");
             } else {
-                showErrorAlert("Error", "Post not found or could not be deleted.");
+                showErrorAlert(ERROR, "Post not found or could not be deleted.");
             }
 
         } catch (Exception e) {
-            showErrorAlert("Error", "Failed to delete post: " + e.getMessage());
+            showErrorAlert(ERROR, "Failed to delete post: " + e.getMessage());
         }
     }
 
@@ -637,7 +697,7 @@ public class RecipeManagerController implements Initializable {
             
             // Find and update the post
             for (int i = 0; i < allPosts.size(); i++) {
-                if (allPosts.get(i).uuid != null && allPosts.get(i).uuid.equals(post.uuid)) {
+                if (allPosts.get(i).getUuid() != null && allPosts.get(i).getUuid().equals(post.getUuid())) {
                     allPosts.set(i, post);
                     break;
                 }
@@ -645,7 +705,7 @@ public class RecipeManagerController implements Initializable {
 
             postRepository.savePosts(allPosts);
         } catch (Exception e) {
-            showErrorAlert("Error", "Failed to save changes: " + e.getMessage());
+            showErrorAlert(ERROR, "Failed to save changes: " + e.getMessage());
         }
     }
 
@@ -679,22 +739,22 @@ public class RecipeManagerController implements Initializable {
         
         // Create dummy posts for testing
         Post testPost1 = new Post();
-        testPost1.uuid = "test-1";
-        testPost1.title = "Test Post 1";
-        testPost1.username = "TestUser1";
-        testPost1.rating = "4.5";
-        testPost1.likecount = "10";
-        testPost1.uploadtime = "2025-07-20T19:00:00";
-        testPost1.description = "This is a test post to verify table functionality";
+        testPost1.setUuid("test-1");
+        testPost1.setTitle("Test Post 1");
+        testPost1.setUsername("TestUser1");
+        testPost1.setRating("4.5");
+        testPost1.setLikecount("10");
+        testPost1.setUploadtime("2025-07-20T19:00:00");
+        testPost1.setDescription("This is a test post to verify table functionality");
         
         Post testPost2 = new Post();
-        testPost2.uuid = "test-2";
-        testPost2.title = "Test Post 2";
-        testPost2.username = "TestUser2";
-        testPost2.rating = "3.8";
-        testPost2.likecount = "5";
-        testPost2.uploadtime = "2025-07-20T18:30:00";
-        testPost2.description = "Another test post";
+        testPost2.setUuid("test-2");
+        testPost2.setTitle("Test Post 2");
+        testPost2.setUsername("TestUser2");
+        testPost2.setRating("3.8");
+        testPost2.setLikecount("5");
+        testPost2.setUploadtime("2025-07-20T18:30:00");
+        testPost2.setDescription("Another test post");
         
         // Convert to table data
         PostTableData tableData1 = new PostTableData(testPost1);

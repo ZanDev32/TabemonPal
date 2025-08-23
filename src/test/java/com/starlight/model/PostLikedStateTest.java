@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * Test class to verify that liked state is properly saved and loaded from XML.
  */
-public class PostLikedStateTest {
+class PostLikedStateTest {
     
     private Path tempFile;
     private PostDataRepository repository;
@@ -36,13 +36,13 @@ public class PostLikedStateTest {
     @Test
     void testLikedStateSavedAndLoaded() {
         // Create a post with liked state
-        Post post = new Post();
-        post.uuid = "test-uuid-123";
-        post.title = "Test Post";
-        post.description = "Test Description";
-        post.likecount = "5";
-        post.commentcount = "3";
-        post.isLiked = "true";
+    Post post = new Post();
+    post.setUuid("test-uuid-123");
+    post.setTitle("Test Post");
+    post.setDescription("Test Description");
+    post.setLikecount("5");
+    post.setCommentcount("3");
+    post.setIsLiked("true");
         
         List<Post> posts = new ArrayList<>();
         posts.add(post);
@@ -57,22 +57,22 @@ public class PostLikedStateTest {
         assertNotNull(loadedPosts);
         assertEquals(1, loadedPosts.size());
         
-        Post loadedPost = loadedPosts.get(0);
-        assertEquals("test-uuid-123", loadedPost.uuid);
-        assertEquals("Test Post", loadedPost.title);
-        assertEquals("Test Description", loadedPost.description);
-        assertEquals("5", loadedPost.likecount);
-        assertEquals("3", loadedPost.commentcount);
-        assertEquals("true", loadedPost.isLiked);
+    Post loadedPost = loadedPosts.get(0);
+    assertEquals("test-uuid-123", loadedPost.getUuid());
+    assertEquals("Test Post", loadedPost.getTitle());
+    assertEquals("Test Description", loadedPost.getDescription());
+    assertEquals("5", loadedPost.getLikecount());
+    assertEquals("3", loadedPost.getCommentcount());
+    assertEquals("true", loadedPost.getIsLiked());
     }
     
     @Test
     void testMissingFieldsInitialized() {
         // Create a post without commentcount and isLiked fields
-        Post post = new Post();
-        post.uuid = "test-uuid-456";
-        post.title = "Test Post Without New Fields";
-        post.likecount = "10";
+    Post post = new Post();
+    post.setUuid("test-uuid-456");
+    post.setTitle("Test Post Without New Fields");
+    post.setLikecount("10");
         // Note: commentcount and isLiked are null
         
         List<Post> posts = new ArrayList<>();
@@ -88,23 +88,23 @@ public class PostLikedStateTest {
         assertNotNull(loadedPosts);
         assertEquals(1, loadedPosts.size());
         
-        Post loadedPost = loadedPosts.get(0);
-        assertEquals("test-uuid-456", loadedPost.uuid);
-        assertEquals("Test Post Without New Fields", loadedPost.title);
-        assertEquals("10", loadedPost.likecount);
-        assertEquals("0", loadedPost.commentcount); // Should be initialized to "0"
-        assertEquals("false", loadedPost.isLiked);  // Should be initialized to "false"
+    Post loadedPost = loadedPosts.get(0);
+    assertEquals("test-uuid-456", loadedPost.getUuid());
+    assertEquals("Test Post Without New Fields", loadedPost.getTitle());
+    assertEquals("10", loadedPost.getLikecount());
+    assertEquals("0", loadedPost.getCommentcount()); // Should be initialized to "0"
+    assertEquals("false", loadedPost.getIsLiked());  // Should be initialized to "false"
     }
     
     @Test
     void testLikeStateToggle() {
         // Create a post with false liked state
-        Post post = new Post();
-        post.uuid = "test-uuid-789";
-        post.title = "Toggle Test Post";
-        post.likecount = "0";
-        post.commentcount = "0";
-        post.isLiked = "false";
+    Post post = new Post();
+    post.setUuid("test-uuid-789");
+    post.setTitle("Toggle Test Post");
+    post.setLikecount("0");
+    post.setCommentcount("0");
+    post.setIsLiked("false");
         
         List<Post> posts = new ArrayList<>();
         posts.add(post);
@@ -116,9 +116,9 @@ public class PostLikedStateTest {
         List<Post> loadedPosts = repository.loadPosts();
         Post loadedPost = loadedPosts.get(0);
         
-        // Toggle the liked state
-        loadedPost.isLiked = "true";
-        loadedPost.likecount = "1";
+    // Toggle the liked state
+    loadedPost.setIsLiked("true");
+    loadedPost.setLikecount("1");
         
         repository.savePosts(loadedPosts);
         
@@ -126,7 +126,7 @@ public class PostLikedStateTest {
         List<Post> reloadedPosts = repository.loadPosts();
         Post reloadedPost = reloadedPosts.get(0);
         
-        assertEquals("true", reloadedPost.isLiked);
-        assertEquals("1", reloadedPost.likecount);
+    assertEquals("true", reloadedPost.getIsLiked());
+        assertEquals("1", reloadedPost.getLikecount());
     }
 }

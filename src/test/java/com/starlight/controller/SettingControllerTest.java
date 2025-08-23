@@ -17,7 +17,7 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 /**
  * Test class for SettingController.
  */
-public class SettingControllerTest {
+class SettingControllerTest {
     
     @TempDir
     Path tempDir;
@@ -25,7 +25,7 @@ public class SettingControllerTest {
     private XStream xstream;
     
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         this.xstream = new XStream(new DomDriver());
         this.xstream.allowTypesByWildcard(new String[]{"com.starlight.api.*"});
         this.xstream.alias("config", ChatbotAPI.Config.class);
@@ -33,7 +33,7 @@ public class SettingControllerTest {
     }
     
     @Test
-    public void testConfigCreationAndSerialization() throws Exception {
+    void testConfigCreationAndSerialization() throws Exception {
         // Create config object
         ChatbotAPI.Config config = new ChatbotAPI.Config();
         config.setOpenaiKey("test-api-key-123");
@@ -50,7 +50,7 @@ public class SettingControllerTest {
     }
     
     @Test
-    public void testConfigFileCreation() throws Exception {
+    void testConfigFileCreation() throws Exception {
         // Create the directory structure
         Path configDir = tempDir.resolve(".tabemonpal").resolve("Database");
         Files.createDirectories(configDir);
@@ -72,7 +72,7 @@ public class SettingControllerTest {
     }
     
     @Test
-    public void testEmptyApiKeyValidation() {
+    void testEmptyApiKeyValidation() {
         ChatbotAPI.Config config = new ChatbotAPI.Config();
         assertNull(config.getOpenaiKey());
         

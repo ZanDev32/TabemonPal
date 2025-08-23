@@ -182,7 +182,7 @@ public class ConsultController implements Initializable {
 
         // Save to chat history if enabled and not a welcome message
         if (saveToHistory && historyManager != null && currentUser != null && !message.contains("Welcome Pal!")) {
-                historyManager.addMessage(message, isUser, currentUser.username);
+                historyManager.addMessage(message, isUser, currentUser.getUsername());
             }
         
 
@@ -334,8 +334,8 @@ public class ConsultController implements Initializable {
      * Gets the avatar path for the current user.
      */
     private String getUserAvatarPath() {
-        if (currentUser != null && currentUser.profilepicture != null && !currentUser.profilepicture.isEmpty()) {
-            return currentUser.profilepicture;
+        if (currentUser != null && currentUser.getProfilepicture() != null && !currentUser.getProfilepicture().isEmpty()) {
+            return currentUser.getProfilepicture();
         }
         
         // Return the same format as used in UserData.xml for default avatar
@@ -487,7 +487,7 @@ public class ConsultController implements Initializable {
         
         // Start chat history session if user is available
         if (currentUser != null && historyManager != null) {
-            historyManager.startSession(currentUser.username);
+            historyManager.startSession(currentUser.getUsername());
         }
         
         // Load previous chat history if available
@@ -601,7 +601,7 @@ public class ConsultController implements Initializable {
     private void loadRecentChatHistory() {
         if (!canLoadHistory()) return;
         try {
-            var histories = historyManager.loadUserHistory(currentUser.username);
+            var histories = historyManager.loadUserHistory(currentUser.getUsername());
             int startIndex = computeHistoryStartIndex(histories);
             if (histories.size() <= startIndex) return; // Nothing to show
 
@@ -645,10 +645,10 @@ public class ConsultController implements Initializable {
     private void appendRecentMessages(java.util.List<com.starlight.model.ChatMessage> messages, int startIndex) {
         for (int i = startIndex; i < messages.size(); i++) {
             var msg = messages.get(i);
-            if (msg != null && msg.content != null) {
-                String content = msg.content.trim();
+            if (msg != null && msg.getContent() != null) {
+                String content = msg.getContent().trim();
                 if (!content.isEmpty()) {
-                    addBubble(content, msg.isUser, false);
+                    addBubble(content, msg.isUser(), false);
                 }
             }
         }
@@ -702,7 +702,7 @@ public class ConsultController implements Initializable {
      */
     public void startNewSession() {
         if (currentUser != null && historyManager != null) {
-            historyManager.startSession(currentUser.username);
+            historyManager.startSession(currentUser.getUsername());
             logger.info("New chat session started");
         }
     }

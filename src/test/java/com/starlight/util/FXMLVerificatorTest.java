@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Unit tests for {@link FXMLVerificator} utility class.
  */
-public class FXMLVerificatorTest {
+class FXMLVerificatorTest {
     private Path tempDir;
     private Path tempFxmlFile;
 
@@ -38,12 +38,14 @@ public class FXMLVerificatorTest {
 
     @Test
     void testFxmlWithCorrectNamespace() throws IOException {
-        String validFxml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<AnchorPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-            "    <children>\n" +
-            "        <Label text=\"Hello World\" />\n" +
-            "    </children>\n" +
-            "</AnchorPane>";
+        String validFxml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Label text="Hello World" />
+                    </children>
+                </AnchorPane>
+                """;
         
         Files.writeString(tempFxmlFile, validFxml);
         
@@ -53,12 +55,14 @@ public class FXMLVerificatorTest {
 
     @Test
     void testFxmlWithIncorrectNamespace() throws IOException {
-        String fxmlWithOldNamespace = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<AnchorPane xmlns=\"http://javafx.com/javafx/11.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-            "    <children>\n" +
-            "        <Label text=\"Hello World\" />\n" +
-            "    </children>\n" +
-            "</AnchorPane>";
+        String fxmlWithOldNamespace = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <AnchorPane xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Label text="Hello World" />
+                    </children>
+                </AnchorPane>
+                """;
         
         Files.writeString(tempFxmlFile, fxmlWithOldNamespace);
         
@@ -74,12 +78,14 @@ public class FXMLVerificatorTest {
         Path testFxmlFile = resourcesDir.resolve("test_illegal.fxml");
         
         try {
-            String fxmlWithIllegalAttr = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<AnchorPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-                "    <children>\n" +
-                "        <Label text=\"Hello World\" fx:factory=\"someFactory\" />\n" +
-                "    </children>\n" +
-                "</AnchorPane>";
+            String fxmlWithIllegalAttr = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                        <children>
+                            <Label text="Hello World" fx:factory="someFactory" />
+                        </children>
+                    </AnchorPane>
+                    """;
             
             Files.writeString(testFxmlFile, fxmlWithIllegalAttr);
             
@@ -99,14 +105,16 @@ public class FXMLVerificatorTest {
         Path testFxmlFile = resourcesDir.resolve("test_unsupported.fxml");
         
         try {
-            String fxmlWithUnsupportedTag = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<AnchorPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-                "    <children>\n" +
-                "        <TextFlow>\n" +
-                "            <Text text=\"Unsupported content\" />\n" +
-                "        </TextFlow>\n" +
-                "    </children>\n" +
-                "</AnchorPane>";
+            String fxmlWithUnsupportedTag = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                        <children>
+                            <TextFlow>
+                                <Text text="Unsupported content" />
+                            </TextFlow>
+                        </children>
+                    </AnchorPane>
+                    """;
             
             Files.writeString(testFxmlFile, fxmlWithUnsupportedTag);
             
@@ -120,13 +128,15 @@ public class FXMLVerificatorTest {
 
     @Test
     void testFxmlWithCustomComponents() throws IOException {
-        String fxmlWithCustom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<AnchorPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-            "    <children>\n" +
-            "        <Button text=\"Standard Button\" />\n" +
-            "        <Label text=\"Standard Label\" />\n" +
-            "    </children>\n" +
-            "</AnchorPane>";
+        String fxmlWithCustom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Button text="Standard Button" />
+                        <Label text="Standard Label" />
+                    </children>
+                </AnchorPane>
+                """;
         
         Files.writeString(tempFxmlFile, fxmlWithCustom);
         
@@ -136,15 +146,17 @@ public class FXMLVerificatorTest {
 
     @Test
     void testFxmlWithMultipleNamespaceVersions() throws IOException {
-        String fxmlMultipleVersions = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<!-- This might contain mixed versions -->\n" +
-            "<AnchorPane xmlns=\"http://javafx.com/javafx/17.0.2\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-            "    <children>\n" +
-            "        <VBox xmlns=\"http://javafx.com/javafx/11.0.1\">\n" +
-            "            <Label text=\"Mixed versions\" />\n" +
-            "        </VBox>\n" +
-            "    </children>\n" +
-            "</AnchorPane>";
+        String fxmlMultipleVersions = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!-- This might contain mixed versions -->
+                <AnchorPane xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <VBox xmlns="http://javafx.com/javafx/11.0.1">
+                            <Label text="Mixed versions" />
+                        </VBox>
+                    </children>
+                </AnchorPane>
+                """;
         
         Files.writeString(tempFxmlFile, fxmlMultipleVersions);
         
@@ -154,37 +166,39 @@ public class FXMLVerificatorTest {
 
     @Test
     void testFxmlWithComplexStructure() throws IOException {
-        String complexFxml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<BorderPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-                "    <top>\n" +
-                "        <MenuBar>\n" +
-                "            <Menu text=\"File\">\n" +
-                "                <MenuItem text=\"New\" />\n" +
-                "                <MenuItem text=\"Open\" />\n" +
-                "            </Menu>\n" +
-                "        </MenuBar>\n" +
-                "    </top>\n" +
-                "    <center>\n" +
-                "        <TabPane>\n" +
-                "            <Tab text=\"Tab 1\">\n" +
-                "                <VBox>\n" +
-                "                    <Label text=\"Content 1\" />\n" +
-                "                    <TextField promptText=\"Enter text\" />\n" +
-                "                    <Button text=\"Submit\" />\n" +
-                "                </VBox>\n" +
-                "            </Tab>\n" +
-                "            <Tab text=\"Tab 2\">\n" +
-                "                <HBox>\n" +
-                "                    <Label text=\"Content 2\" />\n" +
-                "                    <CheckBox text=\"Option\" />\n" +
-                "                </HBox>\n" +
-                "            </Tab>\n" +
-                "        </TabPane>\n" +
-                "    </center>\n" +
-                "    <bottom>\n" +
-                "        <Label text=\"Status: Ready\" />\n" +
-                "    </bottom>\n" +
-                "</BorderPane>";
+        String complexFxml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <BorderPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                    <top>
+                        <MenuBar>
+                            <Menu text="File">
+                                <MenuItem text="New" />
+                                <MenuItem text="Open" />
+                            </Menu>
+                        </MenuBar>
+                    </top>
+                    <center>
+                        <TabPane>
+                            <Tab text="Tab 1">
+                                <VBox>
+                                    <Label text="Content 1" />
+                                    <TextField promptText="Enter text" />
+                                    <Button text="Submit" />
+                                </VBox>
+                            </Tab>
+                            <Tab text="Tab 2">
+                                <HBox>
+                                    <Label text="Content 2" />
+                                    <CheckBox text="Option" />
+                                </HBox>
+                            </Tab>
+                        </TabPane>
+                    </center>
+                    <bottom>
+                        <Label text="Status: Ready" />
+                    </bottom>
+                </BorderPane>
+                """;
         
         Files.writeString(tempFxmlFile, complexFxml);
         
@@ -202,12 +216,14 @@ public class FXMLVerificatorTest {
 
     @Test
     void testInvalidXmlFormat() throws IOException {
-        String invalidXml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-                "<AnchorPane xmlns=\"http://javafx.com/javafx/19\" xmlns:fx=\"http://javafx.com/fxml/1\">\n" +
-                "    <children>\n" +
-                "        <Label text=\"Unclosed tag\"\n" +
-                "    </children>\n" +
-                "</AnchorPane>";
+        String invalidXml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1">
+                    <children>
+                        <Label text="Unclosed tag"
+                    </children>
+                </AnchorPane>
+                """;
         
         Files.writeString(tempFxmlFile, invalidXml);
         

@@ -8,16 +8,17 @@ import java.time.format.DateTimeFormatter;
  */
 public class ChatMessage {
     /** The message content. */
-    public String content;
+    private String content;
     
     /** True if this message is from the user, false if from the AI assistant. */
-    public boolean isUser;
+    private boolean isUser;
     
     /** Timestamp when the message was created. */
-    public String timestamp;
+    private String timestamp;
     
     /** The user who sent the message (for user messages). */
-    public String username;
+    private String username;
+    public static final String AI_USERNAME = "TabemonPal AI";
     
     /**
      * Default constructor for XML serialization.
@@ -35,9 +36,19 @@ public class ChatMessage {
     public ChatMessage(String content, boolean isUser, String username) {
         this.content = content;
         this.isUser = isUser;
-        this.username = isUser ? username : "TabemonPal AI";
+        this.username = isUser ? username : AI_USERNAME;
         this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
+
+    // Accessors
+    public String getContent() { return content; }
+    public void setContent(String content) { this.content = content; }
+    public boolean isUser() { return isUser; }
+    public void setUser(boolean user) { isUser = user; }
+    public String getTimestamp() { return timestamp; }
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
     
     /**
      * Gets a formatted timestamp for display.
@@ -57,7 +68,7 @@ public class ChatMessage {
     public String toString() {
         return String.format("[%s] %s: %s", 
             getFormattedTimestamp(), 
-            isUser ? username : "TabemonPal AI", 
+            isUser ? username : AI_USERNAME, 
             content.substring(0, Math.min(50, content.length())) + (content.length() > 50 ? "..." : ""));
     }
 }

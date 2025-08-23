@@ -41,17 +41,15 @@ import java.util.logging.Logger;
 public class UserManagerController implements Initializable {
 
     private static final Logger logger = Logger.getLogger(UserManagerController.class.getName());
+    private static final String ADMIN_USERNAME = "admin";
+    private static final String STATUS_COLUMN_TITLE = "Status";
+    private static final String VALIDATION_ERROR_TITLE = "Validation Error";
+    private static final String ERROR_TITLE = "Error";
 
     @FXML
     private MFXTableView<UserTableData> postsTable;
 
-    // Create table columns programmatically instead of FXML injection
-    private MFXTableColumn<UserTableData> usernameColumn;
-    private MFXTableColumn<UserTableData> fullNameColumn;
-    private MFXTableColumn<UserTableData> emailColumn;
-    private MFXTableColumn<UserTableData> statusColumn;
-    private MFXTableColumn<UserTableData> postsCountColumn;
-    private MFXTableColumn<UserTableData> actionColumn;
+    // Table columns are created as locals in setupTableColumns() to reduce field clutter
 
     @FXML
     private MFXComboBox<String> sortComboBox;
@@ -86,16 +84,16 @@ public class UserManagerController implements Initializable {
 
         public UserTableData(User user, int userPostsCount) {
             this.originalUser = user;
-            this.email = new SimpleStringProperty(user.email != null ? user.email : "");
-            this.username = new SimpleStringProperty(user.username != null ? user.username : "");
-            this.fullName = new SimpleStringProperty(user.fullname != null ? user.fullname : "");
+                this.email = new SimpleStringProperty(user.getEmail() != null ? user.getEmail() : "");
+                this.username = new SimpleStringProperty(user.getUsername() != null ? user.getUsername() : "");
+                this.fullName = new SimpleStringProperty(user.getFullname() != null ? user.getFullname() : "");
             this.joinDate = new SimpleStringProperty("N/A"); // User model doesn't have creation date
             this.status = new SimpleStringProperty(determineUserStatus(user));
             this.postsCount = new SimpleStringProperty(String.valueOf(userPostsCount));
         }
         
         private static String determineUserStatus(User user) {
-            if (user.username != null && user.username.toLowerCase().equals("admin")) {
+            if (user.getUsername() != null && user.getUsername().equalsIgnoreCase(ADMIN_USERNAME)) {
                 return "Admin";
             }
             // You can add more status logic here based on user properties
@@ -161,8 +159,7 @@ public class UserManagerController implements Initializable {
         }
         
         // Only allow access for users with exact username "admin"
-        return currentUser.username != null && 
-               currentUser.username.toLowerCase().equals("admin");
+    return currentUser.getUsername() != null && currentUser.getUsername().equalsIgnoreCase(ADMIN_USERNAME);
     }
     
     /**
@@ -187,13 +184,13 @@ public class UserManagerController implements Initializable {
     private void setupTableColumns() {
         logger.info("Setting up MFXTableView columns for users...");
         
-        // Create table columns programmatically
-        usernameColumn = new MFXTableColumn<>("Username");
-        fullNameColumn = new MFXTableColumn<>("Full Name");
-        emailColumn = new MFXTableColumn<>("Email");
-        statusColumn = new MFXTableColumn<>("Status");
-        postsCountColumn = new MFXTableColumn<>("Posts");
-        actionColumn = new MFXTableColumn<>("Actions");
+    // Create table columns programmatically (locals)
+    MFXTableColumn<UserTableData> usernameColumn = new MFXTableColumn<>("Username");
+    MFXTableColumn<UserTableData> fullNameColumn = new MFXTableColumn<>("Full Name");
+    MFXTableColumn<UserTableData> emailColumn = new MFXTableColumn<>("Email");
+    MFXTableColumn<UserTableData> statusColumn = new MFXTableColumn<>(STATUS_COLUMN_TITLE);
+    MFXTableColumn<UserTableData> postsCountColumn = new MFXTableColumn<>("Posts");
+    MFXTableColumn<UserTableData> actionColumn = new MFXTableColumn<>("Actions");
 
         // Set preferred widths
         usernameColumn.setPrefWidth(120.0);
@@ -235,7 +232,7 @@ public class UserManagerController implements Initializable {
             deleteButton.setOnAction(event -> showDeleteConfirmation(item));
             
             // Disable delete for admin users
-            if (item.getUsername().toLowerCase().equals("admin")) {
+            if (item.getUsername().equalsIgnoreCase(ADMIN_USERNAME)) {
                 deleteButton.setDisable(true);
                 deleteButton.setStyle("-fx-background-color: #cccccc; -fx-text-fill: white; -fx-font-size: 12px; -fx-pref-width: 60px;");
             }
@@ -331,26 +328,26 @@ public class UserManagerController implements Initializable {
             if (dialogButton == saveButtonType) {
                 // Validate input
                 if (usernameField.getText().trim().isEmpty()) {
-                    showErrorAlert("Validation Error", "Username cannot be empty.");
+                    showErrorAlert(VALIDATION_ERROR_TITLE, "Username cannot be empty.");
                     return null;
                 }
                 
                 if (emailField.getText().trim().isEmpty()) {
-                    showErrorAlert("Validation Error", "Email cannot be empty.");
+                    showErrorAlert(VALIDATION_ERROR_TITLE, "Email cannot be empty.");
                     return null;
                 }
                 
                 // Basic email validation
                 if (!emailField.getText().contains("@")) {
-                    showErrorAlert("Validation Error", "Please enter a valid email address.");
+                    showErrorAlert(VALIDATION_ERROR_TITLE, "Please enter a valid email address.");
                     return null;
                 }
 
                 // Create updated user
                 User updatedUser = data.getOriginalUser();
-                updatedUser.username = usernameField.getText().trim();
-                updatedUser.fullname = fullNameField.getText().trim();
-                updatedUser.email = emailField.getText().trim();
+                updatedUser.setUsername(usernameField.getText().trim());
+                updatedUser.setFullname(fullNameField.getText().trim());
+                updatedUser.setEmail(emailField.getText().trim());
                 // Note: You might want to add more fields to User model for status management
                 
                 return updatedUser;
@@ -364,9 +361,9 @@ public class UserManagerController implements Initializable {
             saveUserChanges(updatedUser);
             
             // Update the table data
-            data.username.set(updatedUser.username);
-            data.fullName.set(updatedUser.fullname);
-            data.email.set(updatedUser.email);
+            data.username.set(updatedUser.getUsername());
+            data.fullName.set(updatedUser.getFullname());
+            data.email.set(updatedUser.getEmail());
             
             // Refresh the table
             postsTable.update();
@@ -383,7 +380,7 @@ public class UserManagerController implements Initializable {
             "Username (A-Z)", "Username (Z-A)", 
             "Full Name (A-Z)", "Full Name (Z-A)",
             "Email (A-Z)", "Email (Z-A)",
-            "Status", "Posts Count (High-Low)", "Posts Count (Low-High)"
+            STATUS_COLUMN_TITLE, "Posts Count (High-Low)", "Posts Count (Low-High)"
         );
 
         sortComboBox.setItems(sortOptions);
@@ -420,7 +417,7 @@ public class UserManagerController implements Initializable {
                     List<UserTableData> tableData = users.stream()
                         .map(user -> {
                             int userPostsCount = (int) posts.stream()
-                                .filter(post -> post.username != null && post.username.equals(user.username))
+                                .filter(post -> post.getUsername() != null && post.getUsername().equals(user.getUsername()))
                                 .count();
                             return new UserTableData(user, userPostsCount);
                         })
@@ -475,14 +472,12 @@ public class UserManagerController implements Initializable {
             }
         };
 
-        loadTask.setOnFailed(e -> {
-            Platform.runLater(() -> {
-                loadingIndicator.setVisible(false);
-                logger.severe("Failed to load data: " + e.getSource().getException());
-                e.getSource().getException().printStackTrace();
-                showErrorAlert("Error", "Failed to load data from XML files: " + e.getSource().getException().getMessage());
-            });
-        });
+        loadTask.setOnFailed(e -> Platform.runLater(() -> {
+            loadingIndicator.setVisible(false);
+            logger.severe("Failed to load data: " + e.getSource().getException());
+            e.getSource().getException().printStackTrace();
+            showErrorAlert(ERROR_TITLE, "Failed to load data from XML files: " + e.getSource().getException().getMessage());
+        }));
 
         new Thread(loadTask).start();
     }
@@ -512,7 +507,7 @@ public class UserManagerController implements Initializable {
             case "Email (Z-A)":
                 comparator = Comparator.comparing(UserTableData::getEmail).reversed();
                 break;
-            case "Status":
+            case STATUS_COLUMN_TITLE:
                 comparator = Comparator.comparing(UserTableData::getStatus);
                 break;
             case "Posts Count (High-Low)":
@@ -533,6 +528,9 @@ public class UserManagerController implements Initializable {
                     }
                 });
                 break;
+            default:
+                // No action; unknown sort option
+                break;
         }
 
         if (comparator != null) {
@@ -545,7 +543,7 @@ public class UserManagerController implements Initializable {
      */
     private void showDeleteConfirmation(UserTableData data) {
         // Prevent deletion of admin user
-        if (data.getUsername().toLowerCase().equals("admin")) {
+    if (data.getUsername().equalsIgnoreCase(ADMIN_USERNAME)) {
             showErrorAlert("Cannot Delete", "Admin user cannot be deleted.");
             return;
         }
@@ -574,7 +572,7 @@ public class UserManagerController implements Initializable {
                 // Also delete all posts by this user
                 List<Post> allPosts = postRepository.loadPosts();
                 List<Post> postsToKeep = allPosts.stream()
-                    .filter(post -> !post.username.equals(data.getUsername()))
+                    .filter(post -> !post.getUsername().equals(data.getUsername()))
                     .collect(Collectors.toList());
                 
                 if (postsToKeep.size() < allPosts.size()) {
@@ -589,11 +587,11 @@ public class UserManagerController implements Initializable {
                 
                 showSuccessAlert("Success", "User and their posts deleted successfully!");
             } else {
-                showErrorAlert("Error", "User not found or could not be deleted.");
+                showErrorAlert(ERROR_TITLE, "User not found or could not be deleted.");
             }
 
         } catch (Exception e) {
-            showErrorAlert("Error", "Failed to delete user: " + e.getMessage());
+            showErrorAlert(ERROR_TITLE, "Failed to delete user: " + e.getMessage());
         }
     }
 
@@ -606,7 +604,7 @@ public class UserManagerController implements Initializable {
             
             // Find and update the user (using email as identifier)
             for (int i = 0; i < allUsers.size(); i++) {
-                if (allUsers.get(i).email != null && allUsers.get(i).email.equals(user.email)) {
+                if (allUsers.get(i).getEmail() != null && allUsers.get(i).getEmail().equals(user.getEmail())) {
                     allUsers.set(i, user);
                     break;
                 }
@@ -614,7 +612,7 @@ public class UserManagerController implements Initializable {
 
             userRepository.saveUsers(allUsers);
         } catch (Exception e) {
-            showErrorAlert("Error", "Failed to save changes: " + e.getMessage());
+            showErrorAlert(ERROR_TITLE, "Failed to save changes: " + e.getMessage());
         }
     }
 

@@ -38,8 +38,15 @@ import com.starlight.util.ImageUtils;
  */
 public class EditProfileController implements Initializable {
     private static final Logger logger = Logger.getLogger(EditProfileController.class.getName());
+    
+    // Dialog result type constants
+    private static final String ACCOUNT_UPDATED_SUCCESS = "account_updated_success";
+    private static final String ACCOUNT_UPDATE_FAILED = "account_update_failed";
+    private static final String ACCOUNT_DELETED_SUCCESS = "account_deleted_success";
+    private static final String ACCOUNT_DELETION_FAILED = "account_deletion_failed";
+    
     @FXML
-    private ImageView Image;
+    private ImageView image;
 
     @FXML
     private MFXButton imagepicker;
@@ -68,17 +75,17 @@ public class EditProfileController implements Initializable {
 
     public void setUser(User user) {
         this.currentUser = user;
-        if (welcomeLabel != null) welcomeLabel.setText("Hello, " + user.username);
-        if (emailField != null) emailField.setText(user.email);
-        if (passwordField != null) passwordField.setText(user.password);
-        if (birthDayPicker != null && user.birthDay != null && !user.birthDay.isEmpty()) {
-            birthDayPicker.setValue(java.time.LocalDate.parse(user.birthDay));
+        if (welcomeLabel != null) welcomeLabel.setText("Hello, " + user.getUsername());
+        if (emailField != null) emailField.setText(user.getEmail());
+        if (passwordField != null) passwordField.setText(user.getPassword());
+        if (birthDayPicker != null && user.getBirthDay() != null && !user.getBirthDay().isEmpty()) {
+            birthDayPicker.setValue(java.time.LocalDate.parse(user.getBirthDay()));
         }
         
         // Load and scale profile image using ImageUtils
-        if (Image != null) {
-            ImageUtils.loadImage(Image, user.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
-            ImageUtils.scaleToFit(Image, 170, 170, 200);
+        if (image != null) {
+            ImageUtils.loadImage(image, user.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.scaleToFit(image, 170, 170, 200);
         }
     }
 
@@ -100,10 +107,10 @@ public class EditProfileController implements Initializable {
      */
     private void loadCurrentUserProfileImage() {
         User currentSessionUser = Session.getCurrentUser();
-        if (currentSessionUser != null && Image != null) {
+        if (currentSessionUser != null && image != null) {
             // Load profile image using ImageUtils
-            ImageUtils.loadImage(Image, currentSessionUser.profilepicture, ImageUtils.DEFAULT_MISSING_IMAGE);
-            ImageUtils.scaleToFit(Image, 170, 170, 85); // Circular profile image with rounded corners
+            ImageUtils.loadImage(image, currentSessionUser.getProfilepicture(), ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.scaleToFit(image, 170, 170, 85); // Circular profile image with rounded corners
         }
     }
     
@@ -143,7 +150,7 @@ public class EditProfileController implements Initializable {
             
             // Copy the selected file to the user's directory
             String copiedFilePath = com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(
-                selectedFile, currentSessionUser.username);
+                selectedFile, currentSessionUser.getUsername());
             
             if (copiedFilePath == null) {
                 logger.warning("Failed to copy image file to user directory");
@@ -151,19 +158,19 @@ public class EditProfileController implements Initializable {
             }
             
             // Update the current user's profile picture path
-            currentSessionUser.profilepicture = copiedFilePath;
+            currentSessionUser.setProfilepicture(copiedFilePath);
             
             // Also update currentUser if it's set
             if (currentUser != null) {
-                currentUser.profilepicture = copiedFilePath;
+                currentUser.setProfilepicture(copiedFilePath);
             }
             
             // Update the UserData XML file
             com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
             java.util.List<com.starlight.model.User> users = repo.loadUsers();
             for (com.starlight.model.User u : users) {
-                if (u.username.equals(currentSessionUser.username)) {
-                    u.profilepicture = copiedFilePath;
+                if (u.getUsername().equals(currentSessionUser.getUsername())) {
+                    u.setProfilepicture(copiedFilePath);
                     break;
                 }
             }
@@ -172,9 +179,9 @@ public class EditProfileController implements Initializable {
             // Refresh the profile image display
             loadCurrentUserProfileImage();
             
-            logger.info("Profile image updated successfully: " + copiedFilePath);
+            logger.info(() -> "Profile image updated successfully: " + copiedFilePath);
         } catch (Exception e) {
-            logger.warning("Failed to update profile image: " + e.getMessage());
+            logger.warning(() -> "Failed to update profile image: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -189,15 +196,15 @@ public class EditProfileController implements Initializable {
             String newPass = passwordField.getText();
             String birth = birthDayPicker.getValue() != null ? birthDayPicker.getValue().toString() : null;
             try {
-                URL endpoint = new URL("http://localhost:8000/users/" + currentUser.username);
+                URL endpoint = new URL("http://localhost:8000/users/" + currentUser.getUsername());
                 HttpURLConnection conn = (HttpURLConnection) endpoint.openConnection();
                 conn.setRequestMethod("PUT");
                 conn.setRequestProperty("Content-Type", "application/xml");
                 conn.setDoOutput(true);
                 User u = new User();
-                u.email = newEmail;
-                u.password = newPass;
-                u.birthDay = birth;
+                u.setEmail(newEmail);
+                u.setPassword(newPass);
+                u.setBirthDay(birth);
                 XStream xs = new XStream(new DomDriver());
                 xs.allowTypesByWildcard(new String[]{"com.starlight.model.*"});
                 xs.alias("user", User.class);
@@ -207,14 +214,15 @@ public class EditProfileController implements Initializable {
                 }
                 if (conn.getResponseCode() == 200) {
                     logger.info("User updated successfully");
-                    showResultDialog("account_updated_success");
+                    showResultDialog(ACCOUNT_UPDATED_SUCCESS);
                 } else {
-                    logger.info("Update failed: " + conn.getResponseCode());
-                    showResultDialog("account_update_failed");
+                    int responseCode = conn.getResponseCode();
+                    logger.info(() -> "Update failed: " + responseCode);
+                    showResultDialog(ACCOUNT_UPDATE_FAILED);
                 }
             } catch (Exception e) {
-                logger.log(Level.SEVERE, "Failed to update user: " + e.getMessage(), e);
-                showResultDialog("account_update_failed");
+                logger.log(Level.SEVERE, "Failed to update user: {0}", e.getMessage());
+                showResultDialog(ACCOUNT_UPDATE_FAILED);
             }
         });
 
@@ -223,7 +231,7 @@ public class EditProfileController implements Initializable {
 
         User currentSessionUser = Session.getCurrentUser();
         if (currentSessionUser != null && welcomeLabel != null) {
-            welcomeLabel.setText("Hello, " + currentSessionUser.username);
+            welcomeLabel.setText("Hello, " + currentSessionUser.getUsername());
         }
         
         // Load the current user's profile image
@@ -242,18 +250,18 @@ public class EditProfileController implements Initializable {
         com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
         java.util.List<com.starlight.model.User> users = repo.loadUsers();
         for (com.starlight.model.User u : users) {
-            if (u.username.equals(currentUser.username)) {
-                u.email = email;
-                u.password = password;
-                u.birthDay = birthDay != null ? birthDay.toString() : null;
+        if (u.getUsername().equals(currentUser.getUsername())) {
+        u.setEmail(email);
+        u.setPassword(password);
+        u.setBirthDay(birthDay != null ? birthDay.toString() : null);
                 break;
             }
         }
         repo.saveUsers(users);
         logger.info("User updated successfully");
-        currentUser.email = email;
-        currentUser.password = password;
-        currentUser.birthDay = birthDay != null ? birthDay.toString() : null;
+    currentUser.setEmail(email);
+    currentUser.setPassword(password);
+    currentUser.setBirthDay(birthDay != null ? birthDay.toString() : null);
         
         // Refresh the profile image in case it was updated
         loadCurrentUserProfileImage();
@@ -264,11 +272,11 @@ public class EditProfileController implements Initializable {
         try {
             // Remove user from UserDataRepository using the new deleteUser method
             com.starlight.repository.UserDataRepository repo = new com.starlight.repository.UserDataRepository();
-            boolean userDeleted = repo.deleteUser(currentUser.username);
+            boolean userDeleted = repo.deleteUser(currentUser.getUsername());
             
             if (!userDeleted) {
                 logger.warning("User could not be deleted.");
-                showResultDialog("account_deletion_failed");
+                showResultDialog(ACCOUNT_DELETION_FAILED);
                 return;
             }
             
@@ -281,7 +289,7 @@ public class EditProfileController implements Initializable {
             }
             
             // Show success message first
-            showResultDialog("account_deleted_success");
+            showResultDialog(ACCOUNT_DELETED_SUCCESS);
             
             // Load the authorization view
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/Authorization.fxml"));
@@ -300,8 +308,8 @@ public class EditProfileController implements Initializable {
             logger.info("User account deleted successfully");
             
         } catch (IOException e) {
-            logger.log(Level.WARNING, "Failed to load authorization view: " + e.getMessage(), e);
-            showResultDialog("account_deletion_failed");
+            logger.log(Level.WARNING, "Failed to load authorization view: {0}", e.getMessage());
+            showResultDialog(ACCOUNT_DELETION_FAILED);
             
             // Fallback to previous behavior if authorization view can't be loaded
             Stage currentStage = (Stage) deleteaccbutton.getScene().getWindow();
@@ -313,8 +321,8 @@ public class EditProfileController implements Initializable {
                 previousStage.requestFocus();
             }
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to delete account: " + e.getMessage(), e);
-            showResultDialog("account_deletion_failed");
+            logger.log(Level.SEVERE, "Failed to delete account: {0}", e.getMessage());
+            showResultDialog(ACCOUNT_DELETION_FAILED);
         }
     }
     
@@ -330,16 +338,16 @@ public class EditProfileController implements Initializable {
             
             // Set appropriate message based on result type
             switch (resultType) {
-                case "account_updated_success":
+                case ACCOUNT_UPDATED_SUCCESS:
                     controller.setAccountUpdatedSuccess();
                     break;
-                case "account_update_failed":
+                case ACCOUNT_UPDATE_FAILED:
                     controller.setAccountUpdateFailed();
                     break;
-                case "account_deleted_success":
+                case ACCOUNT_DELETED_SUCCESS:
                     controller.setAccountDeletedSuccess();
                     break;
-                case "account_deletion_failed":
+                case ACCOUNT_DELETION_FAILED:
                     controller.setAccountDeletionFailed();
                     break;
                 default:
@@ -360,7 +368,7 @@ public class EditProfileController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Failed to show result dialog: " + e.getMessage(), e);
+            logger.log(Level.SEVERE, "Failed to show result dialog: {0}", e.getMessage());
         }
     }
 

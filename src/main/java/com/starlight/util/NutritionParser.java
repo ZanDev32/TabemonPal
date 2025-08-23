@@ -14,6 +14,10 @@ import java.util.regex.Matcher;
  */
 public class NutritionParser {
     private static final Logger logger = Logger.getLogger(NutritionParser.class.getName());
+    private static final String NUTRITION_END_TAG = "</nutrition>";
+    private static final String UNKNOWN_VERDICT = "Unknown";
+    // Reused fragment for matching unit and value inside a tag
+    private static final String UNIT_VALUE_FRAGMENT = "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</";
     
     /**
      * Parses nutrition XML from AI response and returns a Nutrition object.
@@ -41,7 +45,9 @@ public class NutritionParser {
             return nutrition != null ? nutrition : createFallbackNutrition();
             
         } catch (Exception e) {
-            logger.log(Level.WARNING, "Failed to parse nutrition XML: " + e.getMessage(), e);
+            if (logger.isLoggable(Level.WARNING)) {
+                logger.log(Level.WARNING, () -> "Failed to parse nutrition XML: " + e.getMessage());
+            }
             return createFallbackNutrition();
         }
     }
@@ -52,10 +58,10 @@ public class NutritionParser {
     private String extractXmlFromResponse(String response) {
         // Look for nutrition XML tags (with or without attributes)
         int startIndex = response.indexOf("<nutrition");
-        int endIndex = response.lastIndexOf("</nutrition>");
+    int endIndex = response.lastIndexOf(NUTRITION_END_TAG);
         
         if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
-            return response.substring(startIndex, endIndex + "</nutrition>".length());
+            return response.substring(startIndex, endIndex + NUTRITION_END_TAG.length());
         }
         
         // If no proper XML found, try to find any XML-like content
@@ -64,7 +70,7 @@ public class NutritionParser {
         
         if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
             String potentialXml = response.substring(startIndex, endIndex + 1);
-            if (potentialXml.contains("<nutrition") && potentialXml.contains("</nutrition>")) {
+            if (potentialXml.contains("<nutrition") && potentialXml.contains(NUTRITION_END_TAG)) {
                 return potentialXml;
             }
         }
@@ -76,7 +82,7 @@ public class NutritionParser {
      * Parses nutrition XML using regex patterns.
      */
     private Nutrition parseXmlWithRegex(String xmlContent) {
-        Nutrition nutrition = new Nutrition();
+    Nutrition nutrition = new Nutrition();
         
         // Parse verdict attribute from nutrition tag
         Pattern verdictPattern = Pattern.compile("<nutrition\\s+verdict=\"([^\"]*?)\"", Pattern.DOTALL);
@@ -85,16 +91,16 @@ public class NutritionParser {
             String verdict = verdictMatcher.group(1).trim();
             // Validate verdict value
             if (verdict.equals("Healthy") || verdict.equals("Moderate") || 
-                verdict.equals("Unhealthy") || verdict.equals("Junk Food") || verdict.equals("Unknown")) {
-                nutrition.verdict = verdict;
+                verdict.equals("Unhealthy") || verdict.equals("Junk Food") || verdict.equals(UNKNOWN_VERDICT)) {
+                nutrition.setVerdict(verdict);
             } else {
-                nutrition.verdict = "Unknown"; // Default fallback
+                nutrition.setVerdict(UNKNOWN_VERDICT); // Default fallback
             }
         }
         
         // Pattern to match ingredient blocks
         Pattern ingredientPattern = Pattern.compile(
-            "<ingredient\\s+name=\"([^\"]*?)\"\\s+amount=\"([^\"]*?)\">(.*?)</ingredient>", 
+            "<ingredient\\s+name=\"([^\"]*?)\"\\s+amount=\"([^\"]*?)\">(.*?)</ingredient>",
             Pattern.DOTALL
         );
         
@@ -106,29 +112,49 @@ public class NutritionParser {
             String content = ingredientMatcher.group(3);
             
             Nutrition.NutritionIngredient ingredient = new Nutrition.NutritionIngredient();
-            ingredient.name = name;
-            ingredient.amount = amount;
-            
-            // Parse nutrition values
-            ingredient.calories = parseCaloriesValue(content, "calories", "kcal");
-            ingredient.protein = parseProteinValue(content, "protein", "g");
-            ingredient.fat = parseFatValue(content, "fat", "g");
-            ingredient.carbohydrates = parseCarbohydratesValue(content, "carbohydrates", "g");
-            ingredient.fiber = parseFiberValue(content, "fiber", "g");
-            ingredient.sugar = parseSugarValue(content, "sugar", "g");
-            ingredient.salt = parseSaltValue(content, "salt", "mg");
-            
-            nutrition.ingredient.add(ingredient);
+            ingredient.setName(name);
+            ingredient.setAmount(amount);
+
+            // Parse nutrition values and copy into the ingredient's nested objects
+            Nutrition.Calories cals = parseCaloriesValue(content, "calories");
+            ingredient.getCalories().setValue(cals.getValue());
+            ingredient.getCalories().setUnit(cals.getUnit());
+
+            Nutrition.Protein prot = parseProteinValue(content, "protein");
+            ingredient.getProtein().setValue(prot.getValue());
+            ingredient.getProtein().setUnit(prot.getUnit());
+
+            Nutrition.Fat fat = parseFatValue(content, "fat");
+            ingredient.getFat().setValue(fat.getValue());
+            ingredient.getFat().setUnit(fat.getUnit());
+
+            Nutrition.Carbohydrates carbs = parseCarbohydratesValue(content, "carbohydrates");
+            ingredient.getCarbohydrates().setValue(carbs.getValue());
+            ingredient.getCarbohydrates().setUnit(carbs.getUnit());
+
+            Nutrition.Fiber fiber = parseFiberValue(content, "fiber");
+            ingredient.getFiber().setValue(fiber.getValue());
+            ingredient.getFiber().setUnit(fiber.getUnit());
+
+            Nutrition.Sugar sugar = parseSugarValue(content, "sugar");
+            ingredient.getSugar().setValue(sugar.getValue());
+            ingredient.getSugar().setUnit(sugar.getUnit());
+
+            Nutrition.Salt salt = parseSaltValue(content, "salt");
+            ingredient.getSalt().setValue(salt.getValue());
+            ingredient.getSalt().setUnit(salt.getUnit());
+
+            nutrition.getIngredient().add(ingredient);
         }
         
-        return nutrition.ingredient.isEmpty() ? null : nutrition;
+        return nutrition.getIngredient().isEmpty() ? null : nutrition;
     }
     
     /**
      * Parses calories values from XML content.
      */
-    private Nutrition.Calories parseCaloriesValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Calories parseCaloriesValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -136,18 +162,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Calories calories = new Nutrition.Calories(validateNumericValue(value));
-            calories.unit = unit;
+            calories.setUnit(unit);
             return calories;
         }
         
-        return new Nutrition.Calories("0");
+    return new Nutrition.Calories("0");
     }
     
     /**
      * Parses protein values from XML content.
      */
-    private Nutrition.Protein parseProteinValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Protein parseProteinValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -155,18 +181,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Protein protein = new Nutrition.Protein(validateNumericValue(value));
-            protein.unit = unit;
+            protein.setUnit(unit);
             return protein;
         }
         
-        return new Nutrition.Protein("0");
+    return new Nutrition.Protein("0");
     }
     
     /**
      * Parses fat values from XML content.
      */
-    private Nutrition.Fat parseFatValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Fat parseFatValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -174,18 +200,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Fat fat = new Nutrition.Fat(validateNumericValue(value));
-            fat.unit = unit;
+            fat.setUnit(unit);
             return fat;
         }
         
-        return new Nutrition.Fat("0");
+    return new Nutrition.Fat("0");
     }
     
     /**
      * Parses carbohydrates values from XML content.
      */
-    private Nutrition.Carbohydrates parseCarbohydratesValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Carbohydrates parseCarbohydratesValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -193,18 +219,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Carbohydrates carbohydrates = new Nutrition.Carbohydrates(validateNumericValue(value));
-            carbohydrates.unit = unit;
+            carbohydrates.setUnit(unit);
             return carbohydrates;
         }
         
-        return new Nutrition.Carbohydrates("0");
+    return new Nutrition.Carbohydrates("0");
     }
     
     /**
      * Parses fiber values from XML content.
      */
-    private Nutrition.Fiber parseFiberValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Fiber parseFiberValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -212,18 +238,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Fiber fiber = new Nutrition.Fiber(validateNumericValue(value));
-            fiber.unit = unit;
+            fiber.setUnit(unit);
             return fiber;
         }
         
-        return new Nutrition.Fiber("0");
+    return new Nutrition.Fiber("0");
     }
     
     /**
      * Parses sugar values from XML content.
      */
-    private Nutrition.Sugar parseSugarValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Sugar parseSugarValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -231,18 +257,18 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Sugar sugar = new Nutrition.Sugar(validateNumericValue(value));
-            sugar.unit = unit;
+            sugar.setUnit(unit);
             return sugar;
         }
         
-        return new Nutrition.Sugar("0");
+    return new Nutrition.Sugar("0");
     }
     
     /**
      * Parses salt values from XML content.
      */
-    private Nutrition.Salt parseSaltValue(String content, String tagName, String defaultUnit) {
-        Pattern pattern = Pattern.compile("<" + tagName + "\\s+unit=\"([^\"]*?)\"[^>]*>([^<]*)</" + tagName + ">");
+    private Nutrition.Salt parseSaltValue(String content, String tagName) {
+        Pattern pattern = Pattern.compile("<" + tagName + UNIT_VALUE_FRAGMENT + tagName + ">");
         Matcher matcher = pattern.matcher(content);
         
         if (matcher.find()) {
@@ -250,11 +276,11 @@ public class NutritionParser {
             String value = matcher.group(2).trim();
             
             Nutrition.Salt salt = new Nutrition.Salt(validateNumericValue(value));
-            salt.unit = unit;
+            salt.setUnit(unit);
             return salt;
         }
         
-        return new Nutrition.Salt("0");
+    return new Nutrition.Salt("0");
     }
     
     /**
@@ -278,21 +304,22 @@ public class NutritionParser {
      * Creates a fallback nutrition object when parsing fails.
      */
     private Nutrition createFallbackNutrition() {
-        Nutrition nutrition = new Nutrition();
-        nutrition.verdict = "Unknown"; // Default verdict for unanalyzed recipes
-        
-        Nutrition.NutritionIngredient fallback = new Nutrition.NutritionIngredient();
-        fallback.name = "Recipe";
-        fallback.amount = "1 serving";
-        fallback.calories = new Nutrition.Calories("0");
-        fallback.protein = new Nutrition.Protein("0");
-        fallback.fat = new Nutrition.Fat("0");
-        fallback.carbohydrates = new Nutrition.Carbohydrates("0");
-        fallback.fiber = new Nutrition.Fiber("0");
-        fallback.sugar = new Nutrition.Sugar("0");
-        fallback.salt = new Nutrition.Salt("0");
-        
-        nutrition.ingredient.add(fallback);
-        return nutrition;
+    Nutrition nutrition = new Nutrition();
+    nutrition.setVerdict(UNKNOWN_VERDICT); // Default verdict for unanalyzed recipes
+
+    Nutrition.NutritionIngredient fallback = new Nutrition.NutritionIngredient();
+    fallback.setName("Recipe");
+    fallback.setAmount("1 serving");
+    // Set nested numeric defaults
+    fallback.getCalories().setValue("0");
+    fallback.getProtein().setValue("0");
+    fallback.getFat().setValue("0");
+    fallback.getCarbohydrates().setValue("0");
+    fallback.getFiber().setValue("0");
+    fallback.getSugar().setValue("0");
+    fallback.getSalt().setValue("0");
+
+    nutrition.getIngredient().add(fallback);
+    return nutrition;
     }
 }

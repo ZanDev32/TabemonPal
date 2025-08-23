@@ -53,8 +53,8 @@ public class ApiClient {
             conn.setDoOutput(true);
 
             User creds = new User();
-            creds.email = emailOrUsername;
-            creds.password = password;
+            creds.setEmail(emailOrUsername);
+            creds.setPassword(password);
 
             writeXmlToConnection(conn, creds);
 
@@ -85,9 +85,9 @@ public class ApiClient {
             conn.setDoOutput(true);
             
             User newUser = new User();
-            newUser.username = username;
-            newUser.email = email;
-            newUser.password = password;
+            newUser.setUsername(username);
+            newUser.setEmail(email);
+            newUser.setPassword(password);
             
             writeXmlToConnection(conn, newUser);
             

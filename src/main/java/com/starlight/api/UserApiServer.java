@@ -114,11 +114,11 @@ public class UserApiServer {
             User creds = (User) xstream.fromXML(body);
             
             // First check local users (admin and user accounts)
-            String loginIdentifier = creds.email; // This could be username or email
-            User localUser = localRepository.validateCredentials(loginIdentifier, creds.password);
+            String loginIdentifier = creds.getEmail(); // This could be username or email
+            User localUser = localRepository.validateCredentials(loginIdentifier, creds.getPassword());
             
             if (localUser != null) {
-                logger.log(Level.INFO, "Local user authenticated: {0}", localUser.username);
+                logger.log(Level.INFO, "Local user authenticated: {0}", localUser.getUsername());
                 sendXml(exchange, 200, xstream.toXML(localUser));
                 return;
             }
@@ -128,9 +128,9 @@ public class UserApiServer {
             
             // Check for either email or username match
             Optional<User> match = users.stream()
-                    .filter(u -> ((u.email != null && u.email.equals(creds.email)) || 
-                                 (u.username != null && u.username.equals(creds.email))) && 
-                                 u.password != null && u.password.equals(creds.password))
+                    .filter(u -> ((u.getEmail() != null && u.getEmail().equals(creds.getEmail())) || 
+                                 (u.getUsername() != null && u.getUsername().equals(creds.getEmail()))) && 
+                                 u.getPassword() != null && u.getPassword().equals(creds.getPassword()))
                     .findFirst();
                     
             if (match.isPresent()) {
@@ -162,12 +162,12 @@ public class UserApiServer {
             User newUser = (User) xstream.fromXML(body);
             
             // Set default profile picture for new users
-            if (newUser.profilepicture == null || newUser.profilepicture.trim().isEmpty()) {
-                newUser.profilepicture = "src/main/resources/com/starlight/images/dummy/profiledefault.png";
+            if (newUser.getProfilepicture() == null || newUser.getProfilepicture().trim().isEmpty()) {
+                newUser.setProfilepicture("src/main/resources/com/starlight/images/dummy/profiledefault.png");
             }
             
             List<User> users = repository.loadUsers(false);
-            boolean exists = users.stream().anyMatch(u -> newUser.email.equals(u.email));
+            boolean exists = users.stream().anyMatch(u -> newUser.getEmail().equals(u.getEmail()));
             if (exists) {
                 sendXml(exchange, 409, "<error/>");
                 return;
@@ -240,7 +240,7 @@ public class UserApiServer {
             // Fallback to regular repository users
             List<User> users = repository.loadUsers();
             Optional<User> user = users.stream()
-                    .filter(u -> u.username != null && u.username.equals(username))
+                    .filter(u -> u.getUsername() != null && u.getUsername().equals(username))
                     .findFirst();
                     
             if (user.isPresent()) {
@@ -303,7 +303,7 @@ public class UserApiServer {
             
             for (int i = 0; i < users.size(); i++) {
                 User existingUser = users.get(i);
-                if (existingUser.username != null && existingUser.username.equals(username)) {
+                if (existingUser.getUsername() != null && existingUser.getUsername().equals(username)) {
                     updateUserFields(existingUser, updated);
                     repository.saveUsers(users);
                     sendXml(exchange, 200, xstream.toXML(existingUser));
@@ -318,9 +318,9 @@ public class UserApiServer {
          * Updates user fields from the updated user object
          */
         private void updateUserFields(User existingUser, User updated) {
-            if (updated.email != null) existingUser.email = updated.email;
-            if (updated.password != null) existingUser.password = updated.password;
-            if (updated.birthDay != null) existingUser.birthDay = updated.birthDay;
+            if (updated.getEmail() != null) existingUser.setEmail(updated.getEmail());
+            if (updated.getPassword() != null) existingUser.setPassword(updated.getPassword());
+            if (updated.getBirthDay() != null) existingUser.setBirthDay(updated.getBirthDay());
         }
         
         /**

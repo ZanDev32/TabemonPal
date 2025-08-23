@@ -98,7 +98,7 @@ public class LoginViewController implements Initializable {
         try {
             User logged = apiClient.login(em, pass);
             Session.setCurrentUser(logged);
-            logger.info("Login success for user: " + logged.username);
+            logger.info("Login success for user: " + logged.getUsername());
             
             // Ensure we redirect to main.fxml after successful login
             App.loadMainWithSplash();

@@ -14,7 +14,7 @@ import java.nio.file.Paths;
  * Test class for verifying the application's ability to access and use
  * the file system for storing user data and application files.
  */
-public class FileSystemAccessTest {
+class FileSystemAccessTest {
 
     private static final String TEST_USERNAME = "testuser";
     private static final String TEST_FILENAME = "test_image.png";

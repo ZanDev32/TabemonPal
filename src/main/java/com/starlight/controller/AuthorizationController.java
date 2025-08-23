@@ -50,13 +50,17 @@ public class AuthorizationController implements Initializable {
      * Shows the login view in the right section of the BorderPane.
      */
     public void showLoginView() {
-        authPanel.setRight(loginView);
+        if (authPanel != null && loginView != null) {
+            authPanel.setRight(loginView);
+        }
     }
     
     /**
      * Shows the register view in the right section of the BorderPane.
      */
     public void showRegisterView() {
-        authPanel.setRight(registerView);
+        if (authPanel != null && registerView != null) {
+            authPanel.setRight(registerView);
+        }
     }
 }

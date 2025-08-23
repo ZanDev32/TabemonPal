@@ -71,6 +71,8 @@ public class CreatePostController implements Initializable {
     private final PostDataRepository repository = new PostDataRepository();
     private final ChatbotAPI chatbotAPI = new ChatbotAPI();
     private final NutritionParser nutritionParser = new NutritionParser();
+    private static final int MAX_RETRIES = 3;
+    private static final int RETRY_DELAY_MS = 2000;
 
     private MainController mainController;
 
@@ -126,25 +128,25 @@ public class CreatePostController implements Initializable {
 
             // Create a new Post object
             Post newPost = new Post();
-            newPost.uuid = UUID.randomUUID().toString();
-            newPost.username = Session.getCurrentUser().username;
-            newPost.profilepicture = "src/main/resources/com/starlight/images/dummy/2.png";
-            newPost.title = postTitle;
-            newPost.description = postDescription;
-            newPost.ingredients = postIngredients;
-            newPost.directions = postDirections;
-            newPost.uploadtime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            newPost.setUuid(UUID.randomUUID().toString());
+            newPost.setUsername(Session.getCurrentUser().getUsername());
+            newPost.setProfilepicture("src/main/resources/com/starlight/images/dummy/2.png");
+            newPost.setTitle(postTitle);
+            newPost.setDescription(postDescription);
+            newPost.setIngredients(postIngredients);
+            newPost.setDirections(postDirections);
+            newPost.setUploadtime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
             try {
                 String storedPath = copyImageToUserDir(selectedImage);
-                newPost.image = storedPath != null ? storedPath : selectedImage.getAbsolutePath();
+                newPost.setImage(storedPath != null ? storedPath : selectedImage.getAbsolutePath());
             } catch (Exception e) {
                 e.printStackTrace();
-                newPost.image = selectedImage.getAbsolutePath();
+                newPost.setImage(selectedImage.getAbsolutePath());
             }
-            newPost.likecount = "0";
-            newPost.commentcount = "0";
-            newPost.isLiked = "false";
-            newPost.rating = "0.0";
+            newPost.setLikecount("0");
+            newPost.setCommentcount("0");
+            newPost.setIsLiked("false");
+            newPost.setRating("0.0");
 
             // Close the current dialog first
             Stage currentStage = (Stage) submit.getScene().getWindow();
@@ -189,7 +191,7 @@ public class CreatePostController implements Initializable {
      */
     private String copyImageToUserDir(File image) {
         try {
-            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().username : "unknown";
+            String username = Session.getCurrentUser() != null ? Session.getCurrentUser().getUsername() : "unknown";
             return com.starlight.util.FileSystemManager.copyFileToUserDirectoryWithUniqueFilename(image, username);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to copy image to user directory: {0}", new Object[]{e.getMessage()});
@@ -204,263 +206,229 @@ public class CreatePostController implements Initializable {
      */
     private void showProcessingAndAnalyzeNutrition(Post newPost, String ingredients) {
         try {
-            // Create and show processing dialog as a modal popup
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/processingDialog.fxml"));
-            Parent root = loader.load();
-            
-            ProcessingDialogController processingController = loader.getController();
-            
-            Stage dialogStage = new Stage();
-            dialogStage.setTitle("Creating Post");
-            dialogStage.initModality(Modality.APPLICATION_MODAL);
-            dialogStage.setScene(new Scene(root));
-            dialogStage.setResizable(false);
-            
-            // Set the stage reference in the controller
-            processingController.setDialogStage(dialogStage);
-            
-            // Center the dialog
-            dialogStage.centerOnScreen();
-            
-            // Show the dialog (non-blocking)
-            dialogStage.show();
-            
-            // Create background task for AI analysis
-            Task<Void> analysisTask = new Task<Void>() {
-                @Override
-                protected Void call() throws Exception {
-                    final int MAX_RETRIES = 3;
-                    int attempt = 0;
-                    Exception lastException = null;
-                    boolean isApiKeyIssue = false;
-                    boolean isNetworkIssue = false;
-                    
-                    while (attempt < MAX_RETRIES) {
-                        attempt++;
-                        final int currentAttempt = attempt; // Final copy for lambda use
-                        
-                        try {
-                            if (logger.isLoggable(Level.INFO)) {
-                                logger.info(java.text.MessageFormat.format(
-                                    "Analyzing nutrition facts for ingredients (attempt {0}/{1}): {2}",
-                                    currentAttempt, MAX_RETRIES, ingredients));
-                            }
-                            
-                            // Update status on UI thread
-                            Platform.runLater(() -> {
-                                try {
-                                    if (currentAttempt == 1) {
-                                        processingController.updateStatus("Analyzing nutrition facts...");
-                                    } else {
-                                        processingController.updateStatus("Analyzing nutrition facts... (retry " + currentAttempt + "/" + MAX_RETRIES + ")");
-                                    }
-                                } catch (Exception e) {
-                                    logger.log(Level.WARNING, "Failed to update processing status: " + e.getMessage());
-                                }
-                            });
-                            
-                            String nutritionResponse = chatbotAPI.analyzeNutritionFacts(ingredients);
-                            newPost.nutrition = nutritionParser.parseNutritionFromResponse(nutritionResponse);
-                            
-            // Check if we got valid nutrition data
-            if (newPost.nutrition != null && newPost.nutrition.ingredient != null && !newPost.nutrition.ingredient.isEmpty()) {
-                logger.info(java.text.MessageFormat.format(
-                    "Nutrition analysis completed successfully on attempt {0}", currentAttempt));
-                
-                // Update status to show success  
-                Platform.runLater(() -> {
-                    processingController.updateStatus("Nutrition analysis completed successfully!");
-                });
-                
-                return null; // Success - exit the retry loop
-            } else {
-                throw new Exception("Received empty or invalid nutrition data from AI");
-            }                        } catch (Exception e) {
-                            lastException = e;
-                            String errorMessage = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
-                            
-                            // Detect specific error types
-                            if (errorMessage.contains("api key") || errorMessage.contains("configure your openai api key")) {
-                                isApiKeyIssue = true;
-                                logger.log(Level.WARNING, "API Key issue detected: {0}", new Object[]{e.getMessage()});
-                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
-                                break; // No point retrying API key issues
-                            } else if (errorMessage.contains("network") || errorMessage.contains("connection") || 
-                                     errorMessage.contains("timeout") || errorMessage.contains("unreachable") ||
-                                     errorMessage.contains("failed to get response")) {
-                                isNetworkIssue = true;
-                                logger.log(Level.WARNING, "Network issue detected on attempt {0}: {1}", 
-                                          new Object[]{currentAttempt, e.getMessage()});
-                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
-                            } else {
-                                logger.log(Level.WARNING, "Nutrition analysis attempt {0} failed: {1}", 
-                                          new Object[]{currentAttempt, e.getMessage()});
-                                logger.log(Level.WARNING, EXCEPTION_DETAILS, e);
-                            }
-                            
-                            if (currentAttempt < MAX_RETRIES && !isApiKeyIssue) {
-                                // Wait a bit before retrying (unless it's an API key issue)
-                                Platform.runLater(() -> {
-                                    try {
-                                        processingController.updateStatus("Analysis failed, retrying... (" + (currentAttempt + 1) + "/" + MAX_RETRIES + ")");
-                                    } catch (Exception ex) {
-                                        logger.log(Level.WARNING, "Failed to update retry status: " + ex.getMessage());
-                                    }
-                                });
-                                
-                                try {
-                                    Thread.sleep(2000); // Wait 2 seconds before retry
-                                } catch (InterruptedException ie) {
-                                    Thread.currentThread().interrupt();
-                                    throw new Exception("Analysis interrupted", ie);
-                                }
-                            }
-                        }
-                    }
-                    
-                    // All retries failed or specific issue detected
-                    final boolean finalIsApiKeyIssue = isApiKeyIssue;
-                    final boolean finalIsNetworkIssue = isNetworkIssue;
-                    final Exception finalException = lastException;
-                    
-                    Platform.runLater(() -> {
-                        try {
-                            if (finalIsApiKeyIssue) {
-                                logger.log(Level.WARNING, "Skipping nutrition analysis - API key not configured");
-                                processingController.updateStatus("API key not configured. Using default values...");
-                                showPopupDialog("apikey");
-                            } else if (finalIsNetworkIssue) {
-                                logger.log(Level.WARNING, "Skipping nutrition analysis - network issues detected");
-                                processingController.updateStatus("Network issues detected. Using default values...");
-                                showPopupDialog("network");
-                            } else {
-                                logger.log(Level.SEVERE, "All " + MAX_RETRIES + " nutrition analysis attempts failed. Last error: " + 
-                                          (finalException != null ? finalException.getMessage() : "Unknown error"));
-                                processingController.updateStatus("Nutrition analysis failed. Using default values...");
-                                showPopupDialog("analysis_failed");
-                            }
-                        } catch (Exception e) {
-                            logger.log(Level.WARNING, "Failed to update error status or show warning: " + e.getMessage());
-                        }
-                    });
-                    
-                    // Use fallback nutrition data
-                    newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
-                    
-                    return null;
-                }
-                
-                @Override
-                protected void succeeded() {
-                    Platform.runLater(() -> {
-                        try {
-                            // Update final status
-                            processingController.updateStatus("Saving post...");
-                            
-                            // Save the new post
-                            List<Post> posts = repository.loadPosts();
-                            posts.add(0, newPost);
-                            repository.savePosts(posts);
-                            
-                            success = true;
-                            logger.info("Post created and saved successfully");
-                            
-                            // Close the processing dialog
-                            processingController.closeDialog();
-                            
-                            // Show success popup
-                            showResultDialog("post_created_success");
-                            
-                            // Refresh the community page instead of navigating away
-                            if (mainController != null) {
-                                mainController.refreshCommunityPage();
-                            }
-                            
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Failed to save post or refresh community page: " + e.getMessage(), e);
-                            
-                            // Close dialog and show failure message
-                            try {
-                                processingController.closeDialog();
-                                showResultDialog("post_creation_failed");
-                                if (mainController != null) {
-                                    mainController.refreshCommunityPage();
-                                }
-                            } catch (Exception fallbackEx) {
-                                logger.log(Level.SEVERE, "Fallback navigation failed: " + fallbackEx.getMessage(), fallbackEx);
-                            }
-                        }
-                    });
-                }
-                
-                @Override
-                protected void failed() {
-                    Platform.runLater(() -> {
-                        logger.log(Level.SEVERE, "Nutrition analysis task failed completely", getException());
-                        
-                        // Still try to save post without nutrition data
-                        try {
-                            processingController.updateStatus("Saving post with default values...");
-                            newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
-                            List<Post> posts = repository.loadPosts();
-                            posts.add(0, newPost);
-                            repository.savePosts(posts);
-                            success = true;
-                            
-                            // Close the processing dialog
-                            processingController.closeDialog();
-                            
-                            // Show success popup (post was still created)
-                            showResultDialog("post_created_success");
-                            
-                            // Refresh the community page
-                            if (mainController != null) {
-                                mainController.refreshCommunityPage();
-                            }
-                        } catch (Exception e) {
-                            logger.log(Level.SEVERE, "Failed to save post: " + e.getMessage(), e);
-                            
-                            // Close the processing dialog and show failure message
-                            try {
-                                processingController.closeDialog();
-                                showResultDialog("post_creation_failed");
-                                if (mainController != null) {
-                                    mainController.refreshCommunityPage();
-                                }
-                            } catch (Exception ex) {
-                                logger.log(Level.SEVERE, "Failed to close dialog or refresh community page: " + ex.getMessage(), ex);
-                            }
-                        }
-                    });
-                }
-            };
-            
-            // Start the task in a background thread
-            Thread analysisThread = new Thread(analysisTask);
-            analysisThread.setDaemon(true);
-            analysisThread.start();
-            
+            ProcessingDialogController processingController = createAndShowProcessingDialog();
+            startNutritionAnalysis(newPost, ingredients, processingController);
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Failed to show processing screen: {0}", new Object[]{e.getMessage()});
             logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
-            
-            // Fallback: try to save post and navigate directly
-            try {
-                newPost.nutrition = nutritionParser.parseNutritionFromResponse(null); // Creates fallback nutrition
-                List<Post> posts = repository.loadPosts();
-                posts.add(0, newPost);
-                repository.savePosts(posts);
-                success = true;
-                if (mainController != null) {
-                    mainController.refreshCommunityPage();
-                }
-            } catch (Exception fallbackEx) {
-                logger.log(Level.SEVERE, "Fallback save and navigation failed: {0}", new Object[]{fallbackEx.getMessage()});
-                logger.log(Level.SEVERE, EXCEPTION_DETAILS, fallbackEx);
-            }
+            fallbackSavePost(newPost);
         }
     }
-    
+
+    private ProcessingDialogController createAndShowProcessingDialog() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/starlight/view/processingDialog.fxml"));
+        Parent root = loader.load();
+        ProcessingDialogController controller = loader.getController();
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Creating Post");
+        dialogStage.initModality(Modality.APPLICATION_MODAL);
+        dialogStage.setScene(new Scene(root));
+        dialogStage.setResizable(false);
+        controller.setDialogStage(dialogStage);
+        dialogStage.centerOnScreen();
+        dialogStage.show();
+        return controller;
+    }
+
+    private void startNutritionAnalysis(Post newPost, String ingredients, ProcessingDialogController processingController) {
+        Task<Void> analysisTask = new Task<>() {
+            @Override
+            protected Void call() {
+                AnalysisOutcome outcome = performNutritionAnalysisWithRetries(newPost, ingredients, processingController);
+                handlePostAnalysisOutcome(outcome, newPost, processingController);
+                return null;
+            }
+
+            @Override
+            protected void succeeded() {
+                Platform.runLater(() -> finalizeSuccessfulPostCreation(newPost, processingController));
+            }
+
+            @Override
+            protected void failed() {
+                Platform.runLater(() -> finalizeFailedAnalysis(newPost, processingController, getException()));
+            }
+        };
+        Thread analysisThread = new Thread(analysisTask);
+        analysisThread.setDaemon(true);
+        analysisThread.start();
+    }
+
+    private AnalysisOutcome performNutritionAnalysisWithRetries(Post newPost, String ingredients, ProcessingDialogController processingController) {
+        Exception lastException = null;
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            AnalysisOutcome outcome = attemptNutritionAnalysisAttempt(newPost, ingredients, processingController, attempt);
+            if (outcome.type == AnalysisOutcome.Type.SUCCESS) return outcome;
+            if (outcome.type == AnalysisOutcome.Type.API_KEY || outcome.type == AnalysisOutcome.Type.NETWORK || attempt == MAX_RETRIES) {
+                return outcome;
+            }
+            lastException = outcome.exception;
+            scheduleRetryStatusUpdate(processingController, attempt + 1);
+            sleepQuietly(RETRY_DELAY_MS);
+        }
+        return AnalysisOutcome.failure(lastException);
+    }
+
+    private AnalysisOutcome attemptNutritionAnalysisAttempt(Post newPost, String ingredients, ProcessingDialogController controller, int attempt) {
+        try {
+            logInfo("Analyzing nutrition facts for ingredients (attempt {0}/{1}): {2}", attempt, MAX_RETRIES, ingredients);
+            updateStatus(controller, attempt == 1 ? "Analyzing nutrition facts..." : java.text.MessageFormat.format("Analyzing nutrition facts... (retry {0}/{1})", attempt, MAX_RETRIES));
+            String response = chatbotAPI.analyzeNutritionFacts(ingredients);
+            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(response));
+            if (hasValidNutrition(newPost)) {
+                logInfo("Nutrition analysis completed successfully on attempt {0}", attempt);
+                updateStatus(controller, "Nutrition analysis completed successfully!");
+                return AnalysisOutcome.success();
+            }
+            throw new InvalidNutritionDataException("Empty or invalid nutrition data");
+        } catch (Exception e) {
+            String msg = e.getMessage() != null ? e.getMessage().toLowerCase() : "";
+            if (isApiKeyIssue(msg)) return AnalysisOutcome.apiKeyIssue(e);
+            if (isNetworkIssue(msg)) return AnalysisOutcome.networkIssue(e);
+            return AnalysisOutcome.failure(e);
+        }
+    }
+
+    private void handlePostAnalysisOutcome(AnalysisOutcome outcome, Post newPost, ProcessingDialogController controller) {
+        if (outcome.type == AnalysisOutcome.Type.SUCCESS) {
+            return;
+        }
+        Platform.runLater(() -> {
+            switch (outcome.type) {
+                case API_KEY:
+                    logWarn("Skipping nutrition analysis - API key not configured");
+                    controller.updateStatus("API key not configured. Using default values...");
+                    showPopupDialog(POPUP_APIKEY);
+                    break;
+                case NETWORK:
+                    logWarn("Skipping nutrition analysis - network issues detected");
+                    controller.updateStatus("Network issues detected. Using default values...");
+                    showPopupDialog(POPUP_NETWORK);
+                    break;
+                case FAILURE:
+                    logSevere("All nutrition analysis attempts failed. Last error: {0}", outcome.exception != null ? outcome.exception.getMessage() : "Unknown");
+                    controller.updateStatus("Nutrition analysis failed. Using default values...");
+                    showPopupDialog(POPUP_ANALYSIS_FAILED);
+                    break;
+                case SUCCESS:
+                default:
+                    break; // no action
+            }
+            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null));
+        });
+    }
+
+    private boolean hasValidNutrition(Post post) {
+        return post.getNutrition() != null && post.getNutrition().getIngredient() != null && !post.getNutrition().getIngredient().isEmpty();
+    }
+
+    private boolean isApiKeyIssue(String msg) {
+        return msg.contains("api key") || msg.contains("configure your openai api key");
+    }
+
+    private boolean isNetworkIssue(String msg) {
+    return msg.contains(POPUP_NETWORK) || msg.contains("connection") || msg.contains("timeout") || msg.contains("unreachable") || msg.contains("failed to get response");
+    }
+
+    private void scheduleRetryStatusUpdate(ProcessingDialogController controller, int nextAttempt) {
+        Platform.runLater(() -> updateStatus(controller, java.text.MessageFormat.format("Analysis failed, retrying... ({0}/{1})", nextAttempt, MAX_RETRIES)));
+    }
+
+    private void sleepQuietly(int ms) {
+        try { Thread.sleep(ms); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+    }
+
+    private void finalizeSuccessfulPostCreation(Post newPost, ProcessingDialogController controller) {
+        try {
+            updateStatus(controller, "Saving post...");
+            saveNewPost(newPost);
+            success = true;
+            controller.closeDialog();
+            showResultDialog(RESULT_POST_CREATED_SUCCESS);
+            refreshCommunity();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, () -> "Failed to save post or refresh community page: " + e.getMessage());
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
+            handleFinalizeFailure(controller);
+        }
+    }
+
+    private void finalizeFailedAnalysis(Post newPost, ProcessingDialogController controller, Throwable error) {
+        logger.log(Level.SEVERE, "Nutrition analysis task failed completely", error);
+        try {
+            updateStatus(controller, "Saving post with default values...");
+            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null));
+            saveNewPost(newPost);
+            success = true;
+            controller.closeDialog();
+            showResultDialog(RESULT_POST_CREATED_SUCCESS);
+            refreshCommunity();
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, () -> "Failed to save post: " + e.getMessage());
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, e);
+            handleFinalizeFailure(controller);
+        }
+    }
+
+    private void handleFinalizeFailure(ProcessingDialogController controller) {
+        try {
+            controller.closeDialog();
+            showResultDialog(RESULT_POST_CREATION_FAILED);
+            refreshCommunity();
+        } catch (Exception fallbackEx) {
+            logger.log(Level.SEVERE, () -> "Fallback navigation failed: " + fallbackEx.getMessage());
+        }
+    }
+
+    private void saveNewPost(Post post) {
+        List<Post> posts = repository.loadPosts();
+        posts.add(0, post);
+        repository.savePosts(posts);
+    }
+
+    private void refreshCommunity() {
+        if (mainController != null) {
+            mainController.refreshCommunityPage();
+        }
+    }
+
+    private void fallbackSavePost(Post newPost) {
+        try {
+            newPost.setNutrition(nutritionParser.parseNutritionFromResponse(null));
+            saveNewPost(newPost);
+            success = true;
+            refreshCommunity();
+        } catch (Exception fallbackEx) {
+            logger.log(Level.SEVERE, () -> "Fallback save and navigation failed: " + fallbackEx.getMessage());
+            logger.log(Level.SEVERE, EXCEPTION_DETAILS, fallbackEx);
+        }
+    }
+
+    private void logWarn(String pattern, Object... args) { if (logger.isLoggable(Level.WARNING)) logger.log(Level.WARNING, java.text.MessageFormat.format(pattern, args)); }
+    private void logSevere(String pattern, Object... args) { if (logger.isLoggable(Level.SEVERE)) logger.log(Level.SEVERE, java.text.MessageFormat.format(pattern, args)); }
+    private void logInfo(String pattern, Object... args) { if (logger.isLoggable(Level.INFO)) logger.log(Level.INFO, java.text.MessageFormat.format(pattern, args)); }
+
+    private void updateStatus(ProcessingDialogController controller, String message) {
+        try { controller.updateStatus(message); } catch (Exception ignored) { /* dialog may be closed */ }
+    }
+
+    private static class AnalysisOutcome {
+        enum Type { SUCCESS, API_KEY, NETWORK, FAILURE }
+        final Type type;
+        final Exception exception;
+        private AnalysisOutcome(Type type, Exception exception) { this.type = type; this.exception = exception; }
+        static AnalysisOutcome success() { return new AnalysisOutcome(Type.SUCCESS, null); }
+        static AnalysisOutcome apiKeyIssue(Exception e) { return new AnalysisOutcome(Type.API_KEY, e); }
+        static AnalysisOutcome networkIssue(Exception e) { return new AnalysisOutcome(Type.NETWORK, e); }
+        static AnalysisOutcome failure(Exception e) { return new AnalysisOutcome(Type.FAILURE, e); }
+    }
+    private static class InvalidNutritionDataException extends Exception { InvalidNutritionDataException(String msg) { super(msg); } }
+    private static final String POPUP_APIKEY = "apikey";
+    private static final String POPUP_NETWORK = "network";
+    private static final String POPUP_ANALYSIS_FAILED = "analysis_failed";
+    private static final String RESULT_POST_CREATED_SUCCESS = "post_created_success";
+    private static final String RESULT_POST_CREATION_FAILED = "post_creation_failed";
+    private static final String RESULT_NUTRITION_ANALYSIS_SUCCESS = "nutrition_analysis_success";
     /**
      * Shows a popup dialog for nutrition analysis issues
      */
@@ -473,18 +441,10 @@ public class CreatePostController implements Initializable {
             
             // Set appropriate warning message based on type
             switch (warningType) {
-                case "apikey":
-                    controller.setApiKeyWarning();
-                    break;
-                case "network":
-                    controller.setNetworkWarning();
-                    break;
-                case "analysis_failed":
-                    controller.setAnalysisFailedWarning();
-                    break;
-                default:
-                    controller.setMessage("An error occurred during nutrition analysis. Using default values.");
-                    break;
+                case POPUP_APIKEY -> controller.setApiKeyWarning();
+                case POPUP_NETWORK -> controller.setNetworkWarning();
+                case POPUP_ANALYSIS_FAILED -> controller.setAnalysisFailedWarning();
+                default -> controller.setMessage("An error occurred during nutrition analysis. Using default values.");
             }
             
             Stage dialogStage = new Stage();
@@ -519,18 +479,10 @@ public class CreatePostController implements Initializable {
             
             // Set appropriate message based on result type
             switch (resultType) {
-                case "post_created_success":
-                    controller.setPostCreatedSuccess();
-                    break;
-                case "post_creation_failed":
-                    controller.setPostCreationFailed();
-                    break;
-                case "nutrition_analysis_success":
-                    controller.setNutritionAnalysisSuccess();
-                    break;
-                default:
-                    controller.setMessage("Operation completed.");
-                    break;
+                case RESULT_POST_CREATED_SUCCESS -> controller.setPostCreatedSuccess();
+                case RESULT_POST_CREATION_FAILED -> controller.setPostCreationFailed();
+                case RESULT_NUTRITION_ANALYSIS_SUCCESS -> controller.setNutritionAnalysisSuccess();
+                default -> controller.setMessage("Operation completed.");
             }
             
             Stage dialogStage = new Stage();

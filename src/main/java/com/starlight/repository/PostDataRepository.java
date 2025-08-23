@@ -8,6 +8,7 @@ import java.util.List;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.starlight.model.Post;
+import com.starlight.repository.UserDataRepository.DataPersistenceException;
 import com.starlight.util.FileSystemManager;
 
 /**
@@ -66,38 +67,53 @@ public class PostDataRepository {
         return loadPosts(useDummy, false);
     }
 
-    @SuppressWarnings("unchecked")
     private List<Post> loadPosts(boolean useDummy, boolean fallbackToDummyIfMissing) {
+        File xmlFile = resolveXmlFile(useDummy, fallbackToDummyIfMissing);
+        if (xmlFile == null) return new ArrayList<>();
+
+        List<Post> posts = readPostsFromFile(xmlFile);
+        if (posts == null) return new ArrayList<>();
+
+        initializeMissingFields(posts);
+        return posts;
+    }
+
+    /** Resolve which XML file to read based on flags; returns null if none available. */
+    private File resolveXmlFile(boolean useDummy, boolean fallbackToDummyIfMissing) {
         File xmlFile = new File(useDummy ? DUMMY_XML_PATH : xmlPath);
-        if (!xmlFile.exists() || xmlFile.length() == 0) {
-            if (!useDummy && fallbackToDummyIfMissing) {
-                xmlFile = new File(DUMMY_XML_PATH);
-                if (!xmlFile.exists()) {
-                    return new ArrayList<>();
-                }
-            } else {
-                return new ArrayList<>();
+        if (xmlFile.exists() && xmlFile.length() > 0) {
+            return xmlFile;
+        }
+
+        if (!useDummy && fallbackToDummyIfMissing) {
+            File dummy = new File(DUMMY_XML_PATH);
+            if (dummy.exists() && dummy.length() > 0) {
+                return dummy;
             }
         }
+
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Post> readPostsFromFile(File xmlFile) {
         try (FileInputStream fis = new FileInputStream(xmlFile)) {
             Object obj = xstream.fromXML(fis);
             if (obj instanceof List) {
-                List<Post> posts = (List<Post>) obj;
-                // Initialize missing fields for existing posts
-                for (Post post : posts) {
-                    if (post.commentcount == null) {
-                        post.commentcount = "0";
-                    }
-                    if (post.isLiked == null) {
-                        post.isLiked = "false";
-                    }
-                }
-                return posts;
+                return (List<Post>) obj;
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return new ArrayList<>();
+        return null;
+    }
+
+    /** Ensure required fields are present on loaded posts. */
+    private void initializeMissingFields(List<Post> posts) {
+        for (Post post : posts) {
+            if (post.getCommentcount() == null) post.setCommentcount("0");
+            if (post.getIsLiked() == null) post.setIsLiked("false");
+        }
     }
 
     /**
@@ -126,16 +142,16 @@ public class PostDataRepository {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             // Ensure all posts have the required fields before saving
             for (Post post : posts) {
-                if (post.commentcount == null) {
-                    post.commentcount = "0";
+                if (post.getCommentcount() == null) {
+                    post.setCommentcount("0");
                 }
-                if (post.isLiked == null) {
-                    post.isLiked = "false";
+                if (post.getIsLiked() == null) {
+                    post.setIsLiked("false");
                 }
             }
             xstream.toXML(posts, fos);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
+            throw new DataPersistenceException("Failed to save posts to file: " + xmlPath + ". Error: " + e.getMessage(), e);
         }
     }
 
@@ -148,8 +164,8 @@ public class PostDataRepository {
         List<Post> posts = loadPosts();
         int initialSize = posts.size();
         
-        // Remove the post with the specified UUID
-        posts.removeIf(post -> post.uuid != null && post.uuid.equals(uuid));
+    // Remove the post with the specified UUID
+    posts.removeIf(post -> post.getUuid() != null && post.getUuid().equals(uuid));
         
         // Check if any posts were removed
         if (posts.size() < initialSize) {

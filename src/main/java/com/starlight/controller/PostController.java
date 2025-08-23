@@ -83,12 +83,19 @@ public class PostController implements Initializable {
     private MainController mainController; // Reference to main controller for navigation
     private static final Logger logger = Logger.getLogger(PostController.class.getName());
     private static final int MAX_RETRIES = 3;
+    // Duplicated literal constants (Sonar S1192)
+    private static final String UNKNOWN = "Unknown";
+    private static final String STYLE_VERDICT_UNKNOWN = "verdict-unknown";
+    private static final String FONT_POPPINS = "Poppins";
+    private static final String TITLE_NUTRITION_FACTS = "Nutrition Facts";
 
-    @FXML
-    private void initialize() {
-        // Initialize with placeholder data or wait for post data to be set
+    // Dedicated exception for analysis retries
+    private static class NutritionAnalysisException extends Exception {
+        NutritionAnalysisException(String message, Throwable cause) { super(message, cause); }
     }
-    
+
+    // @FXML initialize method intentionally omitted; Initializable#initialize used instead.
+
     /**
      * Handles the go back button click - navigates back to community view
      */
@@ -110,7 +117,7 @@ public class PostController implements Initializable {
             return;
         }
         
-        if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
+    if (currentPost.getIngredients() == null || currentPost.getIngredients().trim().isEmpty()) {
             logger.warning("Cannot perform analysis - no ingredients available");
             showAnalysisErrorDialog("No ingredients found in this recipe to analyze.");
             return;
@@ -129,6 +136,7 @@ public class PostController implements Initializable {
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        // Intentionally left blank (S1186): UI is populated only after a Post is injected via setPost()
     }
     
     /**
@@ -143,95 +151,78 @@ public class PostController implements Initializable {
      * Updates all UI elements with the current post data
      */
     private void updateUIFromPost() {
-        if (currentPost == null) return;
-        
+        if (currentPost == null) {
+            return;
+        }
+        updateBasicTextFields();
+        updateVerdictButton();
+        updateAnalysisButtonState();
+        loadUserImages();
+        populateRecipeContainer();
+        populateNutritionFacts();
+    }
+
+    private void updateBasicTextFields() {
         if (description != null) {
-            description.setText(currentPost.description != null ? currentPost.description : "");
+            description.setText(currentPost.getDescription() != null ? currentPost.getDescription() : "");
         }
-        
         if (uploadtime != null) {
-            uploadtime.setText(formatRelativeTime(currentPost.uploadtime));
+            uploadtime.setText(formatRelativeTime(currentPost.getUploadtime()));
         }
-        
-        // Update username with display name from UserData
         if (username != null) {
-            String displayUsername = getDisplayUsernameForUser(currentPost.username);
-            username.setText(displayUsername != null ? displayUsername : currentPost.username);
+            String displayUsername = getDisplayUsernameForUser(currentPost.getUsername());
+            username.setText(displayUsername != null ? displayUsername : currentPost.getUsername());
         }
-        
-        // Update verdict button if available
-        if (verdict != null && currentPost.nutrition != null) {
-            String verdictText = currentPost.nutrition.verdict != null ? 
-                currentPost.nutrition.verdict : "Unknown";
+    }
+
+    private void updateVerdictButton() {
+        if (verdict == null) {
+            return;
+        }
+        if (currentPost.getNutrition() != null) {
+            String verdictText = currentPost.getNutrition().getVerdict() != null ? currentPost.getNutrition().getVerdict() : UNKNOWN;
             verdict.setText(verdictText);
-            
-            // Apply different styling based on verdict
             verdict.getStyleClass().clear();
             verdict.getStyleClass().add("food-tag");
             switch (verdictText) {
-                case "Healthy":
-                    verdict.getStyleClass().add("verdict-healthy");
-                    break;
-                case "Moderate":
-                    verdict.getStyleClass().add("verdict-moderate");
-                    break;
-                case "Unhealthy":
-                    verdict.getStyleClass().add("verdict-unhealthy");
-                    break;
-                case "Junk Food":
-                    verdict.getStyleClass().add("verdict-junk");
-                    break;
-                case "Unknown":
-                    verdict.getStyleClass().add("verdict-unknown");
-                    break;
-                default:
-                    verdict.getStyleClass().add("verdict-unknown");
-                    break;
+                case "Healthy" -> verdict.getStyleClass().add("verdict-healthy");
+                case "Moderate" -> verdict.getStyleClass().add("verdict-moderate");
+                case "Unhealthy" -> verdict.getStyleClass().add("verdict-unhealthy");
+                case "Junk Food" -> verdict.getStyleClass().add("verdict-junk");
+                case UNKNOWN -> verdict.getStyleClass().add(STYLE_VERDICT_UNKNOWN);
+                default -> verdict.getStyleClass().add(STYLE_VERDICT_UNKNOWN);
             }
-        } else if (verdict != null) {
-            verdict.setText("Unknown");
+        } else {
+            verdict.setText(UNKNOWN);
             verdict.getStyleClass().clear();
             verdict.getStyleClass().add("food-tag");
-            verdict.getStyleClass().add("verdict-unknown");
+            verdict.getStyleClass().add(STYLE_VERDICT_UNKNOWN);
         }
-        
-        // Update doAnalysis button state based on current nutrition status
-        if (doAnalysis != null) {
-            if (currentPost.nutrition != null && currentPost.nutrition.verdict != null && !currentPost.nutrition.verdict.equals("Unknown")) {
-                // Recipe has been analyzed - button can re-analyze
-                doAnalysis.setText("Re-analyze");
-                doAnalysis.setDisable(false);
-            } else {
-                // Recipe hasn't been analyzed - button can analyze
-                doAnalysis.setText("Analyze");
-                doAnalysis.setDisable(false);
-            }
-            
-            // Disable if no ingredients available
-            if (currentPost.ingredients == null || currentPost.ingredients.trim().isEmpty()) {
-                doAnalysis.setText("No Ingredients");
-                doAnalysis.setDisable(true);
-            }
+    }
+
+    private void updateAnalysisButtonState() {
+        if (doAnalysis == null) {
+            return;
         }
-        
-        // Load profile picture
+        boolean analyzed = currentPost.getNutrition() != null && currentPost.getNutrition().getVerdict() != null && !UNKNOWN.equals(currentPost.getNutrition().getVerdict());
+        doAnalysis.setText(analyzed ? "Re-analyze" : "Analyze");
+        doAnalysis.setDisable(false);
+        if (currentPost.getIngredients() == null || currentPost.getIngredients().trim().isEmpty()) {
+            doAnalysis.setText("No Ingredients");
+            doAnalysis.setDisable(true);
+        }
+    }
+
+    private void loadUserImages() {
         if (profile1 != null) {
-            String profilePicture = getProfilePictureForUser(currentPost.username);
+            String profilePicture = getProfilePictureForUser(currentPost.getUsername());
             ImageUtils.loadImage(profile1, profilePicture, ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(profile1, 80, 80, 500);
         }
-        
-        // Load post image
         if (recentphoto1 != null) {
-            ImageUtils.loadImage(recentphoto1, currentPost.image, ImageUtils.DEFAULT_MISSING_IMAGE);
+            ImageUtils.loadImage(recentphoto1, currentPost.getImage(), ImageUtils.DEFAULT_MISSING_IMAGE);
             ImageUtils.scaleToFit(recentphoto1, 1270, 990, 20);
         }
-        
-        // Populate recipe container with formatted text
-        populateRecipeContainer();
-        
-        // Populate nutrition facts chart
-        populateNutritionFacts();
     }
     
     /**
@@ -245,27 +236,27 @@ public class PostController implements Initializable {
         textFlow.getStyleClass().add("post-recipe");
         
         // Add title section
-        if (currentPost.title != null && !currentPost.title.trim().isEmpty()) {
-            addSectionTitle(textFlow, currentPost.title);
+        if (currentPost.getTitle() != null && !currentPost.getTitle().trim().isEmpty()) {
+            addSectionTitle(textFlow, currentPost.getTitle());
             addNewLine(textFlow, 2);
         }
         
         // Add ingredients section
-        if (currentPost.ingredients != null && !currentPost.ingredients.trim().isEmpty()) {
+        if (currentPost.getIngredients() != null && !currentPost.getIngredients().trim().isEmpty()) {
             addSectionTitle(textFlow, "Ingredients :");
             addNewLine(textFlow, 1);
             // Parse vertical line-separated ingredients as newlines
-            String ingredientsWithNewlines = currentPost.ingredients.replace("|", "\n");
+            String ingredientsWithNewlines = currentPost.getIngredients().replace("|", "\n");
             addBulletList(textFlow, ingredientsWithNewlines);
             addNewLine(textFlow, 1);
         }
         
         // Add directions section
-        if (currentPost.directions != null && !currentPost.directions.trim().isEmpty()) {
+        if (currentPost.getDirections() != null && !currentPost.getDirections().trim().isEmpty()) {
             addSectionTitle(textFlow, "Directions :");
             addNewLine(textFlow, 1);
             // Parse vertical line-separated directions as newlines
-            String directionsWithNewlines = currentPost.directions.replace("|", "\n");
+            String directionsWithNewlines = currentPost.getDirections().replace("|", "\n");
             addNumberedList(textFlow, directionsWithNewlines);
         }
         
@@ -289,7 +280,7 @@ public class PostController implements Initializable {
             line = line.trim();
             if (!line.isEmpty()) {
                 Text bullet = new Text("• " + line);
-                bullet.setFont(Font.font("Poppins", 24));
+                bullet.setFont(Font.font(FONT_POPPINS, 24));
                 bullet.setFill(Color.rgb(63, 63, 91)); // #3F3F5B
                 textFlow.getChildren().add(bullet);
                 addNewLine(textFlow, 1);
@@ -307,7 +298,7 @@ public class PostController implements Initializable {
             line = line.trim();
             if (!line.isEmpty()) {
                 Text numberedItem = new Text(counter + ". " + line);
-                numberedItem.setFont(Font.font("Poppins", 24));
+                numberedItem.setFont(Font.font(FONT_POPPINS, 24));
                 numberedItem.setFill(Color.rgb(63, 63, 91)); // #3F3F5B
                 textFlow.getChildren().add(numberedItem);
                 addNewLine(textFlow, 1);
@@ -334,8 +325,8 @@ public class PostController implements Initializable {
     private void parseAndAddFormattedText(TextFlow textFlow, String message) {
         // Base text color and fonts
         Color textColor = Color.rgb(63, 63, 91); // #3F3F5B
-        Font baseFont = Font.font("Poppins", 24);
-        Font boldFont = Font.font("Poppins", FontWeight.BOLD, 24);
+    Font baseFont = Font.font(FONT_POPPINS, 24);
+    Font boldFont = Font.font(FONT_POPPINS, FontWeight.BOLD, 24);
         
         String[] parts = message.split("\\*\\*");
         
@@ -373,8 +364,8 @@ public class PostController implements Initializable {
         
         var users = userRepository.loadUsers();
         for (var user : users) {
-            if (username.equals(user.username)) {
-                return user.profilepicture;
+            if (username.equals(user.getUsername())) {
+                return user.getProfilepicture();
             }
         }
         return null;
@@ -389,10 +380,10 @@ public class PostController implements Initializable {
         
         var users = userRepository.loadUsers();
         for (var user : users) {
-            if (username.equals(user.username)) {
+            if (username.equals(user.getUsername())) {
                 // Return fullname if available, otherwise return username
-                return user.fullname != null && !user.fullname.trim().isEmpty() 
-                    ? user.fullname : user.username;
+                return user.getFullname() != null && !user.getFullname().trim().isEmpty()
+                    ? user.getFullname() : user.getUsername();
             }
         }
         return username; // fallback to original username if not found
@@ -410,101 +401,76 @@ public class PostController implements Initializable {
      * Populates the nutrition facts DoughnutChart with data from the current post.
      */
     private void populateNutritionFacts() {
-        if (nutritionFacts == null || currentPost == null) {
+        if (nutritionFacts == null || currentPost == null) return;
+        if (currentPost.getNutrition() == null) {
+            setPlaceholderNutritionFacts();
             return;
         }
-        
-        // Show placeholder data when no nutrition analysis available
-        if (currentPost.nutrition == null) {
-            ObservableList<PieChart.Data> placeholderData = FXCollections.observableArrayList(
-                new PieChart.Data("No nutrition analysis available", 1)
-            );
-            nutritionFacts.setData(placeholderData);
-            nutritionFacts.setTitle("Nutrition Facts");
-            nutritionFacts.setLegendVisible(true);
-            nutritionFacts.getStyleClass().add("nutrition-chart");
-            
-            // Force layout update to ensure DoughnutChart inner circle is properly displayed
-            refreshDoughnutChart();
-            return;
-        }
-        
         try {
-            Nutrition nutrition = currentPost.nutrition;
-            ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-            
-            // Get total values for all nutrients
-            double totalProtein = nutrition.getTotalProtein();
-            double totalFat = nutrition.getTotalFat();
-            double totalCarbs = nutrition.getTotalCarbohydrates();
-            double totalFiber = nutrition.getTotalFiber();
-            double totalSugar = nutrition.getTotalSugar();
-            double totalSalt = nutrition.getTotalSalt();
-            
-            // Create pie chart data for macronutrients and key micronutrients
-            if (totalProtein > 0) {
-                pieChartData.add(new PieChart.Data("Protein (" + String.format("%.1f", totalProtein) + "g)", totalProtein));
-            }
-            
-            if (totalFat > 0) {
-                pieChartData.add(new PieChart.Data("Fat (" + String.format("%.1f", totalFat) + "g)", totalFat));
-            }
-            
-            if (totalCarbs > 0) {
-                pieChartData.add(new PieChart.Data("Carbohydrates (" + String.format("%.1f", totalCarbs) + "g)", totalCarbs));
-            }
-            
-            if (totalFiber > 0) {
-                pieChartData.add(new PieChart.Data("Fiber (" + String.format("%.1f", totalFiber) + "g)", totalFiber));
-            }
-            
-            if (totalSugar > 0) {
-                pieChartData.add(new PieChart.Data("Sugar (" + String.format("%.1f", totalSugar) + "g)", totalSugar));
-            }
-            
-            if (totalSalt > 0) {
-                // Convert mg to g for display consistency, or keep as mg if preferred
-                if (totalSalt >= 1000) {
-                    pieChartData.add(new PieChart.Data("Salt (" + String.format("%.1f", totalSalt/1000) + "g)", totalSalt/100)); // Scale down for chart
-                } else {
-                    pieChartData.add(new PieChart.Data("Salt (" + String.format("%.0f", totalSalt) + "mg)", totalSalt/100)); // Scale down for chart
-                }
-            }
-            
-            // If no macronutrient data, show calories breakdown
-            if (pieChartData.isEmpty()) {
-                double totalCalories = nutrition.getTotalCalories();
-                if (totalCalories > 0) {
-                    pieChartData.add(new PieChart.Data("Calories (" + String.format("%.0f", totalCalories) + " kcal)", totalCalories));
-                } else {
-                    // Fallback: show a placeholder
-                    pieChartData.add(new PieChart.Data("No nutrition data available", 1));
-                }
-            }
-            
-            nutritionFacts.setData(pieChartData);
-            nutritionFacts.setTitle("Nutrition Facts");
+            ObservableList<PieChart.Data> data = buildNutritionPieData(currentPost.getNutrition());
+            nutritionFacts.setData(data);
+            nutritionFacts.setTitle(TITLE_NUTRITION_FACTS);
             nutritionFacts.setLegendVisible(true);
-            
-            // Apply custom styling if needed
             nutritionFacts.getStyleClass().add("nutrition-chart");
-            
-            // Force layout update to ensure DoughnutChart inner circle is properly displayed
             refreshDoughnutChart();
-            
         } catch (Exception e) {
-            java.util.logging.Logger.getLogger(PostController.class.getName())
-                    .warning("Failed to populate nutrition facts: " + e.getMessage());
-            
-            // Show fallback data
-            ObservableList<PieChart.Data> fallbackData = FXCollections.observableArrayList(
-                new PieChart.Data("Nutrition data unavailable", 1)
-            );
-            nutritionFacts.setData(fallbackData);
-            nutritionFacts.setTitle("Nutrition Facts");
-            
-            // Force layout update to ensure DoughnutChart inner circle is properly displayed
-            refreshDoughnutChart();
+            // Defer message construction (Sonar S3457) while keeping stack trace
+            logger.log(Level.WARNING, e, () -> "Failed to populate nutrition facts: " + e.getMessage());
+            setFallbackNutritionFacts();
+        }
+    }
+
+    private void setPlaceholderNutritionFacts() {
+        ObservableList<PieChart.Data> placeholderData = FXCollections.observableArrayList(
+            new PieChart.Data("No nutrition analysis available", 1)
+        );
+        nutritionFacts.setData(placeholderData);
+        nutritionFacts.setTitle(TITLE_NUTRITION_FACTS);
+        nutritionFacts.setLegendVisible(true);
+        nutritionFacts.getStyleClass().add("nutrition-chart");
+        refreshDoughnutChart();
+    }
+
+    private void setFallbackNutritionFacts() {
+        ObservableList<PieChart.Data> fallbackData = FXCollections.observableArrayList(
+            new PieChart.Data("Nutrition data unavailable", 1)
+        );
+        nutritionFacts.setData(fallbackData);
+        nutritionFacts.setTitle(TITLE_NUTRITION_FACTS);
+        refreshDoughnutChart();
+    }
+
+    private ObservableList<PieChart.Data> buildNutritionPieData(Nutrition nutrition) {
+        ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
+        addIfPositive(pieChartData, "Protein", nutrition.getTotalProtein(), "g");
+        addIfPositive(pieChartData, "Fat", nutrition.getTotalFat(), "g");
+        addIfPositive(pieChartData, "Carbohydrates", nutrition.getTotalCarbohydrates(), "g");
+        addIfPositive(pieChartData, "Fiber", nutrition.getTotalFiber(), "g");
+        addIfPositive(pieChartData, "Sugar", nutrition.getTotalSugar(), "g");
+        addSaltData(pieChartData, nutrition.getTotalSalt());
+        if (pieChartData.isEmpty()) addCaloriesOrPlaceholder(pieChartData, nutrition.getTotalCalories());
+        return pieChartData;
+    }
+
+    private void addIfPositive(ObservableList<PieChart.Data> list, String label, double value, String unit) {
+        if (value > 0) list.add(new PieChart.Data(label + " (" + String.format("%.1f", value) + unit + ")", value));
+    }
+
+    private void addSaltData(ObservableList<PieChart.Data> list, double totalSalt) {
+        if (totalSalt > 0) {
+            if (totalSalt >= 1000) {
+                list.add(new PieChart.Data("Salt (" + String.format("%.1f", totalSalt/1000) + "g)", totalSalt/100));
+            } else {
+                list.add(new PieChart.Data("Salt (" + String.format("%.0f", totalSalt) + "mg)", totalSalt/100));
+            }
+        }
+    }
+
+    private void addCaloriesOrPlaceholder(ObservableList<PieChart.Data> list, double totalCalories) {
+        if (totalCalories > 0) {
+            list.add(new PieChart.Data("Calories (" + String.format("%.0f", totalCalories) + " kcal)", totalCalories));
+        } else {
+            list.add(new PieChart.Data("No nutrition data available", 1));
         }
     }
     
@@ -518,9 +484,7 @@ public class PostController implements Initializable {
             nutritionFacts.refreshDoughnut();
             
             // Additional delayed refresh to ensure proper rendering
-            Platform.runLater(() -> {
-                nutritionFacts.refreshDoughnut();
-            });
+            Platform.runLater(() -> nutritionFacts.refreshDoughnut());
         }
     }
     
@@ -553,46 +517,28 @@ public class PostController implements Initializable {
             Task<Nutrition> nutritionTask = createNutritionAnalysisTask(processingController);
             
             // Handle task completion
-            nutritionTask.setOnSucceeded(e -> {
-                Platform.runLater(() -> {
-                    dialogStage.close();
-                    
-                    Nutrition newNutrition = nutritionTask.getValue();
-                    if (newNutrition != null && !newNutrition.ingredient.isEmpty()) {
-                        // Update the current post's nutrition
-                        currentPost.nutrition = newNutrition;
-                        
-                        // Save the updated post to XML
-                        saveUpdatedPost();
-                        
-                        // Update UI to reflect new nutrition data
-                        updateUIFromPost();
-                        
-                        // Show success dialog
-                        showResultDialog(true, "Nutrition analysis completed successfully!");
-                        
-                        logger.info("Nutrition analysis completed and saved successfully");
-                    } else {
-                        showResultDialog(false, "Nutrition analysis failed. Please try again.");
-                        logger.warning("Nutrition analysis returned empty or invalid results");
-                    }
-                });
-            });
+            nutritionTask.setOnSucceeded(e -> Platform.runLater(() -> {
+                dialogStage.close();
+                Nutrition newNutrition = nutritionTask.getValue();
+                if (newNutrition != null && !newNutrition.getIngredient().isEmpty()) {
+                    currentPost.setNutrition(newNutrition);
+                    saveUpdatedPost();
+                    updateUIFromPost();
+                    showResultDialog(true, "Nutrition analysis completed successfully!");
+                    logger.info("Nutrition analysis completed and saved successfully");
+                } else {
+                    showResultDialog(false, "Nutrition analysis failed. Please try again.");
+                    logger.warning("Nutrition analysis returned empty or invalid results");
+                }
+            }));
             
-            nutritionTask.setOnFailed(e -> {
-                Platform.runLater(() -> {
-                    dialogStage.close();
-                    
-                    Throwable exception = nutritionTask.getException();
-                    String errorMessage = "Nutrition analysis failed";
-                    if (exception != null) {
-                        errorMessage += ": " + exception.getMessage();
-                    }
-                    
-                    showResultDialog(false, errorMessage);
-                    logger.log(Level.SEVERE, "Nutrition analysis task failed", exception);
-                });
-            });
+            nutritionTask.setOnFailed(e -> Platform.runLater(() -> {
+                dialogStage.close();
+                Throwable exception = nutritionTask.getException();
+                String errorMessage = "Nutrition analysis failed" + (exception != null ? ": " + exception.getMessage() : "");
+                showResultDialog(false, errorMessage);
+                logger.log(Level.SEVERE, "Nutrition analysis task failed", exception);
+            }));
             
             // Start the task in a background thread
             Thread taskThread = new Thread(nutritionTask);
@@ -610,56 +556,39 @@ public class PostController implements Initializable {
      * Based on CreatePostController implementation.
      */
     private Task<Nutrition> createNutritionAnalysisTask(ProcessingDialogController processingController) {
-        return new Task<Nutrition>() {
+        return new Task<>() {
             @Override
-            protected Nutrition call() throws Exception {
-                String ingredients = currentPost.ingredients;
-                Exception lastException = null;
-                
-                // Try analysis up to MAX_RETRIES times
-                for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
-                    final int currentAttempt = attempt; // Make effectively final for lambda
-                    try {
-                        Platform.runLater(() -> 
-                            processingController.updateStatus("Analyzing nutrition... (Attempt " + currentAttempt + "/" + MAX_RETRIES + ")")
-                        );
-                        
-                        // Perform nutrition analysis using ChatGPT API
-                        String nutritionResponse = chatbotAPI.analyzeNutritionFacts(ingredients);
-                        
-                        // Parse the AI response into Nutrition object
-                        Nutrition nutrition = nutritionParser.parseNutritionFromResponse(nutritionResponse);
-                        
-                        if (nutrition != null && !nutrition.ingredient.isEmpty()) {
-                            logger.info("Nutrition analysis completed successfully on attempt " + currentAttempt);
-                            Platform.runLater(() -> 
-                                processingController.updateStatus("Analysis completed successfully!")
-                            );
-                            return nutrition;
-                        } else {
-                            throw new Exception("AI returned empty or invalid nutrition data");
-                        }
-                        
-                    } catch (Exception e) {
-                        lastException = e;
-                        logger.log(Level.WARNING, "Nutrition analysis attempt " + currentAttempt + " failed: " + e.getMessage(), e);
-                        
-                        if (currentAttempt < MAX_RETRIES) {
-                            Platform.runLater(() -> 
-                                processingController.updateStatus("Attempt " + currentAttempt + " failed, retrying...")
-                            );
-                            Thread.sleep(1000); // Brief pause between attempts
-                        }
-                    }
-                }
-                
-                // All attempts failed
-                Platform.runLater(() -> 
-                    processingController.updateStatus("Analysis failed after " + MAX_RETRIES + " attempts")
-                );
-                throw lastException != null ? lastException : new Exception("All nutrition analysis attempts failed");
+            protected Nutrition call() throws NutritionAnalysisException {
+                return performNutritionAnalysisWithRetries(currentPost.getIngredients(), processingController);
             }
         };
+    }
+
+    private Nutrition performNutritionAnalysisWithRetries(String ingredients, ProcessingDialogController controller) throws NutritionAnalysisException {
+        Exception lastException = null;
+        for (int attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+            int currentAttempt = attempt;
+            Platform.runLater(() -> controller.updateStatus("Analyzing nutrition... (Attempt " + currentAttempt + "/" + MAX_RETRIES + ")"));
+            try {
+                String response = chatbotAPI.analyzeNutritionFacts(ingredients);
+                Nutrition nutrition = nutritionParser.parseNutritionFromResponse(response);
+                if (nutrition != null && !nutrition.getIngredient().isEmpty()) {
+                    logger.info(() -> "Nutrition analysis completed successfully on attempt " + currentAttempt);
+                    Platform.runLater(() -> controller.updateStatus("Analysis completed successfully!"));
+                    return nutrition;
+                }
+                throw new IllegalStateException("AI returned empty or invalid nutrition data");
+            } catch (Exception e) {
+                lastException = e;
+                logger.log(Level.WARNING, e, () -> "Nutrition analysis attempt " + currentAttempt + " failed: " + e.getMessage());
+                if (currentAttempt < MAX_RETRIES) {
+                    Platform.runLater(() -> controller.updateStatus("Attempt " + currentAttempt + " failed, retrying..."));
+                    try { Thread.sleep(1000); } catch (InterruptedException ie) { Thread.currentThread().interrupt(); }
+                }
+            }
+        }
+        Platform.runLater(() -> controller.updateStatus("Analysis failed after " + MAX_RETRIES + " attempts"));
+        throw new NutritionAnalysisException("Analysis failed after retries", lastException);
     }
     
     /**
@@ -674,7 +603,7 @@ public class PostController implements Initializable {
             boolean updated = false;
             for (int i = 0; i < allPosts.size(); i++) {
                 Post post = allPosts.get(i);
-                if (post.uuid != null && post.uuid.equals(currentPost.uuid)) {
+                        if (post.getUuid() != null && post.getUuid().equals(currentPost.getUuid())) {
                     // Update the post in the list
                     allPosts.set(i, currentPost);
                     updated = true;
@@ -692,8 +621,8 @@ public class PostController implements Initializable {
             logger.info("Post nutrition data updated and saved to XML successfully");
             
         } catch (Exception e) {
+            // Handle locally: log only (Sonar S2139 - do not log then rethrow)
             logger.log(Level.SEVERE, "Failed to save updated post to XML", e);
-            throw new RuntimeException("Failed to save nutrition analysis results", e);
         }
     }
     
@@ -722,6 +651,7 @@ public class PostController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
+            // Log and swallow (dialog already failed, no further recovery path). S2139: choose logging only.
             logger.log(Level.SEVERE, "Failed to show result dialog", e);
         }
     }
@@ -745,6 +675,7 @@ public class PostController implements Initializable {
             dialogStage.showAndWait();
             
         } catch (Exception e) {
+            // Log and swallow (cannot show error dialog about failing to show error dialog). S2139 compliance.
             logger.log(Level.SEVERE, "Failed to show error dialog", e);
         }
     }

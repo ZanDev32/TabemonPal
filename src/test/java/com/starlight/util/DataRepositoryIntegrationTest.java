@@ -10,7 +10,7 @@ import com.starlight.repository.UserDataRepository;
 /**
  * Integration test to verify that data repositories work correctly with the new file system.
  */
-public class DataRepositoryIntegrationTest {
+class DataRepositoryIntegrationTest {
 
     @BeforeEach
     void setUp() {

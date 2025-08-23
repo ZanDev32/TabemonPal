@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.starlight.model.Post;
+import com.starlight.repository.UserDataRepository.DataPersistenceException;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -100,7 +101,7 @@ public class AchievementDataRepository {
         try (FileOutputStream fos = new FileOutputStream(xmlPath)) {
             xstream.toXML(posts, fos);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save posts", e);
+            throw new DataPersistenceException("Failed to save posts", e);
         }
     }
 }

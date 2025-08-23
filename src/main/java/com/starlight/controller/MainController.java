@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 import com.starlight.model.Post;
+import java.util.function.Consumer;
 import com.starlight.util.Session;
 
 import io.github.palexdev.materialfx.controls.MFXButton;
@@ -75,9 +76,8 @@ public class MainController implements Initializable {
     private NavbarController navbarController;
     
     private MFXButton currentActiveButton;
-    
-    private Post currentPost; // Current post for navigation to post view
-    
+    // PostController setup handled via openPost initializer when needed
+
     @FXML
     private BorderPane bp;
     
@@ -117,42 +117,42 @@ public class MainController implements Initializable {
     /** Handles navigation to the achievement view. */
     @FXML
     void achievement(MouseEvent event) {
-        loadPage("underDevelopment");
+    loadPage(PAGE_UNDER_DEVELOPMENT);
         selected(achievement);
     }
 
     /** Handles navigation to the community view. */
     @FXML
     void community(MouseEvent event) {
-        loadPage("community");
+    loadPage(PAGE_COMMUNITY);
         selected(community);
     }
 
     /** Handles navigation to the consult view. */
     @FXML
     void consult(MouseEvent event) {
-        loadPage("consult");
+        loadPage(PAGE_CONSULT);
         selected(consult);
     }
 
     /** Handles navigation to the games view. */
     @FXML
     void games(MouseEvent event) {
-        loadPage("underDevelopment");
+        loadPage(PAGE_UNDER_DEVELOPMENT);
         selected(games);
     }
 
     /** Handles navigation to the mission view. */
     @FXML
     void mission(MouseEvent event) {
-        loadPage("underDevelopment");
+    loadPage(PAGE_UNDER_DEVELOPMENT);
         selected(mission);
     }
 
     /** Handles navigation to the wiki view. */
     @FXML
     void wiki(MouseEvent event) {
-        loadPage("underDevelopment");
+    loadPage(PAGE_UNDER_DEVELOPMENT);
         selected(wiki);
     }
 
@@ -160,7 +160,7 @@ public class MainController implements Initializable {
     @FXML
     void recipeManager(MouseEvent event) {
         // This should only be called if button is visible (admin user logged in)
-        loadPage("recipeManager");
+    loadPage(PAGE_RECIPE_MANAGER);
         selected(recipeManager);
     }
 
@@ -168,7 +168,7 @@ public class MainController implements Initializable {
     @FXML
     void userManager(MouseEvent event) {
         // This should only be called if button is visible (admin user logged in)
-        loadPage("userManager");
+    loadPage(PAGE_USER_MANAGER);
         selected(userManager);
     }
     
@@ -179,9 +179,9 @@ public class MainController implements Initializable {
         if (Session.getCurrentUser() == null) {
             return false;
         }
-        
-        String username = Session.getCurrentUser().username;
-        return username != null && username.toLowerCase().equals("admin");
+
+        String username = Session.getCurrentUser().getUsername();
+        return username != null && username.equalsIgnoreCase("admin");
     }
     
     /**
@@ -224,7 +224,7 @@ public class MainController implements Initializable {
      */
     public void refreshCommunityPage() {
         if (bp.getCenter() != null) {
-            Object controller = bp.getCenter().getProperties().get("controller");
+            Object controller = bp.getCenter().getProperties().get(PROP_CONTROLLER);
             if (controller instanceof CommunityController) {
                 ((CommunityController) controller).refreshPosts();
             }
@@ -234,55 +234,31 @@ public class MainController implements Initializable {
     /**
      * Loads the given FXML page into the grid pane container.
     */
-    void loadPage(String page) {
+    private static final String PAGE_UNDER_DEVELOPMENT = "underDevelopment";
+    private static final String PAGE_COMMUNITY = "community";
+    private static final String PAGE_CONSULT = "consult";
+    private static final String PAGE_RECIPE_MANAGER = "recipeManager";
+    private static final String PAGE_USER_MANAGER = "userManager";
+    private static final String PROP_CONTROLLER = "controller";
+    private static final String STYLE_ACTIVE = "button-active";
+    private static final String STYLE_SIDEBAR = "button-sidebar";
+
+    void loadPage(String page) { loadPage(page, null); }
+
+    private void loadPage(String page, Consumer<Object> controllerInitializer) {
         String fxmlPath = "/com/starlight/view/" + page + ".fxml";
 
         try {
-            // Show the loading screen inside the main grid pane while loading
-            Parent loadingRoot = FXMLLoader.load(getClass().getResource("/com/starlight/view/loading.fxml"));
-            gp.getChildren().removeIf(node ->
-                GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
-                GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
-            );
-            gp.add(loadingRoot, 0, 1);
-            GridPane.setValignment(loadingRoot, VPos.CENTER);
-            GridPane.setHalignment(loadingRoot, HPos.CENTER);
-
-            Task<Parent> task = new Task<>() {
-            @Override
-            protected Parent call() throws Exception {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-                Parent root = loader.load();
-                
-                // Get the controller and pass user data if applicable
-                Object controller = loader.getController();
-                if (controller instanceof EditProfileController) {
-                    ((EditProfileController) controller).setUser(
-                        Session.getCurrentUser()
-                    );
-                }
-                if (controller instanceof CommunityController) {
-                    ((CommunityController) controller).setMainController(MainController.this);
-                }
-                if (controller instanceof ProfileController) {
-                    ((ProfileController) controller).setMainController(MainController.this);
-                }
-                if (controller instanceof PostController) {
-                    PostController postController = (PostController) controller;
-                    postController.setPost(currentPost); 
-                    postController.setMainController(MainController.this);
-                }
-                if (controller instanceof SettingController) {
-                    ((SettingController) controller).setMainController(MainController.this);
-                }
-                
-                return root;
-            }
-        };
+            Parent loadingRoot = showLoadingScreen();
+            Task<Parent> task = createLoadTask(fxmlPath);
 
             task.setOnSucceeded(ev -> {
                 Parent root = task.getValue();
-                root.getProperties().put("controller", task.getValue().getProperties().get("controller"));
+                root.getProperties().put(PROP_CONTROLLER, task.getValue().getProperties().get(PROP_CONTROLLER));
+                if (controllerInitializer != null) {
+                    Object ctrl = loaderController(root);
+                    if (ctrl != null) controllerInitializer.accept(ctrl);
+                }
                 gp.getChildren().remove(loadingRoot);
                 gp.getChildren().removeIf(node ->
                     GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
@@ -295,8 +271,7 @@ public class MainController implements Initializable {
 
             task.setOnFailed(ev -> {
                 gp.getChildren().remove(loadingRoot);
-                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE,
-                        "Failed to load FXML page: " + fxmlPath, task.getException());
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, "Failed to load FXML page: " + fxmlPath, task.getException());
             });
 
             new Thread(task).start();
@@ -304,6 +279,38 @@ public class MainController implements Initializable {
             Logger.getLogger(MainController.class.getName()).log(Level.SEVERE,
                     "Failed to load loading.fxml", e);
         }
+    }
+
+    private Parent showLoadingScreen() throws IOException {
+        Parent loadingRoot = FXMLLoader.load(getClass().getResource("/com/starlight/view/loading.fxml"));
+        gp.getChildren().removeIf(node ->
+            GridPane.getColumnIndex(node) != null && GridPane.getRowIndex(node) != null &&
+            GridPane.getColumnIndex(node) == 0 && GridPane.getRowIndex(node) == 1
+        );
+        gp.add(loadingRoot, 0, 1);
+        GridPane.setValignment(loadingRoot, VPos.CENTER);
+        GridPane.setHalignment(loadingRoot, HPos.CENTER);
+        return loadingRoot;
+    }
+
+    private Task<Parent> createLoadTask(String fxmlPath) {
+        return new Task<>() {
+            @Override
+            protected Parent call() throws Exception {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+                Parent root = loader.load();
+                Object controller = loader.getController();
+                configureController(controller);
+                return root;
+            }
+        };
+    }
+
+    private void configureController(Object controller) {
+        if (controller instanceof EditProfileController epc) epc.setUser(Session.getCurrentUser());
+        if (controller instanceof CommunityController cc) cc.setMainController(this);
+        if (controller instanceof ProfileController pc) pc.setMainController(this);
+        if (controller instanceof SettingController sc) sc.setMainController(this);
     }
 
     /**
@@ -322,14 +329,14 @@ public class MainController implements Initializable {
 
         // Reset previous active button to inactive state
         if (currentActiveButton != null) {
-            currentActiveButton.getStyleClass().remove("button-active");
-            currentActiveButton.getStyleClass().add("button-sidebar");
+            currentActiveButton.getStyleClass().remove(STYLE_ACTIVE);
+            currentActiveButton.getStyleClass().add(STYLE_SIDEBAR);
             setButtonIcon(currentActiveButton, false); // Set to inactive icon
         }
 
         // Set new active button state
-        button.getStyleClass().remove("button-sidebar");
-        button.getStyleClass().add("button-active");
+    button.getStyleClass().remove(STYLE_SIDEBAR);
+    button.getStyleClass().add(STYLE_ACTIVE);
         setButtonIcon(button, true); // Set to active icon
 
         // Track the current active button
@@ -353,7 +360,7 @@ public class MainController implements Initializable {
                 iconView = homeIcon;
                 iconBaseName = "Home";
                 break;
-            case "community":
+            case PAGE_COMMUNITY:
                 iconView = communityIcon;
                 iconBaseName = "Community";
                 break;
@@ -361,7 +368,7 @@ public class MainController implements Initializable {
                 iconView = wikiIcon;
                 iconBaseName = "Wiki";
                 break;
-            case "consult":
+            case PAGE_CONSULT:
                 iconView = consultIcon;
                 iconBaseName = "Consult";
                 break;
@@ -377,11 +384,11 @@ public class MainController implements Initializable {
                 iconView = achievemntIcon;
                 iconBaseName = "Achievements";
                 break;
-            case "recipeManager":
+            case PAGE_RECIPE_MANAGER:
                 iconView = recipeManagerIcon;
                 iconBaseName = "RecipeManager";
                 break;
-            case "userManager":
+            case PAGE_USER_MANAGER:
                 iconView = userManagerIcon;
                 iconBaseName = "UserManager";
                 break;
@@ -396,8 +403,8 @@ public class MainController implements Initializable {
             Image newImage = new Image(getClass().getResourceAsStream(iconPath));
             iconView.setImage(newImage);
         } catch (Exception e) {
-            Logger.getLogger(MainController.class.getName()).log(Level.WARNING,
-                    "Failed to load icon for button: " + buttonId, e);
+            Logger.getLogger(MainController.class.getName()).log(Level.WARNING, () -> "Failed to load icon for button: " + buttonId);
+            Logger.getLogger(MainController.class.getName()).log(Level.WARNING, "Icon load stacktrace", e);
         }
     }
 
@@ -408,14 +415,14 @@ public class MainController implements Initializable {
      */
     private String getButtonIdentifier(MFXButton button) {
         if (button == home) return "home";
-        if (button == community) return "community";
+        if (button == community) return PAGE_COMMUNITY;
         if (button == wiki) return "wiki";
-        if (button == consult) return "consult";
+        if (button == consult) return PAGE_CONSULT;
         if (button == mission) return "mission";
         if (button == games) return "games";
         if (button == achievement) return "achievement";
-        if (button == recipeManager) return "recipeManager";
-        if (button == userManager) return "userManager";
+        if (button == recipeManager) return PAGE_RECIPE_MANAGER;
+        if (button == userManager) return PAGE_USER_MANAGER;
         return null;
     }
 
@@ -464,9 +471,9 @@ public class MainController implements Initializable {
     private void initializeButtons() {
         // Set all buttons to inactive style class
         MFXButton[] buttons = {home, community, wiki, consult, mission, games, achievement, recipeManager, userManager};
-        for (MFXButton button : buttons) {
-            button.getStyleClass().remove("button-active");
-            button.getStyleClass().add("button-sidebar");
+        for (MFXButton btn : buttons) {
+            btn.getStyleClass().remove(STYLE_ACTIVE);
+            if (!btn.getStyleClass().contains(STYLE_SIDEBAR)) btn.getStyleClass().add(STYLE_SIDEBAR);
         }
 
         // Set all icons to inactive state
@@ -493,15 +500,19 @@ public class MainController implements Initializable {
      * Public method to navigate to community page with proper button selection
      * Used by other controllers like PostController for navigation
      */
-    public void navigateToCommunity() {
-        loadPage("community");
-        selected(community);
-    }
+    public void navigateToCommunity() { loadPage(PAGE_COMMUNITY); selected(community); }
     
     /**
      * Sets the current post for navigation to post view
      */
-    public void setCurrentPost(Post post) {
-        this.currentPost = post;
+    public void openPost(Post post) {
+        loadPage("Post", controller -> {
+            if (controller instanceof PostController pc) {
+                pc.setPost(post);
+                pc.setMainController(this);
+            }
+        });
     }
+
+    private Object loaderController(Parent root) { return root.getProperties().get(PROP_CONTROLLER); }
 }

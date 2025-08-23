@@ -5,7 +5,7 @@
 
     <groupId>com.starlight</groupId>
     <artifactId>tabemonpal</artifactId>
-    <version>1.0-ALPHA</version>
+    <version>1.1-ALPHA</version>
     <packaging>jar</packaging>
 
     <properties>
@@ -99,6 +99,12 @@
             <version>17.0.10</version>
             <scope>test</scope>
          </dependency>
+        <dependency>
+            <groupId>org.awaitility</groupId>
+            <artifactId>awaitility</artifactId>
+            <version>4.2.0</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -145,39 +151,13 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>org.openjfx</groupId>
-                <artifactId>javafx-maven-plugin</artifactId>
-                <version>0.0.8</version>
-                <configuration>
-                    <mainClass>com.starlight.App</mainClass>
-                    <commandlineArgs>
-                        --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED
-                        --add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui=org.testfx
-                        --add-opens=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
-                        --add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
-                        --add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.glass.ui.monocle=org.testfx
-                        --add-exports=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,org.testfx.monocle
-                        --add-opens=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui.monocle.input=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.javafx.application.HostServicesDelegate=ALL-UNNAMED
-                    </commandlineArgs>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.0.0-M9</version>
                 <configuration>
+                    <!-- Run tests on the classpath (not module path) so TestFX/Monocle can access internal Glass classes -->
+                    <useModulePath>false</useModulePath>
+                    <!-- Minimal internal access + headless flags (removed invalid/duplicate opens to silence warnings) -->
                     <argLine>
                         --add-exports=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
                         --add-opens=javafx.graphics/com.sun.javafx.application=ALL-UNNAMED
@@ -185,25 +165,19 @@
                         --add-opens=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED
                         --add-exports=javafx.graphics/com.sun.javafx.util=ALL-UNNAMED
                         --add-exports=javafx.base/com.sun.javafx.logging=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui=org.testfx
                         --add-opens=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
+                        --add-exports=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
                         --add-exports=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
                         --add-opens=javafx.controls/com.sun.javafx.scene.control=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.glass.ui.monocle=org.testfx
-                        --add-exports=javafx.graphics/com.sun.glass.ui.monocle=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.glass.ui=ALL-UNNAMED,org.testfx.monocle
-                        --add-opens=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED
-                        --add-exports=javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED
                         --add-exports=javafx.graphics/com.sun.glass.ui.monocle.input=ALL-UNNAMED
                         --add-exports=javafx.graphics/com.sun.glass.ui.monocle.input.devices=ALL-UNNAMED
-                        --add-opens=javafx.graphics/com.sun.javafx.application.HostServicesDelegate=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight.api=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight.model=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight.util=ALL-UNNAMED
-                        --add-opens=com.starlight/com.starlight.controller=ALL-UNNAMED
+                        -Dtestfx.headless=true -Dprism.order=sw -Dprism.verbose=false -Djava.awt.headless=true
                     </argLine>
+                    <systemPropertyVariables>
+                        <testfx.headless>true</testfx.headless>
+                        <prism.order>sw</prism.order>
+                        <java.awt.headless>true</java.awt.headless>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
